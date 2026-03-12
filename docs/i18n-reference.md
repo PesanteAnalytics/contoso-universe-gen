@@ -74,6 +74,10 @@ usando la librería `holidays`:
 | Países | US (12), CA (3), GB (4)... | MX (8), CO (4), AR (3)... |
 | Nombres ciudad | Faker locale cities | Faker locale cities |
 
+> ⚠️ **Fallback**: Solo `en` y `es` tienen distribución de tiendas dedicada.
+> Los demás idiomas (`pt`, `fr`, `de`, `zh`, `ja`, `ar`) usan el layout de
+> tiendas de inglés (US, CA, GB, AU, DE, FR). Esto es una limitación actual.
+
 ### DimCurrency — Moneda primaria
 
 | Language | Moneda usada en FactSales |
