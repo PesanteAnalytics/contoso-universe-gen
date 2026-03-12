@@ -419,3 +419,91 @@ cug generate --seed 42 -n 100000 -f parquet -o ./output/v1
 ## Dependencies
 
 Core: `polars`, `duckdb`, `faker`, `pydantic`, `typer`, `rich`, `pyodbc`
+
+---
+
+## YAML Category Plugin System
+
+> **Full guide**: [`docs/category-plugins.md`](../../../docs/category-plugins.md)
+
+CUG uses YAML files to define product categories. The 4 builtins live in
+`cug/categories/builtin/` (electronics, gaming, home, media). Users can create
+custom categories without touching Python code.
+
+### YAML Schema (Quick Reference)
+
+```yaml
+plugin_id: fashion                # Unique snake_case ID (required)
+display_names:                    # Localized names (at least "en" required)
+  en: Fashion & Apparel
+  es: Moda y Ropa
+subcategories:                    # At least 1 required
+  - id: shoes                    # Unique snake_case ID
+    display_names: {en: Shoes, es: Zapatos}
+    brands: [Nike, Adidas]        # Available brands
+    price_range: [40.0, 350.0]    # [min, max] unit price
+    margin_range: [0.15, 0.45]    # [min, max] margin (0-1)
+    trend:                        # Annual demand multiplier
+      2020: 0.60                  # COVID drop
+      2024: 1.20                  # Growth year
+    products:                     # Name templates
+      - name_template: "{brand} {model} {spec}"
+        models: [Air Max, Superstar]
+        specs: [Size 8, Size 10]
+        brands: []                # [] = inherit from subcategory
+```
+
+### How to Register a Custom Plugin
+
+Add to the TOML config:
+
+```toml
+[categories]
+enabled = ["electronics", "home", "gaming", "media", "fashion"]
+custom_paths = ["./my_plugins/fashion.yaml"]
+```
+
+> The `plugin_id` in the YAML must match the name in `enabled`.
+
+### Key Defaults
+
+| Field | Default if omitted |
+|-------|--------------------|
+| `display_names` | `{en: <plugin_id>}` |
+| `price_range` | `[99, 999]` |
+| `margin_range` | `[0.10, 0.30]` |
+| `name_template` | `{brand} {model}` |
+| Products per subcategory | 5–15 (random) |
+
+---
+
+## Language (`language`) Impact Reference
+
+> **Full guide**: [`docs/i18n-reference.md`](../../../docs/i18n-reference.md)
+
+### What DOES change per language
+
+| Component | What changes | Scope |
+|-----------|-------------|-------|
+| `MonthName` / `DayName` | Translated month/day names | DimDate (en/es/pt/fr/de only — zh/ja/ar fallback to English) |
+| `CategoryName` | YAML `display_names` | DimProduct |
+| `SubCategoryName` | YAML `display_names` | DimProduct |
+| Customer cities | Different city pools per lang | DimCustomer (en→US/CA/GB, es→MX/CO/AR, pt→BR/PT) |
+| Customer countries | Different geo distributions | DimCustomer |
+| Store countries | Different retail footprints | DimStore (en→6 countries, es→7 countries) |
+| Primary currency | Language-mapped currency | FactSales (en→USD, es→MXN, pt→BRL, fr/de→EUR) |
+| Holidays | Country-specific holidays | DimDate (`IsHoliday`, `HolidayName`) |
+
+### What does NOT change (always English)
+
+| Element | Example | Reason |
+|---------|---------|--------|
+| **Column headers** | `ProductKey`, `OrderDate` | Fixed schema — NOT localized |
+| Product names | `Dell Laptop i7/32GB` | Templates in English |
+| Manufacturer / Brand | `Contoso Ltd.`, `Apple` | Global names |
+| Color / WeightUnit | `Black`, `kg` | Static English lists |
+| CurrencyCode / CurrencyName | `USD`, `US Dollar` | ISO catalogue |
+| Store Status | `Online`, `Current` | Fixed enum |
+
+> ⚠️ **Header localization** (e.g., `ProductKey` → `ClaveProducto`) is planned
+> as an opt-in feature in a future version (see ROADMAP v0.3+).

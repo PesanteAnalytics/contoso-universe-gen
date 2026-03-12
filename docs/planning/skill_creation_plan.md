@@ -43,9 +43,9 @@
 
 ---
 
-## 🔴 Fase 4: YAML Plugin — Documentación Completa en SKILL.md
+## ✅ Fase 4: YAML Plugin Schema Documentation (COMPLETADA — 2026-03-12)
 
-> **Problema**: La Skill menciona `custom_paths` pero no explica cómo crear un YAML plugin. Un usuario/agente no puede agregar categorías custom sin explorar el codebase.
+> **Problema resuelto**: La Skill no documentaba el schema YAML necesario para crear categorías custom.
 
 ### Entregables
 
@@ -88,9 +88,9 @@ subcategories:
 
 ---
 
-## 🔴 Fase 5: i18n Deep Documentation — Impacto Real de `language`
+## ✅ Fase 5: i18n Deep Documentation (COMPLETADA — 2026-03-12)
 
-> **Problema**: La Skill dice "cambia `language` a `es`" pero no explica qué cambia exactamente. El usuario piensa que TODO se traduce — pero los headers de columna NUNCA se traducen.
+> **Problema resuelto**: La Skill no explicaba qué cambia exactamente con cada idioma. Ahora está documentado en detalle.
 
 ### Entregables
 
@@ -207,8 +207,8 @@ OrderDate = "FechaPedido"
 | 3 | Dead link a `CATEGORY_PLUGIN_GUIDE.md` | Eliminado; sustituido con referencia a `cug/categories/builtin/` | ✅ Corregido |
 | 4 | ROADMAP v0.2 = Prophet+FRED | Renumerado: Prophet → v0.3, SDV → v0.4. Nota de v0.2.0 añadida | ✅ Corregido |
 | 5 | docs/README dice "7 tablas" | Verificado: `DimCurrencyExchange` SÍ existe como tabla independiente → **7 tablas es correcto** | ✅ Verificado |
-| 6 | SKILL.md no documenta YAML plugins | Pendiente Fase 4 | 🔴 Fase 4 |
-| 7 | SKILL.md no documenta impacto i18n | Pendiente Fase 5 | 🔴 Fase 5 |
+| 6 | SKILL.md no documenta YAML plugins | Secciones YAML Plugin System + `docs/category-plugins.md` creados | ✅ Fase 4 |
+| 7 | SKILL.md no documenta impacto i18n | Secciones i18n Impact Reference + `docs/i18n-reference.md` creados | ✅ Fase 5 |
 
 ### Archivos modificados
 
@@ -241,8 +241,8 @@ graph TD
     A["✅ Fase 1: docs/ en español"] --> B["✅ Fase 2: SKILL.md"]
     B --> C["✅ Fase 3: Validación inicial"]
     C --> D["✅ Fase 8: Coherence Fixes"]
-    D --> E["🔴 Fase 4: YAML Plugin Docs"]
-    D --> F["🔴 Fase 5: i18n Deep Docs"]
+    D --> E["✅ Fase 4: YAML Plugin Docs"]
+    D --> F["✅ Fase 5: i18n Deep Docs"]
     E --> G["🟡 Fase 6: Header Localization"]
     F --> G
     G --> H["🟡 Fase 7: Constantes Config"]
@@ -252,11 +252,11 @@ graph TD
 ### Prioridad de ejecución (actualizada)
 
 1. ~~**Fase 8 PRIMERO**~~ ✅ Completada — Dead links y comandos fantasma corregidos
-2. **Fases 4 + 5 en paralelo** — Son pura documentación, no requieren cambios de código
+2. ~~**Fases 4 + 5 en paralelo**~~ ✅ Completadas — YAML plugins + i18n documentados
 3. **Fase 6** — Cambio de código moderado (opt-in header localization)
 4. **Fase 7** — Cambio de código menor (mover constantes a config)
 5. **Fase 9** — Validación integral final
 
 ---
 
-> **Estado**: Fases 1-3, 8 completadas. Siguiente: Fases 4 + 5 (documentación YAML plugins + i18n).
+> **Estado**: Fases 1-5 y 8 completadas. Siguiente: Fase 6 (Header Localization — código).

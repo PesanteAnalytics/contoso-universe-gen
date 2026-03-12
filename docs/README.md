@@ -15,6 +15,8 @@
 | [Esquema de Datos](esquema-datos.md) | Las 7 tablas generadas, columnas, tipos de datos, relaciones FK |
 | [SQL Server](sqlserver.md) | Guía dedicada: ODBC drivers, autenticación, mapeo de tipos, troubleshooting |
 | [Recetas Rápidas](recetas.md) | Escenarios comunes resueltos en un solo comando |
+| [Plugins de Categorías (YAML)](category-plugins.md) | Schema YAML, campos, defaults, cómo crear categorías custom |
+| [Referencia i18n](i18n-reference.md) | Qué cambia y qué NO cambia por idioma — impacto real del setting `language` |
 
 ---
 
