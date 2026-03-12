@@ -1,0 +1,24 @@
+# Configuración en español — nombres, ciudades y categorías en ES
+[general]
+orders_count = 1_000_000
+start_date   = "2018-01-01"
+end_date     = "2026-12-31"
+language     = "es"
+country      = "MX"
+seed         = 42
+chunk_days   = 30
+
+[output]
+format   = "parquet"
+path     = "./output/retail_1M_es/"
+compress = true
+prefix   = "contoso"
+
+[customers]
+pool_size  = 200_000
+active_pct = 0.20
+online_pct_start = 0.04
+online_pct_end   = 0.30
+
+[categories]
+enabled = ["electronics", "home", "gaming", "media"]

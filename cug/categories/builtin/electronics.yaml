@@ -1,0 +1,164 @@
+plugin_id: electronics
+display_names:
+  en: Electronics
+  es: Electrónica
+  pt: Eletrônicos
+  fr: Électronique
+  de: Elektronik
+  zh: 电子产品
+  ja: 電子機器
+  ar: إلكترونيات
+
+subcategories:
+  - id: computers
+    display_names:
+      en: Computers
+      es: Computadoras
+      pt: Computadores
+      fr: Ordinateurs
+      de: Computer
+      zh: 计算机
+      ja: コンピュータ
+      ar: حواسيب
+    brands: [Microsoft, Dell, HP, Apple, Lenovo, Asus, Acer, MSI, Razer]
+    price_range: [299, 3499]
+    margin_range: [0.08, 0.22]
+    trend:
+      2018: 0.85
+      2019: 0.95
+      2020: 1.65 # COVID WFH boom
+      2021: 1.55
+      2022: 1.25
+      2023: 1.05
+      2024: 0.88
+      2025: 0.80
+      2026: 0.78
+    products:
+      - name_template: "{brand} {model} {spec}"
+        models: [Laptop, Desktop, All-in-One, Mini PC, Workstation]
+        specs:
+          [
+            i5/16GB/512GB,
+            i7/32GB/1TB,
+            Ryzen 5/16GB,
+            Ryzen 9/64GB,
+            M3/16GB,
+            M3 Pro/36GB,
+          ]
+        brands: []
+
+  - id: cell_phones
+    display_names:
+      en: Cell Phones
+      es: Teléfonos Móviles
+      pt: Celulares
+      fr: Téléphones Portables
+      de: Mobiltelefone
+      zh: 手机
+      ja: 携帯電話
+      ar: هواتف محمولة
+    brands: [Apple, Samsung, Google, Motorola, OnePlus, Xiaomi, Sony]
+    price_range: [199, 1399]
+    margin_range: [0.10, 0.28]
+    trend:
+      2018: 0.65
+      2019: 0.75
+      2020: 1.25
+      2021: 1.15
+      2022: 1.30
+      2023: 1.50
+      2024: 1.65
+      2025: 1.75
+      2026: 1.78
+    products:
+      - name_template: "{brand} {model} {spec}"
+        models: [Pro, Ultra, Plus, Max, Lite, Standard]
+        specs: [128GB, 256GB, 512GB, 1TB]
+        brands: []
+
+  - id: audio
+    display_names:
+      en: Audio
+      es: Audio
+      pt: Áudio
+      fr: Audio
+      de: Audio
+      zh: 音频
+      ja: オーディオ
+      ar: صوت
+    brands: [Sony, Bose, Sennheiser, JBL, Apple, Samsung, Jabra]
+    price_range: [29, 799]
+    margin_range: [0.15, 0.40]
+    trend:
+      2018: 1.40
+      2019: 1.30
+      2020: 0.55 # COVID killed physical audio sales
+      2021: 0.65
+      2022: 0.75
+      2023: 0.85
+      2024: 0.78
+      2025: 0.70
+      2026: 0.65
+    products:
+      - name_template: "{brand} {model}"
+        models: [Headphones, Earbuds, Speaker, Soundbar, Subwoofer, ANC Headset]
+        specs: []
+        brands: []
+
+  - id: cameras
+    display_names:
+      en: Cameras and Camcorders
+      es: Cámaras y Videocámaras
+      pt: Câmeras e Filmadoras
+      fr: Appareils Photo et Caméscopes
+      de: Kameras und Camcorder
+      zh: 相机和摄像机
+      ja: カメラとビデオカメラ
+      ar: كاميرات وكاميرات فيديو
+    brands: [Canon, Nikon, Sony, Fujifilm, Panasonic, Olympus, GoPro]
+    price_range: [149, 2999]
+    margin_range: [0.12, 0.28]
+    trend:
+      2018: 1.60
+      2019: 1.35
+      2020: 0.35 # Smartphone cameras destroyed demand
+      2021: 0.45
+      2022: 0.42
+      2023: 0.38
+      2024: 0.33
+      2025: 0.30
+      2026: 0.28
+    products:
+      - name_template: "{brand} {model} {spec}"
+        models: [Digital SLR, Mirrorless, Action Cam, Camcorder, Compact]
+        specs: [24MP, 42MP, 4K, 8K, 61MP, 50MP]
+        brands: []
+
+  - id: tv_video
+    display_names:
+      en: TV and Video
+      es: TV y Video
+      pt: TV e Vídeo
+      fr: TV et Vidéo
+      de: TV und Video
+      zh: 电视和视频
+      ja: TVとビデオ
+      ar: تلفزيون وفيديو
+    brands: [LG, Samsung, Sony, TCL, Hisense, Vizio, Philips]
+    price_range: [199, 3999]
+    margin_range: [0.05, 0.20]
+    trend:
+      2018: 1.15
+      2019: 1.05
+      2020: 1.45 # COVID stay-at-home TV upgrade
+      2021: 1.05
+      2022: 0.78
+      2023: 0.85
+      2024: 0.95
+      2025: 1.05
+      2026: 1.08
+    products:
+      - name_template: "{brand} {model} {spec} {size}"
+        models: [OLED, QLED, LED, NanoCell, Mini-LED]
+        specs: [4K UHD, 8K UHD, Full HD]
+        brands: []

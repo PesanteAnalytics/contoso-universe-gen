@@ -1,0 +1,102 @@
+plugin_id: gaming
+display_names:
+  en: Gaming and Toys
+  es: Videojuegos y Juguetes
+  pt: Jogos e Brinquedos
+  fr: Jeux et Jouets
+  de: Spiele und Spielzeug
+  zh: 游戏和玩具
+  ja: ゲームとおもちゃ
+  ar: ألعاب وألعاب أطفال
+
+subcategories:
+
+  - id: consoles
+    display_names:
+      en: Game Consoles
+      es: Consolas de Videojuegos
+      pt: Consoles de Videogame
+      fr: Consoles de Jeux
+      de: Spielkonsolen
+      zh: 游戏机
+      ja: ゲーム機
+      ar: أجهزة ألعاب
+    brands: [Sony, Microsoft, Nintendo]
+    price_range: [299, 599]
+    margin_range: [0.02, 0.08]   # Hardware margin is thin
+    trend:
+      2018: 1.00
+      2019: 0.90
+      2020: 2.20   # PS5/Xbox Series launch + COVID lockdown
+      2021: 1.80
+      2022: 1.20
+      2023: 0.95
+      2024: 0.80
+      2025: 0.75
+      2026: 0.70
+    products:
+      - name_template: "{brand} {model}"
+        models: [PlayStation 5, Xbox Series X, Nintendo Switch, Xbox Series S,
+                 PlayStation 5 Digital, Nintendo Switch OLED]
+        specs: []
+        brands: []
+
+  - id: video_games
+    display_names:
+      en: Video Games
+      es: Videojuegos
+      pt: Videogames
+      fr: Jeux Vidéo
+      de: Videospiele
+      zh: 电子游戏
+      ja: テレビゲーム
+      ar: ألعاب الفيديو
+    brands: [Activision, EA, Ubisoft, Nintendo, Sony, 2K, Bethesda]
+    price_range: [19, 79]
+    margin_range: [0.30, 0.55]   # Software margin is great
+    trend:
+      2018: 0.85
+      2019: 0.90
+      2020: 1.90   # Lockdown gaming explosion
+      2021: 1.65
+      2022: 1.15
+      2023: 0.90
+      2024: 0.78
+      2025: 0.72
+      2026: 0.70
+    products:
+      - name_template: "{brand} {model}"
+        models: [Action RPG, Sports Simulator, First Person Shooter, Strategy,
+                 Racing, Fighting, Adventure, Puzzle]
+        specs: []
+        brands: []
+
+  - id: toys
+    display_names:
+      en: Toys and Kids
+      es: Juguetes e Infantil
+      pt: Brinquedos e Infantil
+      fr: Jouets et Enfants
+      de: Spielzeug und Kinder
+      zh: 玩具和儿童
+      ja: おもちゃと子供
+      ar: الألعاب والأطفال
+    brands: [LEGO, Hasbro, Mattel, Fisher-Price, Hot Wheels, Nerf, Barbie]
+    price_range: [9, 499]
+    margin_range: [0.25, 0.55]
+    trend:
+      2018: 1.05
+      2019: 1.00
+      2020: 1.40   # Parents buying to entertain kids at home
+      2021: 1.20
+      2022: 0.95
+      2023: 0.90
+      2024: 0.85
+      2025: 0.80
+      2026: 0.78
+    products:
+      - name_template: "{brand} {model}"
+        models: [Building Set, Action Figure, Board Game, Doll, RC Car,
+                 Educational Kit, Craft Set, Remote Control]
+        specs: []
+        brands: []

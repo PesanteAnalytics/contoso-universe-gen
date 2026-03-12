@@ -1,0 +1,100 @@
+plugin_id: home
+display_names:
+  en: Home Appliances
+  es: Electrodomésticos
+  pt: Eletrodomésticos
+  fr: Appareils Ménagers
+  de: Haushaltsgeräte
+  zh: 家用电器
+  ja: 家電製品
+  ar: الأجهزة المنزلية
+
+subcategories:
+
+  - id: large_appliances
+    display_names:
+      en: Large Appliances
+      es: Electrodomésticos Grandes
+      pt: Eletrodomésticos de Grande Porte
+      fr: Gros Électroménager
+      de: Großgeräte
+      zh: 大型家电
+      ja: 大型家電
+      ar: أجهزة كبيرة
+    brands: [LG, Samsung, Whirlpool, Bosch, GE, Maytag, Electrolux, Haier]
+    price_range: [399, 2999]
+    margin_range: [0.06, 0.18]
+    trend:
+      2018: 1.10
+      2019: 1.05
+      2020: 0.65   # COVID supply chain disruption
+      2021: 1.50   # Home renovation boom
+      2022: 1.55
+      2023: 1.35
+      2024: 1.15
+      2025: 1.05
+      2026: 1.00
+    products:
+      - name_template: "{brand} {model} {spec}"
+        models: [Refrigerator, Washing Machine, Dryer, Dishwasher, Range, Oven]
+        specs: [French Door, Side-by-Side, Front Load, Top Load, Smart, Energy Star]
+        brands: []
+
+  - id: small_appliances
+    display_names:
+      en: Small Appliances
+      es: Pequeños Electrodomésticos
+      pt: Pequenos Eletrodomésticos
+      fr: Petit Électroménager
+      de: Kleingeräte
+      zh: 小型家电
+      ja: 小型家電
+      ar: أجهزة صغيرة
+    brands: [Instant Pot, Vitamix, KitchenAid, Breville, Ninja, Keurig, Cuisinart]
+    price_range: [19, 799]
+    margin_range: [0.18, 0.45]
+    trend:
+      2018: 1.00
+      2019: 1.05
+      2020: 1.55   # Cooking at home COVID spike
+      2021: 1.45
+      2022: 1.20
+      2023: 1.10
+      2024: 1.05
+      2025: 1.00
+      2026: 0.98
+    products:
+      - name_template: "{brand} {model}"
+        models: [Air Fryer, Coffee Maker, Blender, Stand Mixer, Toaster, Microwave, Instant Pot]
+        specs: []
+        brands: []
+
+  - id: smart_home
+    display_names:
+      en: Smart Home
+      es: Hogar Inteligente
+      pt: Casa Inteligente
+      fr: Maison Connectée
+      de: Smart Home
+      zh: 智能家居
+      ja: スマートホーム
+      ar: المنزل الذكي
+    brands: [Amazon, Google, Apple, Philips, Ring, Nest, Arlo, Lutron]
+    price_range: [29, 599]
+    margin_range: [0.20, 0.50]
+    trend:
+      2018: 0.60
+      2019: 0.75
+      2020: 1.20
+      2021: 1.50
+      2022: 1.70
+      2023: 1.85
+      2024: 1.90
+      2025: 1.95
+      2026: 2.00
+    products:
+      - name_template: "{brand} {model}"
+        models: [Smart Speaker, Smart Display, Smart Doorbell, Smart Thermostat,
+                 Smart Bulb, Smart Plug, Smart Lock, Security Camera]
+        specs: []
+        brands: []

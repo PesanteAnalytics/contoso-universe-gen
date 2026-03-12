@@ -1,0 +1,100 @@
+plugin_id: media
+display_names:
+  en: Music, Movies and Media
+  es: Música, Películas y Medios
+  pt: Música, Filmes e Mídia
+  fr: Musique, Films et Médias
+  de: Musik, Filme und Medien
+  zh: 音乐、电影和媒体
+  ja: 音楽・映画・メディア
+  ar: الموسيقى والأفلام والوسائط
+
+subcategories:
+
+  - id: music_physical
+    display_names:
+      en: Music (Physical)
+      es: Música Física
+      pt: Música Física
+      fr: Musique Physique
+      de: Musik (Physisch)
+      zh: 实体音乐
+      ja: 音楽（物理メディア）
+      ar: الموسيقى الفيزيائية
+    brands: [Universal Music, Sony Music, Warner Music, Atlantic, Columbia]
+    price_range: [9, 49]
+    margin_range: [0.35, 0.60]
+    trend:
+      2018: 1.15
+      2019: 1.08
+      2020: 0.40   # Streaming killed physical music but COVID lockdown
+      2021: 0.50
+      2022: 0.55
+      2023: 0.50
+      2024: 0.45
+      2025: 0.42
+      2026: 0.40
+    products:
+      - name_template: "{model} — {brand}"
+        models: [CD Album, Vinyl Record, Box Set, Collector's Edition, Live Album]
+        specs: []
+        brands: []
+
+  - id: movies_physical
+    display_names:
+      en: Movies and TV Shows (Physical)
+      es: Películas y Series (Físico)
+      pt: Filmes e Séries (Físico)
+      fr: Films et Séries TV (Physique)
+      de: Filme und Serien (Physisch)
+      zh: 电影和电视节目（实体）
+      ja: 映画とTVシリーズ（物理メディア）
+      ar: الأفلام والمسلسلات (فيزيائي)
+    brands: [Disney, Universal, Warner Bros, Paramount, Sony Pictures, A24]
+    price_range: [9, 69]
+    margin_range: [0.30, 0.55]
+    trend:
+      2018: 1.20
+      2019: 1.10
+      2020: 1.55   # Streaming surge but also physical disc buying
+      2021: 1.35
+      2022: 1.10
+      2023: 0.98
+      2024: 0.90
+      2025: 0.85
+      2026: 0.82
+    products:
+      - name_template: "{brand} {model}"
+        models: [Blu-ray, 4K UHD Blu-ray, DVD, Collector's Edition, Steelbook]
+        specs: []
+        brands: []
+
+  - id: streaming_devices
+    display_names:
+      en: Streaming Devices
+      es: Dispositivos de Streaming
+      pt: Dispositivos de Streaming
+      fr: Dispositifs de Streaming
+      de: Streaming-Geräte
+      zh: 流媒体设备
+      ja: ストリーミングデバイス
+      ar: أجهزة البث
+    brands: [Amazon, Google, Apple, Roku, NVIDIA, Xiaomi]
+    price_range: [29, 179]
+    margin_range: [0.12, 0.30]
+    trend:
+      2018: 0.70
+      2019: 0.90
+      2020: 1.80   # Everyone setting up streaming at home
+      2021: 1.60
+      2022: 1.40
+      2023: 1.50
+      2024: 1.55
+      2025: 1.45
+      2026: 1.40
+    products:
+      - name_template: "{brand} {model}"
+        models: [Fire Stick, Chromecast, Apple TV, Roku Stick, Shield Pro,
+                 Fire TV Cube, Chromecast with Google TV]
+        specs: []
+        brands: []

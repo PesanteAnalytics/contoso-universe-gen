@@ -1,0 +1,120 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Contoso Universe Generator — Session Configuration
+# Generated from CUG-CONFIG.md on 2026-03-11
+# ─────────────────────────────────────────────────────────────────────────────
+
+[general]
+start_date  = "2022-01-01"
+end_date    = "2026-03-17"
+language    = "en"
+country     = "US"
+seed        = 42
+chunk_days  = 30
+
+[output]
+output_path    = "./output"
+formats        = ["csv"]
+target_orders  = 100
+compress       = true
+
+[output.format_options]
+# Parquet
+parquet_compression     = "zstd"
+# parquet_row_group_size = auto
+
+# CSV
+csv_separator           = ","
+csv_include_header      = true
+csv_null_value          = ""
+# csv_date_format       = auto
+
+# DuckDB
+duckdb_db_name          = "contoso.duckdb"
+
+# Delta Lake
+delta_mode              = "overwrite"
+delta_name              = "contoso"
+
+# JSON
+json_row_oriented       = false
+json_pretty             = false
+
+# Excel
+excel_single_workbook   = true
+excel_workbook_name     = "contoso.xlsx"
+
+[customers]
+pool_size         = 50000
+active_pct        = 0.30
+online_pct_start  = 0.05
+online_pct_end    = 0.55
+
+[categories]
+enabled      = ["electronics", "home", "gaming", "media"]
+custom_paths = []
+
+# ─── Annual recurring sales events ───────────────────────────────────────────
+[[events.annual]]
+name   = "Black Friday"
+month  = 11
+day    = 25
+factor = 2.8
+
+[[events.annual]]
+name   = "Cyber Monday"
+month  = 11
+day    = 28
+factor = 2.5
+
+[[events.annual]]
+name   = "Christmas"
+month  = 12
+day    = 25
+factor = 2.0
+
+[[events.annual]]
+name   = "Back to School"
+month  = 8
+day    = 15
+factor = 1.8
+
+[[events.annual]]
+name   = "Prime Day"
+month  = 7
+day    = 12
+factor = 2.5
+
+# ─── One-time historical events ───────────────────────────────────────────────
+[[events.one_time]]
+name       = "COVID Lockdown Drop"
+date_start = "2020-03-15"
+date_end   = "2020-04-30"
+factor     = 0.45
+
+[[events.one_time]]
+name       = "COVID eCommerce Surge"
+date_start = "2020-05-01"
+date_end   = "2021-03-31"
+factor     = 1.18
+
+[[events.one_time]]
+name       = "Post-COVID Recovery"
+date_start = "2021-04-01"
+date_end   = "2022-06-30"
+factor     = 1.06
+
+[[events.one_time]]
+name       = "Inflation Pressure 2022"
+date_start = "2022-01-01"
+date_end   = "2022-12-31"
+factor     = 0.92
+
+[[events.one_time]]
+name       = "AI & Electronics Boom 2023-2024"
+date_start = "2023-06-01"
+date_end   = "2024-12-31"
+factor     = 1.09
+
+# ─── Weekday sales factors (Mon=0 … Sun=6) ────────────────────────────────────
+[weekday_factors]
+factors = [0.75, 0.85, 0.95, 1.05, 1.20, 1.60, 0.30]

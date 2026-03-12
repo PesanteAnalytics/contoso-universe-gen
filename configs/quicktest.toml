@@ -1,0 +1,51 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CUG — Quick Test Config  (small, fast, all formats)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[general]
+start_date  = "2022-01-01"
+end_date    = "2024-12-31"
+language    = "en"
+country     = "US"
+seed        = 42
+chunk_days  = 30
+
+[output]
+output_path      = "./output/quicktest"
+formats          = ["csv", "parquet", "duckdb"]
+target_orders    = 5_000
+duckdb_db_name   = "contoso_test.duckdb"
+compress         = false
+integrity_check  = true
+integrity_strict = true
+
+[customers]
+pool_size         = 2_000
+active_pct        = 0.30
+online_pct_start  = 0.10
+online_pct_end    = 0.50
+
+[categories]
+enabled      = ["electronics", "home", "gaming", "media"]
+custom_paths = []
+
+[[events.annual]]
+name   = "Black Friday"
+month  = 11
+day    = 25
+factor = 4.5
+
+[[events.annual]]
+name   = "Christmas"
+month  = 12
+day    = 25
+factor = 3.2
+
+[[events.one_time]]
+name       = "COVID eCommerce Surge"
+date_start = "2022-01-01"
+date_end   = "2022-06-30"
+factor     = 1.85
+
+[weekday_factors]
+factors = [0.75, 0.85, 0.95, 1.05, 1.20, 1.60, 0.30]

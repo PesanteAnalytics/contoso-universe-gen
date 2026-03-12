@@ -1,0 +1,135 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Contoso Universe Generator — Default Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[general]
+start_date  = "2018-01-01"
+end_date    = "2026-03-05"
+language    = "en"          # en | es | pt | fr | de | zh | ja | ar
+country     = "US"
+seed        = 42
+chunk_days  = 30
+
+[output]
+output_path    = "./output"
+formats        = ["parquet"]       # Default: parquet only (fastest)
+                                    # Available: parquet, csv, duckdb, delta, json, excel, sqlserver
+                                    # Combine: ["parquet", "csv", "duckdb"]
+target_orders  = 100_000
+compress       = true
+
+# ── Per-format options (all optional — sensible defaults used) ────────────────
+[output.format_options]
+# Parquet
+parquet_compression     = "zstd"    # zstd | snappy | gzip | lz4 | brotli | none
+# parquet_row_group_size = 100000   # rows per row group (default: auto)
+
+# CSV
+csv_separator           = ","       # field delimiter
+csv_include_header      = true
+csv_null_value          = ""
+# csv_date_format       = "%Y-%m-%d"  # (default: ISO 8601)
+
+# DuckDB
+duckdb_db_name          = "contoso.duckdb"
+
+# Delta Lake (great for Microsoft Fabric / Databricks)
+delta_mode              = "overwrite"  # overwrite | append | error
+# delta_partition_by    = ["Year"]     # partition FactSales by column(s)
+delta_name              = "contoso"
+
+# JSON / NDJSON
+json_row_oriented       = false     # false = NDJSON (one record per line), true = JSON array
+json_pretty             = false     # pretty-print (only with row_oriented = true)
+
+# Excel
+excel_single_workbook   = true      # true = all tables in one .xlsx, false = one per table
+excel_workbook_name     = "contoso.xlsx"
+
+# SQL Server (requires ODBC driver installed on the machine)
+# sqlserver_server            = "localhost"          # server instance (e.g. localhost\SQLEXPRESS)
+# sqlserver_database          = "ContosoRetail"      # target database (auto-created if possible)
+# sqlserver_schema            = "dbo"                # target schema
+# sqlserver_driver            = "ODBC Driver 17 for SQL Server"  # auto-detected if omitted
+# sqlserver_trusted           = true                 # Windows Auth (true) or SQL Auth (false)
+# sqlserver_username          = ""                   # SQL Auth only
+# sqlserver_password          = ""                   # SQL Auth only
+# sqlserver_if_exists         = "replace"            # replace | append | fail
+# sqlserver_batch_size        = 5000                 # rows per INSERT batch
+# sqlserver_connection_string = ""                   # full ODBC string (overrides above)
+
+[customers]
+pool_size         = 50_000
+active_pct        = 0.30
+online_pct_start  = 0.05   # fraction of orders online at start_date
+online_pct_end    = 0.55   # fraction of orders online at end_date
+
+[categories]
+enabled      = ["electronics", "home", "gaming", "media"]
+custom_paths = []
+
+# ─── Annual recurring sales events ───────────────────────────────────────────
+[[events.annual]]
+name   = "Black Friday"
+month  = 11
+day    = 25
+factor = 2.8   # calibrated: real Black Friday retail lift ~2-3x average day
+
+[[events.annual]]
+name   = "Cyber Monday"
+month  = 11
+day    = 28
+factor = 2.5   # Cyber Monday lift, slightly below Black Friday
+
+[[events.annual]]
+name   = "Christmas"
+month  = 12
+day    = 25
+factor = 2.0   # Christmas week lift, spread over more days
+
+[[events.annual]]
+name   = "Back to School"
+month  = 8
+day    = 15
+factor = 1.8
+
+[[events.annual]]
+name   = "Prime Day"
+month  = 7
+day    = 12
+factor = 2.5
+
+# ─── One-time historical events ───────────────────────────────────────────────
+[[events.one_time]]
+name       = "COVID Lockdown Drop"
+date_start = "2020-03-15"
+date_end   = "2020-04-30"
+factor     = 0.45  # COVID lockdown: real retail drop ~50-55% (not 65%)
+
+[[events.one_time]]
+name       = "COVID eCommerce Surge"
+date_start = "2020-05-01"
+date_end   = "2021-03-31"
+factor     = 1.18  # COVID eCommerce real lift: Best Buy +11%, electronics avg +15-20%
+
+[[events.one_time]]
+name       = "Post-COVID Recovery"
+date_start = "2021-04-01"
+date_end   = "2022-06-30"
+factor     = 1.06  # Post-COVID soft landing, gradual normalization
+
+[[events.one_time]]
+name       = "Inflation Pressure 2022"
+date_start = "2022-01-01"
+date_end   = "2022-12-31"
+factor     = 0.92  # CPI spike 2022: consumer spending compressed ~8%
+
+[[events.one_time]]
+name       = "AI & Electronics Boom 2023-2024"
+date_start = "2023-06-01"
+date_end   = "2024-12-31"
+factor     = 1.09  # AI/tech spending recovery, laptop/device refresh cycle
+
+# ─── Weekday sales factors (Mon=0 … Sun=6) ────────────────────────────────────
+[weekday_factors]
+factors = [0.75, 0.85, 0.95, 1.05, 1.20, 1.60, 0.30]

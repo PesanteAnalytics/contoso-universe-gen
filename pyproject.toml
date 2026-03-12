@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contoso-universe-gen"
+version = "0.2.0"
+description = "God-level synthetic retail data generator — Polars + DuckDB + Faker + i18n"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+authors = [
+    {name = "CSalcedoDataBI / PAL Data Team"}
+]
+keywords = ["data-generator", "synthetic-data", "polars", "duckdb", "faker", "retail", "power-bi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Database",
+]
+
+dependencies = [
+    # Core DataFrame engine — vectorized, fast, lazy evaluation
+    "polars>=0.20.0",
+    # Embedded analytical SQL engine
+    "duckdb>=0.10.0",
+    # Synthetic data generation with multi-locale support
+    "faker>=24.0.0",
+    # Config validation with type-safe schemas
+    "pydantic>=2.6.0",
+    # CLI framework — type-hint based, autocomplete
+    "typer>=0.12.0",
+    # Beautiful terminal UI — progress bars, tables, colors
+    "rich>=13.7.0",
+    # YAML parsing for category plugins
+    "pyyaml>=6.0.1",
+    # Parquet + Arrow backend (used by Polars internally)
+    "pyarrow>=15.0.0",
+    # Delta Lake Python writer for Fabric output
+    "deltalake>=0.17.0",
+    # Excel workbook writer for .xlsx output
+    "xlsxwriter>=3.1.0",
+    # SQL Server output via ODBC
+    "pyodbc>=5.0.0",
+    # Holidays by country for DimDate calendar
+    "holidays>=0.46",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+]
+
+[project.scripts]
+cug = "cug.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cug"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
