@@ -1,10 +1,11 @@
 ---
 name: contoso-universe-gen
 description: >
-  Generate synthetic retail datasets using the Contoso Universe Generator (CUG).
-  Use this skill whenever the user needs to create demo data, test datasets,
-  or populate databases (SQL Server, DuckDB, Parquet, CSV, Delta, JSON, Excel)
-  with realistic Contoso-style retail data.
+Generate synthetic retail datasets using the Contoso Universe Generator (CUG).
+Use this skill whenever the user needs to create demo data, test datasets,
+or populate databases (SQL Server, DuckDB, Parquet, CSV, Delta, JSON, Excel)
+with realistic Contoso-style retail data.
+
 ---
 
 # Contoso Universe Generator (CUG) — Agent Skill
@@ -17,6 +18,7 @@ with realistic temporal patterns (COVID, Black Friday, seasonality).
 Activate this skill when the user says phrases like:
 
 **Español:**
+
 - "Crear 1000 filas" / "Generar 5000 registros" / "Dame 100K filas"
 - "Crear datos de prueba" / "Dame datos demo" / "Necesito datos sintéticos"
 - "Generar dataset Contoso" / "Refrescar el dataset" / "Regenerar los datos"
@@ -26,6 +28,7 @@ Activate this skill when the user says phrases like:
 - "Crear base de datos de prueba" / "Montar datos de retail"
 
 **English:**
+
 - "Create 1000 rows" / "Generate 5000 records" / "Give me 100K rows"
 - "Create test data" / "Generate demo dataset" / "I need synthetic data"
 - "Populate SQL Server" / "Fill the database" / "Refresh the dataset"
@@ -33,6 +36,7 @@ Activate this skill when the user says phrases like:
 - "Sample data for Power BI" / "Workshop dataset" / "Data for Fabric"
 
 **Implicit triggers** (user may not mention CUG explicitly):
+
 - "Necesito datos de ventas" → use CUG with default retail schema
 - "Quiero probar mi modelo de datos" → generate quick test dataset
 - "Llena la tabla con datos ficticios" → use CUG with SQL Server format
@@ -64,16 +68,16 @@ Check if `CUG-CONFIG.md` exists at the project root.
 
 The template file contains **ALL** configurable options organized in these sections:
 
-| Section | Contents |
-|---------|----------|
-| 🔧 General | start_date, end_date, language, country, seed, chunk_days |
-| 📤 Output | output_path, formats, target_orders, compress, integrity, strict |
-| 📄 Format Options | parquet, csv, duckdb, delta, json, excel, sqlserver |
-| 👥 Clientes | pool_size, active_pct, online_pct_start, online_pct_end |
-| 📂 Categorías | enabled categories, custom_paths |
-| 📅 Eventos Anuales | name, month, day, factor (table rows) |
-| 📅 Eventos Históricos | name, date_start, date_end, factor (table rows) |
-| 📊 Factores Día de Semana | Monday–Sunday factors |
+| Section                   | Contents                                                         |
+| ------------------------- | ---------------------------------------------------------------- |
+| 🔧 General                | start_date, end_date, language, country, seed, chunk_days        |
+| 📤 Output                 | output_path, formats, target_orders, compress, integrity, strict |
+| 📄 Format Options         | parquet, csv, duckdb, delta, json, excel, sqlserver              |
+| 👥 Clientes               | pool_size, active_pct, online_pct_start, online_pct_end          |
+| 📂 Categorías             | enabled categories, custom_paths                                 |
+| 📅 Eventos Anuales        | name, month, day, factor (table rows)                            |
+| 📅 Eventos Históricos     | name, date_start, date_end, factor (table rows)                  |
+| 📊 Factores Día de Semana | Monday–Sunday factors                                            |
 
 ### Step 2: Read & Parse CUG-CONFIG.md
 
@@ -145,18 +149,19 @@ including those without CLI flags:
 
 **Mapping from CUG-CONFIG.md → TOML sections:**
 
-| CUG-CONFIG.md Section | TOML Section |
-|------------------------|--------------|
-| 🔧 General | `[general]` |
-| 📤 Output | `[output]` — **except** `integrity_check` and `integrity_strict` |
-| 📄 Format Options | `[output.format_options]` |
-| 👥 Clientes | `[customers]` |
-| 📂 Categorías | `[categories]` |
-| 📅 Eventos Anuales | `[[events.annual]]` (one block per row) |
-| 📅 Eventos Históricos | `[[events.one_time]]` (one block per row) |
-| 📊 Factores Día Semana | `[weekday_factors]` |
+| CUG-CONFIG.md Section  | TOML Section                                                     |
+| ---------------------- | ---------------------------------------------------------------- |
+| 🔧 General             | `[general]`                                                      |
+| 📤 Output              | `[output]` — **except** `integrity_check` and `integrity_strict` |
+| 📄 Format Options      | `[output.format_options]`                                        |
+| 👥 Clientes            | `[customers]`                                                    |
+| 📂 Categorías          | `[categories]`                                                   |
+| 📅 Eventos Anuales     | `[[events.annual]]` (one block per row)                          |
+| 📅 Eventos Históricos  | `[[events.one_time]]` (one block per row)                        |
+| 📊 Factores Día Semana | `[weekday_factors]`                                              |
 
 > **⚠️ CLI-only variables** (do NOT write these to TOML):
+>
 > - `integrity_check` = `true` → add `--verify` CLI flag
 > - `integrity_check` = `false` → omit flag (default)
 > - `integrity_strict` = `true` → add `--strict` CLI flag
@@ -164,12 +169,12 @@ including those without CLI flags:
 
 **Event table column mapping** (Markdown header → TOML key):
 
-| Eventos Anuales Header | TOML Key | Eventos Históricos Header | TOML Key |
-|------------------------|----------|---------------------------|----------|
-| Evento | `name` | Evento | `name` |
-| Mes | `month` | Fecha Inicio | `date_start` |
-| Día | `day` | Fecha Fin | `date_end` |
-| Factor | `factor` | Factor | `factor` |
+| Eventos Anuales Header | TOML Key | Eventos Históricos Header | TOML Key     |
+| ---------------------- | -------- | ------------------------- | ------------ |
+| Evento                 | `name`   | Evento                    | `name`       |
+| Mes                    | `month`  | Fecha Inicio              | `date_start` |
+| Día                    | `day`    | Fecha Fin                 | `date_end`   |
+| Factor                 | `factor` | Factor                    | `factor`     |
 
 3. **Build the CLI command** using the session TOML:
 
@@ -178,9 +183,9 @@ cd d:\PAL-TEMPORAL-REPORSITORIOS\contoso-universe-gen
 .venv\Scripts\python.exe -m cug generate -c configs/_session.toml
 ```
 
-   Optionally add CLI flags that override TOML values for convenience:
-   `-n`, `-f`, `-l`, `--seed`, `-o` (these override TOML values).
-   Also add integrity flags from `CUG-CONFIG.md` if enabled (see table above).
+Optionally add CLI flags that override TOML values for convenience:
+`-n`, `-f`, `-l`, `--seed`, `-o` (these override TOML values).
+Also add integrity flags from `CUG-CONFIG.md` if enabled (see table above).
 
 ### Step 5: Execute & Update Footer
 
@@ -210,27 +215,51 @@ cd d:\PAL-TEMPORAL-REPORSITORIOS\contoso-universe-gen
 
 ### CLI Flags Reference (for Step 4 overrides)
 
-| Setting | CLI Flag |
-|---------|----------|
-| Config file | `-c PATH` |
-| Output dir | `-o DIR` |
-| Language | `-l CODE` |
-| Orders | `-n COUNT` |
-| Formats | `-f FORMAT,...` |
-| Seed | `--seed N` |
-| Strict mode | `--strict` / `--no-strict` |
-| Verbose | `-v` |
-| Parquet compression | `--parquet-compression CODEC` |
-| CSV separator | `--csv-separator SEP` |
-| Delta mode | `--delta-mode MODE` |
-| JSON format | `--json-rows` / `--json-ndjson` |
-| Excel mode | `--excel-single` / `--excel-multi` |
-| SQL Server name | `--sqlserver-name SERVER` |
-| SQL Server DB | `--sqlserver-db NAME` |
-| SQL Server schema | `--sqlserver-schema NAME` |
-| SQL Server mode | `--sqlserver-mode MODE` |
+| Setting             | CLI Flag                           |
+| ------------------- | ---------------------------------- |
+| Config file         | `-c PATH`                          |
+| Output dir          | `-o DIR`                           |
+| Language            | `-l CODE`                          |
+| Orders              | `-n COUNT`                         |
+| Formats             | `-f FORMAT,...`                    |
+| Seed                | `--seed N`                         |
+| Strict mode         | `--strict` / `--no-strict`         |
+| Verbose             | `-v`                               |
+| Parquet compression | `--parquet-compression CODEC`      |
+| CSV separator       | `--csv-separator SEP`              |
+| Delta mode          | `--delta-mode MODE`                |
+| JSON format         | `--json-rows` / `--json-ndjson`    |
+| Excel mode          | `--excel-single` / `--excel-multi` |
+| SQL Server name     | `--sqlserver-name SERVER`          |
+| SQL Server DB       | `--sqlserver-db NAME`              |
+| SQL Server schema   | `--sqlserver-schema NAME`          |
+| SQL Server mode     | `--sqlserver-mode MODE`            |
 
 > **IMPORTANT**: CLI flags always take priority over TOML values.
+
+### Format-Specific Notes
+
+#### DuckDB — Analytical Views
+
+The DuckDB writer auto-creates **3 analytical views** alongside the 7 data tables:
+
+| View | Description |
+| ---- | ----------- |
+| `v_sales_summary` | Daily sales totals (date, year, month, orders, revenue, margin, avg order value) |
+| `v_top_products` | Top 20 products by revenue (product, category, revenue, units, avg discount) |
+| `v_category_trend` | Monthly revenue by category (year, month, category, revenue, orders) |
+
+These views use V2-aligned column names and join `FactSales` with dimension tables.
+
+#### JSON — NDJSON Format
+
+JSON output uses **NDJSON** (Newline-Delimited JSON) format with `.ndjson` extension.
+Each line is a self-contained JSON object — not wrapped in an array.
+
+#### Delta Lake — Null Column Handling
+
+The Delta writer automatically casts `Null`-type columns to `String` before writing.
+This prevents errors when columns like `EndDT` or `CloseDate` are all-null in small datasets.
 
 ---
 
@@ -238,102 +267,102 @@ cd d:\PAL-TEMPORAL-REPORSITORIOS\contoso-universe-gen
 
 ### 🔧 General (`[general]`)
 
-| Variable     | CLI Flag    | Default        | Opciones                                       | Descripción                        |
-| ------------ | ----------- | -------------- | ---------------------------------------------- | ---------------------------------- |
-| `start_date` | —           | `2018-01-01`   | Cualquier fecha YYYY-MM-DD                     | Inicio del rango temporal          |
-| `end_date`   | —           | `2026-12-31`   | Cualquier fecha YYYY-MM-DD                     | Fin del rango temporal             |
-| `language`   | `-l`        | `en`           | `en`, `es`, `pt`, `fr`, `de`, `zh`, `ja`, `ar` | Idioma para nombres y categorías   |
-| `country`    | —           | `US`           | Código ISO 3166-1                              | País para días festivos            |
-| `seed`       | `--seed`    | `42`           | Cualquier entero                               | Semilla maestra (reproducibilidad) |
-| `chunk_days` | —           | `30`           | > 0                                            | Días por chunk (memoria vs velocidad) |
+| Variable     | CLI Flag | Default      | Opciones                                       | Descripción                           |
+| ------------ | -------- | ------------ | ---------------------------------------------- | ------------------------------------- |
+| `start_date` | —        | `2018-01-01` | Cualquier fecha YYYY-MM-DD                     | Inicio del rango temporal             |
+| `end_date`   | —        | `2026-12-31` | Cualquier fecha YYYY-MM-DD                     | Fin del rango temporal                |
+| `language`   | `-l`     | `en`         | `en`, `es`, `pt`, `fr`, `de`, `zh`, `ja`, `ar` | Idioma para nombres y categorías      |
+| `country`    | —        | `US`         | Código ISO 3166-1                              | País para días festivos               |
+| `seed`       | `--seed` | `42`         | Cualquier entero                               | Semilla maestra (reproducibilidad)    |
+| `chunk_days` | —        | `30`         | > 0                                            | Días por chunk (memoria vs velocidad) |
 
 ### 📤 Output (`[output]`)
 
-| Variable           | CLI Flag       | Default       | Opciones                                                      | Descripción                    |
-| ------------------ | -------------- | ------------- | ------------------------------------------------------------- | ------------------------------ |
-| `output_path`      | `-o`           | `./output`    | Cualquier directorio                                          | Directorio de salida           |
-| `formats`          | `-f`           | `["parquet"]` | `parquet`, `csv`, `duckdb`, `delta`, `json`, `excel`, `sqlserver` | Formatos (combinables con `,`) |
-| `target_orders`    | `-n`           | `100,000`     | > 0                                                           | Órdenes aproximadas            |
-| `compress`         | —              | `true`        | `true` / `false`                                              | Compresión Gzip para CSV       |
-| `integrity_check`  | —              | `false`       | `true` / `false`                                              | Validar integridad FK          |
-| `integrity_strict` | `--strict`     | `true`        | `true` / `false`                                              | Abortar en violaciones FK      |
+| Variable           | CLI Flag   | Default       | Opciones                                                          | Descripción                    |
+| ------------------ | ---------- | ------------- | ----------------------------------------------------------------- | ------------------------------ |
+| `output_path`      | `-o`       | `./output`    | Cualquier directorio                                              | Directorio de salida           |
+| `formats`          | `-f`       | `["parquet"]` | `parquet`, `csv`, `duckdb`, `delta`, `json`, `excel`, `sqlserver` | Formatos (combinables con `,`) |
+| `target_orders`    | `-n`       | `100,000`     | > 0                                                               | Órdenes aproximadas            |
+| `compress`         | —          | `true`        | `true` / `false`                                                  | Compresión Gzip para CSV       |
+| `integrity_check`  | —          | `false`       | `true` / `false`                                                  | Validar integridad FK          |
+| `integrity_strict` | `--strict` | `true`        | `true` / `false`                                                  | Abortar en violaciones FK      |
 
 ### 📄 Opciones por Formato (`[output.format_options]`)
 
 #### Parquet
 
-| Variable               | CLI Flag                  | Default  | Opciones                                   |
-| ---------------------- | ------------------------- | -------- | ------------------------------------------ |
-| `parquet_compression`  | `--parquet-compression`   | `zstd`   | `zstd`, `snappy`, `gzip`, `lz4`, `brotli`, `none` |
-| `parquet_row_group_size` | —                       | `None`   | Entero o None (automático)                 |
+| Variable                 | CLI Flag                | Default | Opciones                                          |
+| ------------------------ | ----------------------- | ------- | ------------------------------------------------- |
+| `parquet_compression`    | `--parquet-compression` | `zstd`  | `zstd`, `snappy`, `gzip`, `lz4`, `brotli`, `none` |
+| `parquet_row_group_size` | —                       | `None`  | Entero o None (automático)                        |
 
 #### CSV
 
-| Variable             | CLI Flag          | Default | Opciones         |
-| -------------------- | ----------------- | ------- | ---------------- |
-| `csv_separator`      | `--csv-separator` | `,`     | Cualquier carácter |
-| `csv_include_header` | —                 | `true`  | `true` / `false` |
-| `csv_null_value`     | —                 | `""`    | Cualquier string |
+| Variable             | CLI Flag          | Default | Opciones                        |
+| -------------------- | ----------------- | ------- | ------------------------------- |
+| `csv_separator`      | `--csv-separator` | `,`     | Cualquier carácter              |
+| `csv_include_header` | —                 | `true`  | `true` / `false`                |
+| `csv_null_value`     | —                 | `""`    | Cualquier string                |
 | `csv_date_format`    | —                 | `None`  | ISO 8601 o patrón personalizado |
 
 #### DuckDB
 
-| Variable        | CLI Flag | Default          | Opciones       |
-| --------------- | -------- | ---------------- | -------------- |
-| `duckdb_db_name` | —       | `contoso.duckdb` | Nombre archivo |
+| Variable         | CLI Flag | Default          | Opciones       |
+| ---------------- | -------- | ---------------- | -------------- |
+| `duckdb_db_name` | —        | `contoso.duckdb` | Nombre archivo |
 
 #### Delta Lake
 
-| Variable             | CLI Flag       | Default     | Opciones                        |
-| -------------------- | -------------- | ----------- | ------------------------------- |
-| `delta_mode`         | `--delta-mode` | `overwrite` | `overwrite`, `append`, `error`  |
+| Variable             | CLI Flag       | Default     | Opciones                           |
+| -------------------- | -------------- | ----------- | ---------------------------------- |
+| `delta_mode`         | `--delta-mode` | `overwrite` | `overwrite`, `append`, `error`     |
 | `delta_partition_by` | —              | `None`      | Lista de columnas (ej: `["Year"]`) |
-| `delta_name`         | —              | `contoso`   | Nombre metadata                 |
+| `delta_name`         | —              | `contoso`   | Nombre metadata                    |
 
 #### JSON
 
-| Variable            | CLI Flag                        | Default | Opciones         |
-| ------------------- | ------------------------------- | ------- | ---------------- |
+| Variable            | CLI Flag                        | Default | Opciones                              |
+| ------------------- | ------------------------------- | ------- | ------------------------------------- |
 | `json_row_oriented` | `--json-rows` / `--json-ndjson` | `false` | `true` = JSON array, `false` = NDJSON |
-| `json_pretty`       | —                               | `false` | `true` / `false` |
+| `json_pretty`       | —                               | `false` | `true` / `false`                      |
 
 #### Excel
 
-| Variable                | CLI Flag                          | Default         | Opciones         |
-| ----------------------- | --------------------------------- | --------------- | ---------------- |
+| Variable                | CLI Flag                           | Default        | Opciones                          |
+| ----------------------- | ---------------------------------- | -------------- | --------------------------------- |
 | `excel_single_workbook` | `--excel-single` / `--excel-multi` | `true`         | `true` = uno, `false` = por tabla |
-| `excel_workbook_name`   | —                                 | `contoso.xlsx`  | Nombre archivo   |
+| `excel_workbook_name`   | —                                  | `contoso.xlsx` | Nombre archivo                    |
 
 #### SQL Server
 
-| Variable                       | CLI Flag             | Default          | Opciones                           |
-| ------------------------------ | -------------------- | ---------------- | ---------------------------------- |
-| `sqlserver_server`             | `--sqlserver-name`   | `localhost`      | Instancia (ej: `localhost\SQLEXPRESS`) |
-| `sqlserver_database`           | `--sqlserver-db`     | `ContosoRetail`  | Nombre DB                          |
-| `sqlserver_schema`             | `--sqlserver-schema` | `dbo`            | Esquema destino                    |
-| `sqlserver_if_exists`          | `--sqlserver-mode`   | `replace`        | `replace`, `append`, `fail`        |
-| `sqlserver_batch_size`         | —                    | `5,000`          | Filas por INSERT batch             |
-| `sqlserver_driver`             | —                    | Auto-detect      | Nombre driver ODBC                 |
-| `sqlserver_trusted`            | —                    | `true`           | Windows Auth (`true`) o SQL Auth   |
-| `sqlserver_username`           | —                    | `None`           | Usuario SQL (si trusted=false)     |
-| `sqlserver_password`           | —                    | `None`           | Password SQL (si trusted=false)    |
-| `sqlserver_connection_string`  | —                    | `None`           | ODBC string completa (override)    |
+| Variable                      | CLI Flag             | Default         | Opciones                               |
+| ----------------------------- | -------------------- | --------------- | -------------------------------------- |
+| `sqlserver_server`            | `--sqlserver-name`   | `localhost`     | Instancia (ej: `localhost\SQLEXPRESS`) |
+| `sqlserver_database`          | `--sqlserver-db`     | `ContosoRetail` | Nombre DB                              |
+| `sqlserver_schema`            | `--sqlserver-schema` | `dbo`           | Esquema destino                        |
+| `sqlserver_if_exists`         | `--sqlserver-mode`   | `replace`       | `replace`, `append`, `fail`            |
+| `sqlserver_batch_size`        | —                    | `5,000`         | Filas por INSERT batch                 |
+| `sqlserver_driver`            | —                    | Auto-detect     | Nombre driver ODBC                     |
+| `sqlserver_trusted`           | —                    | `true`          | Windows Auth (`true`) o SQL Auth       |
+| `sqlserver_username`          | —                    | `None`          | Usuario SQL (si trusted=false)         |
+| `sqlserver_password`          | —                    | `None`          | Password SQL (si trusted=false)        |
+| `sqlserver_connection_string` | —                    | `None`          | ODBC string completa (override)        |
 
 ### 👥 Clientes (`[customers]`)
 
-| Variable           | Default   | Opciones         | Descripción                                 |
-| ------------------ | --------- | ---------------- | ------------------------------------------- |
-| `pool_size`        | `50,000`  | > 0              | Total de clientes únicos en el universo     |
-| `active_pct`       | `0.30`    | 0.01 – 1.0       | % de clientes que compran al menos 1 vez    |
-| `online_pct_start` | `0.05`    | 0.0 – 1.0        | % ventas online al inicio del período       |
-| `online_pct_end`   | `0.55`    | 0.0 – 1.0        | % ventas online al final (crecimiento)      |
+| Variable           | Default  | Opciones   | Descripción                              |
+| ------------------ | -------- | ---------- | ---------------------------------------- |
+| `pool_size`        | `50,000` | > 0        | Total de clientes únicos en el universo  |
+| `active_pct`       | `0.30`   | 0.01 – 1.0 | % de clientes que compran al menos 1 vez |
+| `online_pct_start` | `0.05`   | 0.0 – 1.0  | % ventas online al inicio del período    |
+| `online_pct_end`   | `0.55`   | 0.0 – 1.0  | % ventas online al final (crecimiento)   |
 
 ### 📂 Categorías (`[categories]`)
 
-| Variable       | Default                                        | Descripción                   |
-| -------------- | ---------------------------------------------- | ----------------------------- |
-| `enabled`      | `["electronics", "home", "gaming", "media"]`   | Categorías activas            |
-| `custom_paths` | `[]`                                           | Rutas a plugins YAML custom   |
+| Variable       | Default                                      | Descripción                 |
+| -------------- | -------------------------------------------- | --------------------------- |
+| `enabled`      | `["electronics", "home", "gaming", "media"]` | Categorías activas          |
+| `custom_paths` | `[]`                                         | Rutas a plugins YAML custom |
 
 ---
 
@@ -346,13 +375,13 @@ cd d:\PAL-TEMPORAL-REPORSITORIOS\contoso-universe-gen
 
 ## Commands
 
-| Command          | Purpose                            |
-| ---------------- | ---------------------------------- |
-| `cug generate`   | Generate a full dataset            |
-| `cug formats`    | Show all supported output formats  |
-| `cug info`       | Show available languages           |
-| `cug categories` | Show product categories            |
-| `cug init [DIR]` | Copy default config template       |
+| Command          | Purpose                           |
+| ---------------- | --------------------------------- |
+| `cug generate`   | Generate a full dataset           |
+| `cug formats`    | Show all supported output formats |
+| `cug info`       | Show available languages          |
+| `cug categories` | Show product categories           |
+| `cug init [DIR]` | Copy default config template      |
 
 ## SQL Server Environment (User's Machine)
 
@@ -377,7 +406,7 @@ cd d:\PAL-TEMPORAL-REPORSITORIOS\contoso-universe-gen
 | `DimCustomer`         | Dimension | CustomerKey, CustomerName, City, Country       |
 | `DimProduct`          | Dimension | ProductKey, ProductName, Category, Subcategory |
 | `DimStore`            | Dimension | StoreKey, StoreName, StoreType, Country        |
-| `DimCurrency`         | Dimension | CurrencyKey, CurrencyCode, CurrencyName       |
+| `DimCurrency`         | Dimension | CurrencyKey, CurrencyCode, CurrencyName        |
 | `DimCurrencyExchange` | Dimension | CurrencyCode, Date, ExchangeRate               |
 | `FactSales`           | Fact      | OrderKey, CustomerKey, ProductKey, StoreKey    |
 
@@ -408,13 +437,13 @@ cug generate --seed 42 -n 100000 -f parquet -o ./output/v1
 
 ## Configuration Files
 
-| Config                       | Description                |
-| ---------------------------- | -------------------------- |
-| `configs/default.toml`      | Standard config, 100K      |
-| `configs/quicktest.toml`    | Quick test, ~5K orders     |
-| `configs/retail_1M_en.toml` | 1M orders, English         |
-| `configs/retail_1M_es.toml` | 1M orders, Spanish         |
-| `configs/retail_10M_es.toml`| 10M orders, Spanish        |
+| Config                       | Description            |
+| ---------------------------- | ---------------------- |
+| `configs/default.toml`       | Standard config, 100K  |
+| `configs/quicktest.toml`     | Quick test, ~5K orders |
+| `configs/retail_1M_en.toml`  | 1M orders, English     |
+| `configs/retail_1M_es.toml`  | 1M orders, Spanish     |
+| `configs/retail_10M_es.toml` | 10M orders, Spanish    |
 
 ## Dependencies
 
@@ -433,24 +462,24 @@ custom categories without touching Python code.
 ### YAML Schema (Quick Reference)
 
 ```yaml
-plugin_id: fashion                # Unique snake_case ID (required)
-display_names:                    # Localized names (at least "en" required)
+plugin_id: fashion # Unique snake_case ID (required)
+display_names: # Localized names (at least "en" required)
   en: Fashion & Apparel
   es: Moda y Ropa
-subcategories:                    # At least 1 required
-  - id: shoes                    # Unique snake_case ID
-    display_names: {en: Shoes, es: Zapatos}
-    brands: [Nike, Adidas]        # Available brands
-    price_range: [40.0, 350.0]    # [min, max] unit price
-    margin_range: [0.15, 0.45]    # [min, max] margin (0-1)
-    trend:                        # Annual demand multiplier
-      2020: 0.60                  # COVID drop
-      2024: 1.20                  # Growth year
-    products:                     # Name templates
+subcategories: # At least 1 required
+  - id: shoes # Unique snake_case ID
+    display_names: { en: Shoes, es: Zapatos }
+    brands: [Nike, Adidas] # Available brands
+    price_range: [40.0, 350.0] # [min, max] unit price
+    margin_range: [0.15, 0.45] # [min, max] margin (0-1)
+    trend: # Annual demand multiplier
+      2020: 0.60 # COVID drop
+      2024: 1.20 # Growth year
+    products: # Name templates
       - name_template: "{brand} {model} {spec}"
         models: [Air Max, Superstar]
         specs: [Size 8, Size 10]
-        brands: []                # [] = inherit from subcategory
+        brands: [] # [] = inherit from subcategory
 ```
 
 ### How to Register a Custom Plugin
@@ -467,13 +496,13 @@ custom_paths = ["./my_plugins/fashion.yaml"]
 
 ### Key Defaults
 
-| Field | Default if omitted |
-|-------|--------------------|
-| `display_names` | `{en: <plugin_id>}` |
-| `price_range` | `[99, 999]` |
-| `margin_range` | `[0.10, 0.30]` |
-| `name_template` | `{brand} {model}` |
-| Products per subcategory | 5–15 (random) |
+| Field                    | Default if omitted  |
+| ------------------------ | ------------------- |
+| `display_names`          | `{en: <plugin_id>}` |
+| `price_range`            | `[99, 999]`         |
+| `margin_range`           | `[0.10, 0.30]`      |
+| `name_template`          | `{brand} {model}`   |
+| Products per subcategory | 5–15 (random)       |
 
 ---
 
@@ -483,27 +512,27 @@ custom_paths = ["./my_plugins/fashion.yaml"]
 
 ### What DOES change per language
 
-| Component | What changes | Scope |
-|-----------|-------------|-------|
-| `MonthName` / `DayName` | Translated month/day names | DimDate (en/es/pt/fr/de only — zh/ja/ar fallback to English) |
-| `CategoryName` | YAML `display_names` | DimProduct |
-| `SubCategoryName` | YAML `display_names` | DimProduct |
-| Customer cities | Different city pools per lang | DimCustomer (en→US/CA/GB, es→MX/CO/AR, pt→BR/PT) |
-| Customer countries | Different geo distributions | DimCustomer |
-| Store countries | Different retail footprints | DimStore (en→6 countries, es→7 countries) |
-| Primary currency | Language-mapped currency | FactSales (en→USD, es→MXN, pt→BRL, fr/de→EUR) |
-| Holidays | Country-specific holidays | DimDate (`IsHoliday`, `HolidayName`) |
+| Component               | What changes                  | Scope                                                        |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------ |
+| `MonthName` / `DayName` | Translated month/day names    | DimDate (en/es/pt/fr/de only — zh/ja/ar fallback to English) |
+| `CategoryName`          | YAML `display_names`          | DimProduct                                                   |
+| `SubCategoryName`       | YAML `display_names`          | DimProduct                                                   |
+| Customer cities         | Different city pools per lang | DimCustomer (en→US/CA/GB, es→MX/CO/AR, pt→BR/PT)             |
+| Customer countries      | Different geo distributions   | DimCustomer                                                  |
+| Store countries         | Different retail footprints   | DimStore (en→6 countries, es→7 countries)                    |
+| Primary currency        | Language-mapped currency      | FactSales (en→USD, es→MXN, pt→BRL, fr/de→EUR)                |
+| Holidays                | Country-specific holidays     | DimDate (`IsHoliday`, `HolidayName`)                         |
 
 ### What does NOT change (always English)
 
-| Element | Example | Reason |
-|---------|---------|--------|
-| **Column headers** | `ProductKey`, `OrderDate` | Fixed schema — NOT localized |
-| Product names | `Dell Laptop i7/32GB` | Templates in English |
-| Manufacturer / Brand | `Contoso Ltd.`, `Apple` | Global names |
-| Color / WeightUnit | `Black`, `kg` | Static English lists |
-| CurrencyCode / CurrencyName | `USD`, `US Dollar` | ISO catalogue |
-| Store Status | `Online`, `Current` | Fixed enum |
+| Element                     | Example                   | Reason                       |
+| --------------------------- | ------------------------- | ---------------------------- |
+| **Column headers**          | `ProductKey`, `OrderDate` | Fixed schema — NOT localized |
+| Product names               | `Dell Laptop i7/32GB`     | Templates in English         |
+| Manufacturer / Brand        | `Contoso Ltd.`, `Apple`   | Global names                 |
+| Color / WeightUnit          | `Black`, `kg`             | Static English lists         |
+| CurrencyCode / CurrencyName | `USD`, `US Dollar`        | ISO catalogue                |
+| Store Status                | `Online`, `Current`       | Fixed enum                   |
 
 > ⚠️ **Header localization** (e.g., `ProductKey` → `ClaveProducto`) is planned
 > as an opt-in feature in a future version (see ROADMAP v0.3+).

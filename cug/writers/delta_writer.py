@@ -69,6 +69,13 @@ def write_delta(
         table_path = dest / table_name
         table_path.mkdir(parents=True, exist_ok=True)
 
+        # Cast Null-type columns to String — Delta Lake rejects Null as a type.
+        # This happens with small datasets where columns like EndDT/CloseDate
+        # are all-null and Polars infers them as pl.Null.
+        null_cols = [c for c in df.columns if df[c].dtype == pl.Null]
+        if null_cols:
+            df = df.with_columns([pl.col(c).cast(pl.Utf8) for c in null_cols])
+
         # Convert Polars → Arrow for deltalake
         arrow_table = df.to_arrow()
 
