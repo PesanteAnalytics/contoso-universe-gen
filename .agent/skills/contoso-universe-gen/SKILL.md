@@ -105,6 +105,23 @@ Parse the user's chat message to extract any requested changes:
 - **Language**: "en español", "in English" → update `language`
 - **Any other variable**: "seed 99", "sin compresión" → update accordingly
 
+> **⚠️ EXCEL EXCLUSION RULE (MANDATORY)**
+>
+> Excel has a **hard limit of 1,048,576 rows** per sheet. Datasets that exceed
+> this limit will be **silently truncated**, producing incomplete data.
+>
+> **Agent behavior:**
+>
+> 1. **"All formats" / "todos los formatos"** → use `parquet, csv, duckdb,
+>    delta, json` — **NEVER include `excel` automatically**.
+> 2. **Only add `excel`** to the formats list if the user **explicitly** says
+>    "excel", "quiero excel", "include excel", "también en xlsx", etc.
+> 3. If the user explicitly requests Excel **and** `target_orders > 800,000`,
+>    warn them: _"⚠️ Con ~X órdenes, FactSales puede superar el límite de
+>    1,048,576 filas de Excel y será truncado. ¿Deseas incluir Excel de
+>    todas formas?"_ — proceed only on confirmation.
+> 4. The default `formats` in `CUG-CONFIG.md` should **never** include `excel`.
+
 **If the user specifies changes in the chat:**
 
 1. **Edit `CUG-CONFIG.md`** directly using file editing tools — update the Valor
@@ -260,6 +277,20 @@ Each line is a self-contained JSON object — not wrapped in an array.
 
 The Delta writer automatically casts `Null`-type columns to `String` before writing.
 This prevents errors when columns like `EndDT` or `CloseDate` are all-null in small datasets.
+
+#### Excel — Row Limit (CRITICAL)
+
+Excel has a **hard limit of 1,048,576 rows** per sheet. The CUG writer will
+automatically **truncate** FactSales if it exceeds this limit, producing a
+`UserWarning`. This means **data loss** — the Excel file will be incomplete.
+
+**Safeguards built into the agent workflow:**
+
+| Rule | Behavior |
+| ---- | -------- |
+| "All formats" request | Excel is **excluded** — only parquet, csv, duckdb, delta, json |
+| Explicit "excel" request | Allowed, but warn if `target_orders > 800,000` |
+| Default CUG-CONFIG.md | Does **not** include excel in formats list |
 
 ---
 

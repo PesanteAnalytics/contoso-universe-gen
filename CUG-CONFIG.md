@@ -22,8 +22,8 @@
 | Variable         | Valor    | Opciones                                                                              |
 | ---------------- | -------- | ------------------------------------------------------------------------------------- |
 | output_path      | ./output | Ruta de directorio                                                                    |
-| formats          | csv      | parquet, csv, duckdb, delta, json, excel, sqlserver — separar con coma para múltiples |
-| target_orders    | 100      | Entero > 0 (≈ filas generadas)                                                        |
+| formats          | parquet, csv, duckdb, delta, json | parquet, csv, duckdb, delta, json, excel, sqlserver — separar con coma para múltiples |
+| target_orders    | 1000000  | Entero > 0 (≈ filas generadas)                                                        |
 | compress         | true     | true / false — compresión Gzip para CSV                                               |
 | integrity_check  | false    | true / false — validar integridad FK                                                  |
 | integrity_strict | true     | true / false — abortar en violaciones FK                                              |
@@ -149,5 +149,5 @@
 
 ---
 
-> **Última ejecución**: _2026-03-11 18:23_
-> **Última modificación**: _2026-03-11 18:23_
+> **Última ejecución**: _2026-03-12 16:15_
+> **Última modificación**: _2026-03-12 16:14_

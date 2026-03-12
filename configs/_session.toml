@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Contoso Universe Generator — Session Configuration
-# Generated from CUG-CONFIG.md on 2026-03-11
+# Generated: 2026-03-12 16:06 from CUG-CONFIG.md
 # ─────────────────────────────────────────────────────────────────────────────
 
 [general]
@@ -13,8 +13,8 @@ chunk_days  = 30
 
 [output]
 output_path    = "./output"
-formats        = ["csv"]
-target_orders  = 100
+formats        = ["parquet", "csv", "duckdb", "delta", "json", "excel"]
+target_orders  = 1_000_000
 compress       = true
 
 [output.format_options]
@@ -26,7 +26,6 @@ parquet_compression     = "zstd"
 csv_separator           = ","
 csv_include_header      = true
 csv_null_value          = ""
-# csv_date_format       = auto
 
 # DuckDB
 duckdb_db_name          = "contoso.duckdb"
@@ -35,7 +34,7 @@ duckdb_db_name          = "contoso.duckdb"
 delta_mode              = "overwrite"
 delta_name              = "contoso"
 
-# JSON
+# JSON / NDJSON
 json_row_oriented       = false
 json_pretty             = false
 
@@ -44,7 +43,7 @@ excel_single_workbook   = true
 excel_workbook_name     = "contoso.xlsx"
 
 [customers]
-pool_size         = 50000
+pool_size         = 50_000
 active_pct        = 0.30
 online_pct_start  = 0.05
 online_pct_end    = 0.55
