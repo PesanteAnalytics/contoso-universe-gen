@@ -137,9 +137,15 @@ def generate_fact_sales(
     # Expected orders per day: avg × weight × growth
     lambdas = avg_daily * day_weights * growth
 
-    # Sample with Gaussian noise (~15% stddev, like original)
-    noise   = rng.normal(0, 1, size=total_days)
-    n_per_day = np.maximum(1, np.round(lambdas + noise * lambdas * 0.15)).astype(np.int64)
+    # Sample daily order counts based on expected volume
+    if avg_daily < 1.0:
+        # Low-volume mode: use Poisson to allow zero-order days
+        # This ensures target_orders=100 → ~100 FactSales rows
+        n_per_day = rng.poisson(lambdas).astype(np.int64)
+    else:
+        # Normal mode: Gaussian noise (~15% stddev) with min 1 order/day
+        noise   = rng.normal(0, 1, size=total_days)
+        n_per_day = np.maximum(1, np.round(lambdas + noise * lambdas * 0.15)).astype(np.int64)
 
     total_rows = int(n_per_day.sum())
 

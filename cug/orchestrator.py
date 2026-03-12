@@ -87,8 +87,21 @@ def run_generation(
     )
 
     _step("DimCustomer", 0.22)
+
+    # Auto-scale pool_size when target_orders is low to avoid
+    # generating 50K customers for just 100 orders
+    configured_pool = config.customers.pool_size
+    target_orders = config.output.target_orders
+    auto_pool = max(1_000, target_orders * 5)
+    effective_pool = min(configured_pool, auto_pool)
+    if effective_pool < configured_pool:
+        console.print(
+            f"  [dim]ℹ pool_size auto-scaled: {configured_pool:,} → "
+            f"{effective_pool:,} (based on target_orders={target_orders:,})[/dim]"
+        )
+
     result.dim_customer = generate_dim_customer(
-        pool_size=config.customers.pool_size,
+        pool_size=effective_pool,
         language=config.general.language,
         seed=config.general.seed,
     )
