@@ -80,10 +80,6 @@ skill_capability_audit.md
 # Everything private lives in _pal-internal/ (one folder = one rule)
 _pal-internal/
 
-# Legacy agent tooling folders (kept for convention compatibility)
-.agents/
-.agent/
-
 # Per-user local files
 configs/_session.toml
 configs/quicktest.toml
