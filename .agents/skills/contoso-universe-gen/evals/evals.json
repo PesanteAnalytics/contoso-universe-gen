@@ -1,0 +1,67 @@
+{
+  "skill_name": "contoso-universe-gen",
+  "version": "1.0.0",
+  "evals": [
+    {
+      "id": 1,
+      "name": "quick_test_dataset",
+      "prompt": "Generate a quick test dataset",
+      "expected_output": "Agent reads or creates CUG-CONFIG.md, sets target_orders=5000, then executes cug generate",
+      "expectations": [
+        "CUG-CONFIG.md is read or created from template",
+        "target_orders is set to a small value (~5000)",
+        "cug generate command is executed successfully",
+        "Output summary is shown with table count, format, and time"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "change_format_and_count",
+      "prompt": "Generate 50,000 rows in CSV and Parquet",
+      "expected_output": "Agent updates CUG-CONFIG.md with target_orders=50000 and formats=csv,parquet, confirms with user, then executes",
+      "expectations": [
+        "CUG-CONFIG.md is updated with target_orders=50000",
+        "formats is set to csv,parquet (no excel)",
+        "Change summary is shown before asking for confirmation",
+        "Execution only starts after user confirms"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "excel_warning",
+      "prompt": "Generate 2 million rows in Excel",
+      "expected_output": "Agent warns user about Excel row limit before proceeding",
+      "expectations": [
+        "Agent detects Excel format + target_orders > 800000",
+        "Warning is issued: data would be truncated at 1,048,576 rows",
+        "Agent asks for confirmation before proceeding",
+        "Agent offers Parquet or CSV as alternative"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "sql_server_population",
+      "prompt": "Meter datos en SQL Server para demo",
+      "expected_output": "Agent updates formats=sqlserver in CUG-CONFIG.md and runs cug generate with sqlserver flags",
+      "expectations": [
+        "Skill is triggered by Spanish phrase",
+        "formats is updated to sqlserver in CUG-CONFIG.md",
+        "CLI command includes --sqlserver-name and --sqlserver-db flags",
+        "User is informed of SQL Server instance being used"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "config_card_creation",
+      "prompt": "Generar datos con seed 99, idioma español, 100K filas",
+      "expected_output": "Agent creates CUG-CONFIG.md if missing, updates seed=99, language=es, target_orders=100000",
+      "expectations": [
+        "If CUG-CONFIG.md does not exist, it is created from the template",
+        "seed is set to 99",
+        "language is set to es",
+        "target_orders is set to 100000",
+        "Change summary shown before asking for confirmation"
+      ]
+    }
+  ]
+}
