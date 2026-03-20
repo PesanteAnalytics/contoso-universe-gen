@@ -1,95 +1,237 @@
 # Contoso Universe Generator (`cug`)
 
-> **God-level synthetic retail data generator** — 100% Python, zero .NET required.
+> **The Python-native synthetic retail data generator** — multi-language, multi-format, zero .NET required.
 
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
-[![Polars](https://img.shields.io/badge/dataframe-polars-orange)](https://pola.rs)
-[![DuckDB](https://img.shields.io/badge/engine-duckdb-yellow)](https://duckdb.org)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/CSalcedoDataBI/contoso-universe-gen/actions/workflows/ci.yml/badge.svg)](https://github.com/CSalcedoDataBI/contoso-universe-gen/actions/workflows/ci.yml)
+[![Polars](https://img.shields.io/badge/dataframe-Polars-orange)](https://pola.rs)
+[![DuckDB](https://img.shields.io/badge/engine-DuckDB-yellow)](https://duckdb.org)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+---
+
+## Why CUG?
+
+The [Contoso Data Generator V2](https://github.com/sql-bi/Contoso-Data-Generator-V2) by **SQLBI** (Marco Russo & Alberto Ferrari) is the gold standard for Power BI demo data. Their schema design and temporal realism patterns are simply excellent — CUG would not exist without them.
+
+CUG is a Python-native answer to the same problem: same spirit, different stack, expanded scope. It was built for teams that need offline generation, multi-language localization, or scripted/agent-driven workflows.
+
+> *Standing on the shoulders of giants.*
+
+**What CUG adds:**
+
+| Problem with DG V2 | CUG solution |
+| --- | --- |
+| Requires .NET SDK (~75 MB runtime) | 100% Python — `pip install` and go |
+| English-only names and categories | 8 languages: EN, ES, PT, FR, DE, ZH, JA, AR |
+| Downloads real data from SQLBI servers | Fully offline — Faker generates everything locally |
+| Fixed product schema (`data.xlsx`) | YAML category plugins — extend without touching code |
+| CSV / Parquet / Delta only | + DuckDB, JSON, Excel, SQL Server |
+| No integrity checks | `--verify` + `--strict` for FK-safe datasets |
+| No AI agent integration | Native Antigravity skill (trigger phrases in EN/ES) |
+
+> CUG and DG V2 serve different needs. DG V2 remains the definitive Contoso reference for .NET environments.
+> CUG is the Python-native alternative — offline, multi-language, and built to be scripted and automated.
+
+---
 
 ## Features
 
-| Feature                 | Description                                                    |
-| ----------------------- | -------------------------------------------------------------- |
-| 🌍 **Multi-language**   | EN, ES, PT, FR, DE, ZH, JA, AR — names, cities, categories     |
-| ⚡ **Polars engine**    | Vectorized generation — 5-10x faster than Pandas-based tools   |
-| 📦 **7 output formats** | Parquet, CSV, DuckDB, Delta Lake, JSON, Excel, SQL Server      |
-| 🔌 **Category plugins** | Add any industry with a simple YAML file                       |
-| 🎯 **Deterministic**    | Seed-per-day reproducibility — same config = same data         |
-| 🕐 **Temporal realism** | COVID spikes, Black Friday, eCommerce curves, Poisson delivery |
+| | Feature | Detail |
+| --- | --- | --- |
+| 🌍 | **Multi-language** | 8 locales — names, cities, and categories fully localized |
+| ⚡ | **Polars engine** | Vectorized generation — 5–10× faster than Pandas-based tools |
+| 📦 | **7 output formats** | Parquet, CSV, DuckDB, Delta Lake, JSON, Excel, SQL Server |
+| 🔌 | **YAML category plugins** | Add any industry vertical without changing a line of code |
+| 🎯 | **Deterministic** | Seed-per-day reproducibility — same config = same data, always |
+| 🕐 | **Temporal realism** | COVID dip, Black Friday spikes, eCommerce growth, Poisson delivery |
+| ✅ | **FK integrity checks** | `--verify` catches orphaned rows before you load to Power BI |
+| 🤖 | **AI-agent native** | Configure and run via natural language through the bundled Skill |
+
+---
 
 ## Quick Start
 
 ```bash
-# Install with uv (recommended)
+# Install (uv recommended)
 uv pip install -e .
 
-# Generate 100k retail orders in English (Parquet)
-cug generate -n 100000 -f parquet
+# Generate 10,000 retail orders in English (Parquet)
+cug generate -n 10000 -f parquet
 
-# Generate in multiple formats
+# Multiple formats + Spanish locale
 cug generate -n 50000 -f parquet,csv,duckdb -l es
 
 # Direct to SQL Server
-cug generate -n 100000 -f sqlserver --sqlserver-name "localhost\SQLEXPRESS" --sqlserver-db ContosoRetail
+cug generate -n 100000 -f sqlserver \
+  --sqlserver-name "localhost\SQLEXPRESS" \
+  --sqlserver-db ContosoRetail
 
-# Generate 1M orders in Spanish using config
+# Generate from a TOML config file
 cug generate -c configs/retail_1M_es.toml
 
-# See available formats
-cug formats
-
-# See available categories
-cug categories
+# Explore the CLI
+cug formats          # list all output formats
+cug categories       # list product categories
+cug categories -l es # categories in Spanish
+cug info             # show current config
 ```
+
+---
 
 ## Output Schema
 
-### Fact Tables
+CUG produces a classic **retail star schema**:
 
-- `fact_sales` — Order lines with pricing, discounts, delivery dates
+```
+                    ┌─────────────┐
+                    │  FactSales  │
+                    └──────┬──────┘
+           ┌───────────────┼───────────────┐
+           │               │               │
+    ┌──────▼──────┐ ┌──────▼──────┐ ┌──────▼──────┐
+    │ DimProduct  │ │ DimCustomer │ │  DimStore   │
+    └─────────────┘ └─────────────┘ └─────────────┘
+           │               │
+    ┌──────▼──────┐ ┌──────▼──────────────┐
+    │   DimDate   │ │ DimCurrencyExchange  │
+    └─────────────┘ └─────────────────────┘
+```
 
-### Dimension Tables
+| Table | Key columns |
+| --- | --- |
+| `FactSales` | `OrderKey`, `CustomerKey`, `ProductKey`, `StoreKey`, `OrderDate`, `UnitPrice`, `NetPrice`, `UnitCost` |
+| `DimProduct` | `ProductKey`, `ProductName`, `Category`, `Subcategory`, `Brand`, `Price`, `Cost` |
+| `DimCustomer` | `CustomerKey`, `GivenName`, `Surname`, `Email`, `City`, `CountryCode` |
+| `DimStore` | `StoreKey`, `StoreName`, `Country`, `StoreType` |
+| `DimDate` | `DateKey`, `Date`, `Year`, `Month`, `Quarter`, `IsHoliday`, `IsWorkingDay` |
+| `DimCurrencyExchange` | `CurrencyKey`, `DateKey`, `Exchange` |
 
-- `dim_product` — Products with category/subcategory hierarchy
-- `dim_customer` — Customers (real-ish names via Faker, localized)
-- `dim_store` — Physical stores + online channel
-- `dim_date` — Extended calendar with holidays, working days
-- `dim_currency` — Exchange rates over time
+---
+
+## Custom Category Plugins
+
+Add any product category with a YAML file — no code changes needed:
+
+```yaml
+# my_fashion_category.yaml
+name: Fashion
+subcategories:
+  - name: Footwear
+    products:
+      - { name: "Running Shoes", price: 120, cost: 55 }
+      - { name: "Leather Boots", price: 250, cost: 110 }
+```
+
+Register in your TOML config:
+
+```toml
+[categories]
+custom_paths = ["./my_fashion_category.yaml"]
+```
+
+See [`docs/category-plugins.md`](docs/category-plugins.md) for the full YAML schema.
+
+---
 
 ## Stack
 
-- **[Polars](https://pola.rs)** — DataFrame engine
-- **[DuckDB](https://duckdb.org)** — Embedded analytical SQL
-- **[Faker](https://faker.readthedocs.io)** — Synthetic data + locales
-- **[Pydantic v2](https://docs.pydantic.dev)** — Config validation
-- **[Typer](https://typer.tiangolo.com)** — CLI
-- **[Rich](https://rich.readthedocs.io)** — Terminal UI
+| Library | Role |
+| --- | --- |
+| [Polars](https://pola.rs) | DataFrame engine — vectorized, blazing fast |
+| [DuckDB](https://duckdb.org) | Embedded analytical SQL engine |
+| [Faker](https://faker.readthedocs.io) | Synthetic names, addresses, companies — 8 locales |
+| [Pydantic v2](https://docs.pydantic.dev) | Config validation |
+| [Typer](https://typer.tiangolo.com) | CLI framework |
+| [Rich](https://rich.readthedocs.io) | Terminal UI with progress bars and tables |
 
-## Adding Custom Categories
+---
 
-CUG supports custom product categories via YAML plugin files.
+## Documentation
 
-1. Create a YAML file following the builtin schema (see `cug/categories/builtin/` for examples)
-2. Add the path to your TOML config:
+| Doc | Description |
+| --- | --- |
+| [`docs/MANUAL.md`](docs/MANUAL.md) | Complete reference manual (ES) |
+| [`docs/category-plugins.md`](docs/category-plugins.md) | YAML plugin authoring guide |
+| [`docs/output-formats.md`](docs/output-formats.md) | Format-specific configuration |
+| [`docs/temporal-realism.md`](docs/temporal-realism.md) | How CUG models time and seasonality |
+| [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) | AI agent skill (Antigravity / Gemini) |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
 
-   ```toml
-   [categories]
-   custom_paths = ["./my_fashion_category.yaml"]
-   ```
+---
 
-3. Run generation as normal — your custom categories will be included:
+## 🤖 AI Agent Integration
 
-   ```bash
-   cug generate -c my_config.toml
-   ```
+CUG ships with a native **Agent Skill** for AI coding assistants
+(Antigravity, Gemini CLI, and others that support `SKILL.md` files).
 
-To see all loaded categories:
+Once installed, you can configure and run CUG entirely through natural language:
+
+```text
+You: "Generate 50k rows in Spanish and load to SQL Server"
+Agent: reads CUG-CONFIG.md → updates config → runs generation → reports results
+
+"Generator 100K orders en parquet para un workshop"
+Agent: target_orders=100000, format=parquet, proceeds automatically
+```
+
+The skill uses a **persistent `CUG-CONFIG.md`** file as a configuration card
+that you can view and edit directly in your IDE — no JSON, no command memorization.
 
 ```bash
-cug categories
-cug categories -l es   # show in Spanish
+cug init   # create your local CUG-CONFIG.md configuration card
 ```
+
+See [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) for full installation instructions.
+
+---
+
+## 🏗️ From the PAL Data Team
+
+CUG started as an internal tool for the **PAL Data Team** — a Power BI consulting group
+that builds analytics solutions across industries: VMS/workforce staffing, healthcare,
+financial services, and retail.
+
+The challenge: every client engagement needs realistic demo data *in their industry,
+in their language, at their scale* — and no existing tool could deliver that without
+significant manual effort. CUG solves that.
+
+We built it in the open because the problem is universal.
+**If you build Power BI solutions for clients, CUG can save you days of work.**
+
+> *We built what we needed. We shared it because you might need it too.*
+
+---
+
+## 🤝 Built with AI Collaboration
+
+CUG was designed and built by **Cristóbal Salcedo** ([@CSalcedoDataBI](https://github.com/CSalcedoDataBI))
+in close collaboration with **Antigravity** — Google DeepMind's agentic coding assistant.
+
+This is not a project *generated* by AI. It is a project *architected* by a domain expert
+who used AI as a pair programmer. Every design decision, every feature, every test scenario
+reflects real-world data modeling experience from the Power BI and analytics space.
+
+**What Cristóbal brought:** Domain expertise in VMS, retail analytics, and Power BI data modeling.
+**What AI brought:** Implementation speed, code structure, and iteration velocity.
+
+The result: a production-grade tool built by a solo practitioner in weeks rather than months.
+This is the new paradigm of open-source — and CUG is built to inspire others to do the same.
+
+---
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for:
+- Setting up a dev environment
+- Running the test suite
+- Creating YAML category plugins
+- Code style and PR process
+
+---
 
 ## License
 
-MIT — See [NOTICE.md](NOTICE.md) for attribution to original Contoso concepts.
+MIT — see [LICENSE](LICENSE). \
+See [NOTICE.md](NOTICE.md) for attribution to the original Contoso concept by SQLBI.

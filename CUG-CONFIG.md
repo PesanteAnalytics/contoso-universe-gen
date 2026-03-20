@@ -1,153 +1,153 @@
-# 📦 CUG — Configuración Activa
+# 📦 CUG — Active Configuration Card
 
-> **Tarjeta de configuración persistente** para el Contoso Universe Generator.
-> Edita los valores en la columna **Valor** y el agente los aplicará automáticamente.
-> Los valores aquí son los **defaults** — cambia solo lo que necesites.
+> **Persistent configuration card** for the Contoso Universe Generator.
+> Edit the values in the **Value** column and the agent will apply them automatically.
+> The values shown here are the **defaults** — only change what you need.
 
 ---
 
 ## 🔧 General
 
-| Variable   | Valor      | Opciones                       |
-| ---------- | ---------- | ------------------------------ |
-| start_date | 2022-01-01 | Fecha YYYY-MM-DD               |
-| end_date   | 2026-03-17 | Fecha YYYY-MM-DD               |
-| language   | en         | en, es, pt, fr, de, zh, ja, ar |
-| country    | US         | Código ISO 3166-1              |
-| seed       | 42         | Cualquier entero               |
-| chunk_days | 30         | Entero > 0                     |
+| Parameter    | Value      | Options                              |
+| ------------ | ---------- | ------------------------------------ |
+| start_date   | 2022-01-01 | Date YYYY-MM-DD                      |
+| end_date     | 2026-03-17 | Date YYYY-MM-DD                      |
+| language     | en         | en, es, pt, fr, de, zh, ja, ar       |
+| country      | US         | ISO 3166-1 alpha-2 code              |
+| seed         | 42         | Any integer                          |
+| chunk_days   | 30         | Integer > 0                          |
 
 ## 📤 Output
 
-| Variable         | Valor    | Opciones                                                                              |
-| ---------------- | -------- | ------------------------------------------------------------------------------------- |
-| output_path      | ./output | Ruta de directorio                                                                    |
-| formats          | parquet, csv, duckdb, delta, json | parquet, csv, duckdb, delta, json, excel, sqlserver — separar con coma para múltiples |
-| target_orders    | 1000000  | Entero > 0 (≈ filas generadas)                                                        |
-| compress         | true     | true / false — compresión Gzip para CSV                                               |
-| integrity_check  | false    | true / false — validar integridad FK                                                  |
-| integrity_strict | true     | true / false — abortar en violaciones FK                                              |
+| Parameter        | Value                             | Options                                                                               |
+| ---------------- | --------------------------------- | ------------------------------------------------------------------------------------- |
+| output_path      | ./output                          | Directory path                                                                        |
+| formats          | parquet, csv, duckdb, delta, json | parquet, csv, duckdb, delta, json, excel, sqlserver — comma-separated for multiple    |
+| target_orders    | 1000000                           | Integer > 0 (≈ rows generated)                                                        |
+| compress         | true                              | true / false — Gzip compression for CSV                                               |
+| integrity_check  | false                             | true / false — validate FK integrity                                                  |
+| integrity_strict | true                              | true / false — abort on FK violations                                                 |
 
-## 📄 Opciones de Formato
+## 📄 Format Options
 
-> Solo aplican las opciones del formato seleccionado arriba.
+> Only the options for the selected format(s) above apply.
 
 ### Parquet
 
-| Variable               | Valor | Opciones                              |
-| ---------------------- | ----- | ------------------------------------- |
-| parquet_compression    | zstd  | zstd, snappy, gzip, lz4, brotli, none |
-| parquet_row_group_size | auto  | Entero o auto                         |
+| Parameter              | Value | Options                                |
+| ---------------------- | ----- | -------------------------------------- |
+| parquet_compression    | zstd  | zstd, snappy, gzip, lz4, brotli, none  |
+| parquet_row_group_size | auto  | Integer or auto                        |
 
 ### CSV
 
-| Variable           | Valor | Opciones                                |
-| ------------------ | ----- | --------------------------------------- |
-| csv_separator      | ,     | Cualquier carácter                      |
-| csv_include_header | true  | true / false                            |
-| csv_null_value     |       | Cualquier string (vacío = default)      |
-| csv_date_format    | auto  | auto = ISO 8601, o patrón como %Y-%m-%d |
+| Parameter          | Value | Options                                    |
+| ------------------ | ----- | ------------------------------------------ |
+| csv_separator      | ,     | Any single character                       |
+| csv_include_header | true  | true / false                               |
+| csv_null_value     |       | Any string (empty = default)               |
+| csv_date_format    | auto  | auto = ISO 8601, or pattern like %Y-%m-%d  |
 
 ### DuckDB
 
-| Variable       | Valor          | Opciones                   |
-| -------------- | -------------- | -------------------------- |
-| duckdb_db_name | contoso.duckdb | Nombre del archivo .duckdb |
+| Parameter      | Value          | Options                      |
+| -------------- | -------------- | ---------------------------- |
+| duckdb_db_name | contoso.duckdb | DuckDB output filename       |
 
 ### Delta Lake
 
-| Variable           | Valor     | Opciones                                            |
-| ------------------ | --------- | --------------------------------------------------- |
-| delta_mode         | overwrite | overwrite, append, error                            |
-| delta_partition_by |           | Lista de columnas, ej: Year (vacío = sin partición) |
-| delta_name         | contoso   | Nombre metadata Delta                               |
+| Parameter          | Value     | Options                                               |
+| ------------------ | --------- | ----------------------------------------------------- |
+| delta_mode         | overwrite | overwrite, append, error                              |
+| delta_partition_by |           | Column list, e.g. Year (empty = no partitioning)      |
+| delta_name         | contoso   | Delta log metadata name                               |
 
 ### JSON
 
-| Variable          | Valor | Opciones                                                   |
-| ----------------- | ----- | ---------------------------------------------------------- |
-| json_row_oriented | false | false = NDJSON (1 record/línea), true = JSON array         |
-| json_pretty       | false | true / false — pretty-print (solo con row_oriented = true) |
+| Parameter         | Value | Options                                                       |
+| ----------------- | ----- | ------------------------------------------------------------- |
+| json_row_oriented | false | false = NDJSON (1 record/line), true = JSON array             |
+| json_pretty       | false | true / false — pretty-print (only with row_oriented = true)   |
 
 ### Excel
 
-| Variable              | Valor        | Opciones                                                    |
-| --------------------- | ------------ | ----------------------------------------------------------- |
-| excel_single_workbook | true         | true = todas las tablas en 1 xlsx, false = 1 xlsx por tabla |
-| excel_workbook_name   | contoso.xlsx | Nombre del archivo Excel                                    |
+| Parameter             | Value        | Options                                                        |
+| --------------------- | ------------ | -------------------------------------------------------------- |
+| excel_single_workbook | true         | true = all tables in one .xlsx, false = one .xlsx per table    |
+| excel_workbook_name   | contoso.xlsx | Excel filename                                                 |
 
 ### SQL Server
 
-| Variable                    | Valor                | Opciones                                             |
-| --------------------------- | -------------------- | ---------------------------------------------------- |
-| sqlserver_server            | localhost\SQLEXPRESS | Instancia del servidor                               |
-| sqlserver_database          | ContosoRetail        | Base de datos destino (se crea si no existe)         |
-| sqlserver_schema            | dbo                  | Esquema destino                                      |
-| sqlserver_driver            | auto                 | auto = detectar, o nombre exacto del driver ODBC     |
-| sqlserver_trusted           | true                 | true = Windows Auth, false = SQL Auth                |
-| sqlserver_username          |                      | Solo si trusted = false                              |
-| sqlserver_password          |                      | Solo si trusted = false                              |
-| sqlserver_if_exists         | replace              | replace, append, fail                                |
-| sqlserver_batch_size        | 5000                 | Filas por INSERT batch                               |
-| sqlserver_connection_string |                      | ODBC string completa (sobreescribe todo lo anterior) |
+| Parameter                   | Value                | Options                                                    |
+| --------------------------- | -------------------- | ---------------------------------------------------------- |
+| sqlserver_server            | localhost\SQLEXPRESS | Server instance                                            |
+| sqlserver_database          | ContosoRetail        | Target database (auto-created if possible)                 |
+| sqlserver_schema            | dbo                  | Target schema                                              |
+| sqlserver_driver            | auto                 | auto = detect, or exact ODBC driver name                   |
+| sqlserver_trusted           | true                 | true = Windows Auth, false = SQL Auth                      |
+| sqlserver_username          |                      | Only if trusted = false                                    |
+| sqlserver_password          |                      | Only if trusted = false                                    |
+| sqlserver_if_exists         | replace              | replace, append, fail                                      |
+| sqlserver_batch_size        | 5000                 | Rows per INSERT batch                                      |
+| sqlserver_connection_string |                      | Full ODBC string (overrides all settings above)            |
 
-## 👥 Clientes
+## 👥 Customers
 
-| Variable         | Valor | Opciones                                  |
-| ---------------- | ----- | ----------------------------------------- |
-| pool_size        | 50000 | Entero > 0 — total clientes únicos        |
-| active_pct       | 0.30  | 0.01 – 1.0 — % que compran al menos 1 vez |
-| online_pct_start | 0.05  | 0.0 – 1.0 — % ventas online al inicio     |
-| online_pct_end   | 0.55  | 0.0 – 1.0 — % ventas online al final      |
+| Parameter        | Value | Options                                      |
+| ---------------- | ----- | -------------------------------------------- |
+| pool_size        | 50000 | Integer > 0 — total unique customers         |
+| active_pct       | 0.30  | 0.01 – 1.0 — % that make at least 1 purchase |
+| online_pct_start | 0.05  | 0.0 – 1.0 — % online orders at start_date    |
+| online_pct_end   | 0.55  | 0.0 – 1.0 — % online orders at end_date      |
 
-## 📂 Categorías
+## 📂 Categories
 
-| Variable     | Valor                            | Opciones                                      |
-| ------------ | -------------------------------- | --------------------------------------------- |
-| enabled      | electronics, home, gaming, media | Categorías activas separadas por coma         |
-| custom_paths |                                  | Rutas a plugins YAML custom (vacío = ninguno) |
+| Parameter    | Value                            | Options                                         |
+| ------------ | -------------------------------- | ----------------------------------------------- |
+| enabled      | electronics, home, gaming, media | Active categories, comma-separated               |
+| custom_paths |                                  | Paths to custom YAML plugins (empty = none)      |
 
-## 📅 Eventos Anuales
+## 📅 Annual Events
 
-> Eventos recurrentes que afectan el volumen de ventas cada año.
-> Para agregar: nueva fila. Para desactivar: elimina la fila o pon factor = 1.0.
+> Recurring events that boost or reduce sales volume every year.
+> To add: new row. To disable: delete the row or set factor = 1.0.
 
-| Evento         | Mes | Día | Factor |
-| -------------- | --- | --- | ------ |
-| Black Friday   | 11  | 25  | 2.8    |
-| Cyber Monday   | 11  | 28  | 2.5    |
-| Christmas      | 12  | 25  | 2.0    |
-| Back to School | 8   | 15  | 1.8    |
-| Prime Day      | 7   | 12  | 2.5    |
+| Event          | Month | Day | Factor |
+| -------------- | ----- | --- | ------ |
+| Black Friday   | 11    | 25  | 2.8    |
+| Cyber Monday   | 11    | 28  | 2.5    |
+| Christmas      | 12    | 25  | 2.0    |
+| Back to School | 8     | 15  | 1.8    |
+| Prime Day      | 7     | 12  | 2.5    |
 
-## 📅 Eventos Históricos (One-Time)
+## 📅 Historical Events (One-Time)
 
-> Eventos únicos con impacto en un rango específico de fechas.
-> Para agregar: nueva fila. Para desactivar: elimina la fila o pon factor = 1.0.
+> One-off events with impact over a specific date range.
+> To add: new row. To disable: delete the row or set factor = 1.0.
 
-| Evento                  | Fecha Inicio | Fecha Fin  | Factor |
-| ----------------------- | ------------ | ---------- | ------ |
-| COVID Lockdown Drop     | 2020-03-15   | 2020-04-30 | 0.45   |
-| COVID eCommerce Surge   | 2020-05-01   | 2021-03-31 | 1.18   |
-| Post-COVID Recovery     | 2021-04-01   | 2022-06-30 | 1.06   |
-| Inflation Pressure 2022 | 2022-01-01   | 2022-12-31 | 0.92   |
-| AI & Electronics Boom 2023-2024 | 2023-06-01   | 2024-12-31 | 1.09   |
+| Event                          | Start Date | End Date   | Factor |
+| ------------------------------ | ---------- | ---------- | ------ |
+| COVID Lockdown Drop            | 2020-03-15 | 2020-04-30 | 0.45   |
+| COVID eCommerce Surge          | 2020-05-01 | 2021-03-31 | 1.18   |
+| Post-COVID Recovery            | 2021-04-01 | 2022-06-30 | 1.06   |
+| Inflation Pressure 2022        | 2022-01-01 | 2022-12-31 | 0.92   |
+| AI & Electronics Boom 2023-24  | 2023-06-01 | 2024-12-31 | 1.09   |
 
-## 📊 Factores por Día de Semana
+## 📊 Weekday Sales Factors
 
-> Lun=0 … Dom=6. Factor 1.0 = promedio. Mayor = más ventas, menor = menos.
+> Mon=0 … Sun=6. Factor 1.0 = average. Higher = more sales, lower = fewer.
 
-| Día       | Factor |
+| Day       | Factor |
 | --------- | ------ |
-| Lunes     | 0.75   |
-| Martes    | 0.85   |
-| Miércoles | 0.95   |
-| Jueves    | 1.05   |
-| Viernes   | 1.20   |
-| Sábado    | 1.60   |
-| Domingo   | 0.30   |
+| Monday    | 0.75   |
+| Tuesday   | 0.85   |
+| Wednesday | 0.95   |
+| Thursday  | 1.05   |
+| Friday    | 1.20   |
+| Saturday  | 1.60   |
+| Sunday    | 0.30   |
 
 ---
 
-> **Última ejecución**: _2026-03-12 16:15_
-> **Última modificación**: _2026-03-12 16:14_
+> **Last run**: _2026-03-12 16:15_
+> **Last modified**: _2026-03-12 16:14_
