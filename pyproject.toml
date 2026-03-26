@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "contoso-universe-gen"
 version = "0.2.0"
-description = "God-level synthetic retail data generator — Polars + DuckDB + Faker + i18n"
+description = "High-performance synthetic retail data generator — Polars + DuckDB + Faker + i18n"
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.12"

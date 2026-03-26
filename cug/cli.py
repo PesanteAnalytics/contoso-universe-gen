@@ -40,7 +40,7 @@ from .categories.registry import CategoryRegistry
 console = Console(highlight=True)
 app = typer.Typer(
     name="cug",
-    help="[bold cyan]Contoso Universe Generator[/bold cyan] — God-level synthetic data for analytics.",
+    help="[bold cyan]Contoso Universe Generator[/bold cyan] — High-performance synthetic data for analytics.",
     rich_markup_mode="rich",
     no_args_is_help=True,
 )
