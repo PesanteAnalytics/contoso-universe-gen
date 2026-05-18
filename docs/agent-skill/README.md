@@ -83,13 +83,13 @@ The **`CUG-CONFIG.md`** file acts as a persistent, human-readable configuration 
 
 > These files live in the parent `docs/` directory:
 
-- [`docs/instalacion.md`](../instalacion.md) — Installation guide
-- [`docs/configuracion-toml.md`](../configuracion-toml.md) — Full TOML reference
-- [`docs/formatos-salida.md`](../formatos-salida.md) — Format-specific details
-- [`docs/esquema-datos.md`](../esquema-datos.md) — Generated star schema
+- [`docs/installation.md`](../installation.md) — Installation guide
+- [`docs/toml-configuration.md`](../toml-configuration.md) — Full TOML reference
+- [`docs/output-formats.md`](../output-formats.md) — Format-specific details
+- [`docs/data-schema.md`](../data-schema.md) — Generated star schema
 - [`docs/category-plugins.md`](../category-plugins.md) — YAML plugin system
 - [`docs/i18n-reference.md`](../i18n-reference.md) — Language & locale guide
-- [`docs/recetas.md`](../recetas.md) — CLI quick recipes
+- [`docs/recipes.md`](../recipes.md) — CLI quick recipes
 
 ---
 

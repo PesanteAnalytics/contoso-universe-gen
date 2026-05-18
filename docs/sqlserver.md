@@ -1,52 +1,52 @@
 # SQL Server
 
-> Guía completa para usar CUG con SQL Server: prerequisitos, autenticación, mapeo de tipos y troubleshooting.
+> Complete guide for using CUG with SQL Server: prerequisites, authentication, type mapping, and troubleshooting.
 
 ---
 
-## Prerequisitos
+## Prerequisites
 
 ### SQL Server
 
-CUG es compatible con:
+CUG is compatible with:
 
-- **SQL Server Express** 2017+ (ideal para desarrollo local)
+- **SQL Server Express** 2017+ (ideal for local development)
 - **SQL Server Developer** 2017+
 - **SQL Server Standard/Enterprise** 2017+
 - **Azure SQL Database**
 - **Azure SQL Managed Instance**
 
-### Driver ODBC
+### ODBC Driver
 
-CUG necesita un driver ODBC para conectarse a SQL Server. Se auto-detecta el mejor disponible.
+CUG needs an ODBC driver to connect to SQL Server. The best available driver is auto-detected.
 
-**Drivers soportados (en orden de preferencia):**
+**Supported drivers (in order of preference):**
 
-| Driver | Notas |
+| Driver | Notes |
 |--------|-------|
-| ODBC Driver 18 for SQL Server | Más reciente. Requiere SSL/TLS (manejado automáticamente) |
-| ODBC Driver 17 for SQL Server | Ampliamente disponible. Recomendado |
-| SQL Server Native Client 11.0 | Legacy, funcional |
+| ODBC Driver 18 for SQL Server | Latest version. Requires SSL/TLS (handled automatically) |
+| ODBC Driver 17 for SQL Server | Widely available. Recommended |
+| SQL Server Native Client 11.0 | Legacy, functional |
 
-### Verificar drivers instalados
+### Verify Installed Drivers
 
 ```python
 import pyodbc
 print(pyodbc.drivers())
-# Output ejemplo: ['ODBC Driver 17 for SQL Server', 'SQL Server']
+# Example output: ['ODBC Driver 17 for SQL Server', 'SQL Server']
 ```
 
-### Instalar ODBC Driver (si falta)
+### Install ODBC Driver (if missing)
 
-Descargar desde: [Microsoft ODBC Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
+Download from: [Microsoft ODBC Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
 
 ---
 
-## Autenticación
+## Authentication
 
-CUG soporta tres métodos de autenticación:
+CUG supports three authentication methods:
 
-### Windows Authentication (recomendado para desarrollo)
+### Windows Authentication (recommended for development)
 
 ```toml
 [output.format_options]
@@ -58,53 +58,53 @@ sqlserver_trusted = true    # default
 cug generate -f sqlserver --sqlserver-name "localhost\SQLEXPRESS"
 ```
 
-Usa las credenciales del usuario de Windows actual. No necesita usuario/contraseña.
+Uses the current Windows user credentials. No username/password needed.
 
 ### SQL Authentication
 
 ```toml
 [output.format_options]
-sqlserver_server   = "mi-servidor.database.windows.net"
+sqlserver_server   = "my-server.database.windows.net"
 sqlserver_trusted  = false
-sqlserver_username = "mi_usuario"
-sqlserver_password = "mi_password"
+sqlserver_username = "my_user"
+sqlserver_password = "my_password"
 ```
 
-Para servidores remotos o Azure SQL.
+For remote servers or Azure SQL.
 
-### Connection String Completa
+### Full Connection String
 
 ```toml
 [output.format_options]
 sqlserver_connection_string = "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost\\SQLEXPRESS;DATABASE=ContosoRetail;Trusted_Connection=yes"
 ```
 
-Sobreescribe todas las demás opciones de conexión. Útil para configuraciones avanzadas.
+Overrides all other connection options. Useful for advanced configurations.
 
 ---
 
-## Opciones de Configuración
+## Configuration Options
 
-### En el archivo TOML
+### In the TOML File
 
 ```toml
 [output.format_options]
-sqlserver_server            = "localhost\\SQLEXPRESS"  # Instancia SQL Server
-sqlserver_database          = "ContosoRetail"          # Base de datos destino
-sqlserver_schema            = "dbo"                     # Esquema destino
-sqlserver_driver            = "ODBC Driver 17 for SQL Server"  # Auto-detectado si se omite
+sqlserver_server            = "localhost\\SQLEXPRESS"  # SQL Server instance
+sqlserver_database          = "ContosoRetail"          # Target database
+sqlserver_schema            = "dbo"                     # Target schema
+sqlserver_driver            = "ODBC Driver 17 for SQL Server"  # Auto-detected if omitted
 sqlserver_trusted           = true                      # Windows Auth (default)
-sqlserver_username          = ""                        # Solo para SQL Auth
-sqlserver_password          = ""                        # Solo para SQL Auth
+sqlserver_username          = ""                        # SQL Auth only
+sqlserver_password          = ""                        # SQL Auth only
 sqlserver_if_exists         = "replace"                 # replace | append | fail
-sqlserver_batch_size        = 5000                      # Filas por INSERT batch
-sqlserver_connection_string = ""                        # ODBC string completa (override)
+sqlserver_batch_size        = 5000                      # Rows per INSERT batch
+sqlserver_connection_string = ""                        # Full ODBC string (override)
 ```
 
 ### Via CLI
 
-| Flag CLI | Equivalente TOML | Default |
-|----------|-----------------|---------|
+| CLI Flag | TOML Equivalent | Default |
+|----------|----------------|---------|
 | `--sqlserver-name` | `sqlserver_server` | `localhost` |
 | `--sqlserver-db` | `sqlserver_database` | `ContosoRetail` |
 | `--sqlserver-schema` | `sqlserver_schema` | `dbo` |
@@ -112,55 +112,55 @@ sqlserver_connection_string = ""                        # ODBC string completa (
 
 ---
 
-## Comportamiento del Writer
+## Writer Behavior
 
-El writer de SQL Server ejecuta los siguientes pasos:
+The SQL Server writer executes the following steps:
 
-1. **Crea la base de datos** automáticamente si no existe (conecta a `master` primero)
-2. **Crea/reemplaza tablas** con tipos correctamente mapeados
-3. **Inserta datos en batch** usando `pyodbc.fast_executemany` para alto rendimiento
-4. **Fallback automático** a inserción fila por fila si `fast_executemany` falla en alguna tabla
+1. **Creates the database** automatically if it doesn't exist (connects to `master` first)
+2. **Creates/replaces tables** with correctly mapped types
+3. **Inserts data in batches** using `pyodbc.fast_executemany` for high performance
+4. **Automatic fallback** to row-by-row insertion if `fast_executemany` fails on a table
 
-### Modos `if_exists`
+### `if_exists` Modes
 
-| Modo | Descripción |
+| Mode | Description |
 |------|-------------|
-| `replace` | Elimina la tabla existente y la recrea (default) |
-| `append` | Agrega filas a la tabla existente |
-| `fail` | Error si la tabla ya existe |
+| `replace` | Drops the existing table and recreates it (default) |
+| `append` | Adds rows to the existing table |
+| `fail` | Error if the table already exists |
 
 ---
 
-## Mapeo de Tipos: Polars → SQL Server
+## Type Mapping: Polars → SQL Server
 
-| Tipo Polars | Tipo SQL Server | Notas |
+| Polars Type | SQL Server Type | Notes |
 |-------------|----------------|-------|
 | `Int8` | `TINYINT` | |
 | `Int16` | `SMALLINT` | |
 | `Int32` | `INT` | |
 | `Int64` | `BIGINT` | |
-| `UInt8` | `SMALLINT` | SQL Server no tiene unsigned → se promueve |
-| `UInt16` | `INT` | SQL Server no tiene unsigned → se promueve |
-| `UInt32` | `BIGINT` | SQL Server no tiene unsigned → se promueve |
-| `UInt64` | `BIGINT` | SQL Server no tiene unsigned → se promueve |
+| `UInt8` | `SMALLINT` | SQL Server has no unsigned → promoted |
+| `UInt16` | `INT` | SQL Server has no unsigned → promoted |
+| `UInt32` | `BIGINT` | SQL Server has no unsigned → promoted |
+| `UInt64` | `BIGINT` | SQL Server has no unsigned → promoted |
 | `Float32` | `REAL` | |
 | `Float64` | `FLOAT` | |
-| `String` | `NVARCHAR(400)` | Unicode, 400 caracteres máximo |
+| `String` | `NVARCHAR(400)` | Unicode, 400 characters max |
 | `Categorical` | `NVARCHAR(200)` | |
-| `Boolean` | `BIT` | Se convierte a `1`/`0` internamente |
+| `Boolean` | `BIT` | Converted to `1`/`0` internally |
 | `Date` | `DATE` | |
 | `Datetime` | `DATETIME2` | |
 | `Time` | `TIME` | |
-| `Duration` | `BIGINT` | Almacenado como microsegundos |
+| `Duration` | `BIGINT` | Stored as microseconds |
 | `Binary` | `VARBINARY(MAX)` | |
 | `Decimal` | `DECIMAL(19,4)` | |
-| `Null` | `NVARCHAR(1) NULL` | Columnas donde todos los valores son `None` |
+| `Null` | `NVARCHAR(1) NULL` | Columns where all values are `None` |
 
 ---
 
-## Ejemplos
+## Examples
 
-### Caso 1: SQL Server Express local (el más común)
+### Case 1: Local SQL Server Express (most common)
 
 ```bash
 cug generate -n 100000 -f sqlserver \
@@ -168,7 +168,7 @@ cug generate -n 100000 -f sqlserver \
   --sqlserver-db ContosoRetail
 ```
 
-### Caso 2: Parquet + SQL Server simultáneamente
+### Case 2: Parquet + SQL Server simultaneously
 
 ```bash
 cug generate -n 50000 -f parquet,sqlserver \
@@ -176,16 +176,16 @@ cug generate -n 50000 -f parquet,sqlserver \
   --sqlserver-db ContosoDemo
 ```
 
-### Caso 3: Schema personalizado
+### Case 3: Custom schema
 
 ```bash
 cug generate -n 100000 -f sqlserver \
   --sqlserver-name "localhost\SQLEXPRESS" \
-  --sqlserver-db MiBase \
+  --sqlserver-db MyDatabase \
   --sqlserver-schema staging
 ```
 
-### Caso 4: Append a tabla existente
+### Case 4: Append to existing table
 
 ```bash
 cug generate -n 50000 -f sqlserver \
@@ -198,36 +198,36 @@ cug generate -n 50000 -f sqlserver \
 
 ## Troubleshooting
 
-### ❌ Error: `DataError` con `fast_executemany`
+### ❌ Error: `DataError` with `fast_executemany`
 
-**Síntoma:** Error al insertar datos en alguna tabla con `fast_executemany`.
+**Symptom:** Error inserting data in a table with `fast_executemany`.
 
-**Solución:** CUG lo maneja automáticamente. Si `fast_executemany` falla en un batch, hace fallback a inserción fila por fila. Verás un warning en la consola pero la generación continuará.
+**Solution:** CUG handles this automatically. If `fast_executemany` fails on a batch, it falls back to row-by-row insertion. You'll see a warning in the console but generation will continue.
 
-**Causa raíz:** Tipos mixtos o edge cases en ciertas columnas que `fast_executemany` no maneja bien.
+**Root cause:** Mixed types or edge cases in certain columns that `fast_executemany` doesn't handle well.
 
 ---
 
-### ❌ Caracteres corruptos (CJK/Unicode) en columnas de texto
+### ❌ Corrupted characters (CJK/Unicode) in text columns
 
-**Síntoma:** Los caracteres chinos (中文), japoneses (日本語) o árabes (العربية) aparecen como `?` o caracteres basura en SQL Server.
+**Symptom:** Chinese (中文), Japanese (日本語), or Arabic (العربية) characters appear as `?` or garbled characters in SQL Server.
 
-**Causa:** Configuración manual de encoding en la conexión.
+**Cause:** Manual encoding configuration on the connection.
 
-**Solución:** **No** configurar `conn.setencoding(encoding="utf-8")` manualmente. SQL Server usa UTF-16LE internamente y `pyodbc` en Windows lo maneja correctamente por defecto. Forzar UTF-8 **corrompe** los datos `NVARCHAR`.
+**Solution:** **Do not** configure `conn.setencoding(encoding="utf-8")` manually. SQL Server uses UTF-16LE internally and `pyodbc` on Windows handles it correctly by default. Forcing UTF-8 **corrupts** `NVARCHAR` data.
 
 > [!CAUTION]
-> **Nunca** usar `conn.setencoding(encoding="utf-8")` con pyodbc en Windows. Es la causa #1 de corrupción de datos Unicode en SQL Server.
+> **Never** use `conn.setencoding(encoding="utf-8")` with pyodbc on Windows. This is the #1 cause of Unicode data corruption in SQL Server.
 
 ---
 
-### ❌ Error de conexión con ODBC Driver 18
+### ❌ Connection error with ODBC Driver 18
 
-**Síntoma:** `[Microsoft][ODBC Driver 18 for SQL Server]SSL Provider: The target principal name is incorrect`
+**Symptom:** `[Microsoft][ODBC Driver 18 for SQL Server]SSL Provider: The target principal name is incorrect`
 
-**Causa:** El Driver 18 requiere certificado SSL válido por defecto.
+**Cause:** Driver 18 requires a valid SSL certificate by default.
 
-**Solución:** CUG agrega automáticamente `TrustServerCertificate=yes` cuando detecta el Driver 18. Si usas `sqlserver_connection_string`, agrégalo manualmente:
+**Solution:** CUG automatically adds `TrustServerCertificate=yes` when it detects Driver 18. If you use `sqlserver_connection_string`, add it manually:
 
 ```
 ...;TrustServerCertificate=yes
@@ -237,60 +237,60 @@ cug generate -n 50000 -f sqlserver \
 
 ### ❌ Boolean → BIT casting
 
-**Síntoma:** Error al insertar valores `True`/`False` en columnas `BIT`.
+**Symptom:** Error inserting `True`/`False` values into `BIT` columns.
 
-**Solución:** CUG convierte automáticamente `True` → `1` y `False` → `0` antes de la inserción. Esto es requerido por `pyodbc.fast_executemany`.
-
----
-
-### ❌ Small integers (Int8/UInt8) con ODBC
-
-**Síntoma:** Error de tipo al insertar valores `Int8` o `UInt8`.
-
-**Solución:** CUG convierte automáticamente estos tipos a `int` nativo de Python antes de la inserción. `pyodbc` no maneja bien los enteros de NumPy/Polars de tamaño pequeño.
+**Solution:** CUG automatically converts `True` → `1` and `False` → `0` before insertion. This is required by `pyodbc.fast_executemany`.
 
 ---
 
-### ❌ No se puede crear la base de datos automáticamente
+### ❌ Small integers (Int8/UInt8) with ODBC
 
-**Síntoma:** `Could not auto-create database: ...`
+**Symptom:** Type error when inserting `Int8` or `UInt8` values.
 
-**Causa:** El usuario no tiene permisos `CREATE DATABASE` en la instancia.
+**Solution:** CUG automatically converts these types to native Python `int` before insertion. `pyodbc` doesn't handle small NumPy/Polars integers well.
 
-**Solución:** Crear la base de datos manualmente:
+---
+
+### ❌ Cannot auto-create database
+
+**Symptom:** `Could not auto-create database: ...`
+
+**Cause:** The user doesn't have `CREATE DATABASE` permissions on the instance.
+
+**Solution:** Create the database manually:
 
 ```sql
 CREATE DATABASE ContosoRetail;
 ```
 
-CUG imprimirá un warning pero continuará intentando conectarse a la base de datos.
+CUG will print a warning but will continue trying to connect to the database.
 
 ---
 
 ### ❌ `ImportError: No module named 'pyodbc'`
 
-**Solución:**
+**Solution:**
 
 ```bash
 pip install pyodbc
 ```
 
-Si falla en Windows, instalar [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
+If it fails on Windows, install [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/).
 
 ---
 
-## Entorno del Usuario (referencia)
+## Developer Environment (reference)
 
-Esta es la configuración de SQL Server en la máquina del desarrollador:
+This is the SQL Server configuration on the developer machine:
 
-| Elemento | Valor |
-|----------|-------|
+| Element | Value |
+|---------|-------|
 | **Server** | `localhost\SQLEXPRESS` |
-| **Versión** | SQL Server Express 2019 |
+| **Version** | SQL Server Express 2019 |
 | **Auth** | Windows Authentication |
 | **ODBC Driver** | ODBC Driver 17 for SQL Server |
-| **Python** | 3.12+ con entorno `uv` |
+| **Python** | 3.12+ with `uv` environment |
 
 ---
 
-← [Esquema de Datos](esquema-datos.md) | [Recetas Rápidas →](recetas.md)
+← [Data Schema](data-schema.md) | [Recipes →](recipes.md)

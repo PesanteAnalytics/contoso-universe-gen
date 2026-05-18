@@ -1,14 +1,14 @@
-# Referencia de Internacionalización (i18n)
+# Internationalization (i18n) Reference
 
-> Esta guía explica exactamente qué cambia y qué NO cambia cuando se selecciona
-> un idioma en CUG.
+> This guide explains exactly what changes and what does NOT change when
+> selecting a language in CUG.
 
 ---
 
-## Idiomas soportados
+## Supported Languages
 
-| Código | Idioma | Faker Locale | País Default | Moneda Principal |
-|--------|--------|-------------|-------------|-----------------|
+| Code | Language | Faker Locale | Default Country | Primary Currency |
+|------|----------|-------------|-----------------|-----------------|
 | `en` | English | `en_US` | US | USD |
 | `es` | Español | `es_MX` | MX | MXN |
 | `pt` | Português | `pt_BR` | BR | BRL |
@@ -20,26 +20,26 @@
 
 ---
 
-## ✅ Qué SÍ se traduce (valores dentro de columnas)
+## ✅ What IS Translated (values within columns)
 
-### DimDate — Nombres de meses y días
+### DimDate — Month and Day Names
 
-| Columna | `en` | `es` | `pt` | `fr` | `de` |
-|---------|------|------|------|------|------|
+| Column | `en` | `es` | `pt` | `fr` | `de` |
+|--------|------|------|------|------|------|
 | `MonthName` | January | Enero | Janeiro | Janvier | Januar |
 | `MonthNameShort` | Jan | Ene | Jan | Jan | Jan |
 | `DayName` | Monday | Lunes | Segunda | Lundi | Montag |
 | `DayNameShort` | Mon | Lun | Seg | Lun | Mon |
 
-> **Nota**: `zh`, `ja`, `ar` no tienen nombres de mes/día en el mapeo actual.
-> El sistema aplica fallback a inglés para estos idiomas.
+> **Note**: `zh`, `ja`, `ar` don't have month/day name mappings in the current version.
+> The system falls back to English for these languages.
 
-### DimDate — Festivos
+### DimDate — Holidays
 
-Los festivos se cargan automáticamente según el **country** configurado,
-usando la librería `holidays`:
+Holidays are automatically loaded based on the configured **country**,
+using the `holidays` library:
 
-| Language | Country Default | Ejemplo Festivo |
+| Language | Default Country | Holiday Example |
 |----------|----------------|-----------------|
 | `en` | US | Independence Day (Jul 4) |
 | `es` | MX | Día de la Independencia (Sep 16) |
@@ -47,41 +47,41 @@ usando la librería `holidays`:
 | `fr` | FR | Fête Nationale (Jul 14) |
 | `de` | DE | Tag der Deutschen Einheit (Oct 3) |
 
-### DimProduct — Nombres de categoría y subcategoría
+### DimProduct — Category and Subcategory Names
 
-| Columna | `en` | `es` | `pt` |
-|---------|------|------|------|
+| Column | `en` | `es` | `pt` |
+|--------|------|------|------|
 | `CategoryName` | Electronics | Electrónica | Eletrônicos |
 | `SubCategoryName` | Computers | Computadoras | Computadores |
 | `CategoryName` | Home | Hogar | Casa e Decoração |
 | `SubCategoryName` | Cell Phones | Teléfonos Móviles | Celulares |
 
-> Los nombres provienen de `display_names` en cada archivo YAML de categoría.
-> Si un idioma no tiene traducción en el YAML, se usa fallback a inglés.
+> Names come from `display_names` in each category YAML file.
+> If a language doesn't have a translation in the YAML, English is used as fallback.
 
-### DimCustomer — Geografía y ciudades
+### DimCustomer — Geography and Cities
 
-| Componente | `en` | `es` | `pt` |
+| Component | `en` | `es` | `pt` |
 |-----------|------|------|------|
-| Ciudades | New York, LA, Chicago... | CDMX, Guadalajara, Bogotá... | São Paulo, Rio, Curitiba... |
-| Países | US, CA, GB, AU | MX, CO, AR, ES, CL, PE, EC | BR, PT |
-| Distribución | US 55%, CA 12%... | MX 35%, CO 15%... | BR 80%, PT 20% |
+| Cities | New York, LA, Chicago... | CDMX, Guadalajara, Bogotá... | São Paulo, Rio, Curitiba... |
+| Countries | US, CA, GB, AU | MX, CO, AR, ES, CL, PE, EC | BR, PT |
+| Distribution | US 55%, CA 12%... | MX 35%, CO 15%... | BR 80%, PT 20% |
 
-### DimStore — Países y tiendas
+### DimStore — Countries and Stores
 
-| Componente | `en` | `es` |
+| Component | `en` | `es` |
 |-----------|------|------|
-| Países | US (12), CA (3), GB (4)... | MX (8), CO (4), AR (3)... |
-| Nombres ciudad | Faker locale cities | Faker locale cities |
+| Countries | US (12), CA (3), GB (4)... | MX (8), CO (4), AR (3)... |
+| City Names | Faker locale cities | Faker locale cities |
 
-> ⚠️ **Fallback**: Solo `en` y `es` tienen distribución de tiendas dedicada.
-> Los demás idiomas (`pt`, `fr`, `de`, `zh`, `ja`, `ar`) usan el layout de
-> tiendas de inglés (US, CA, GB, AU, DE, FR). Esto es una limitación actual.
+> ⚠️ **Fallback**: Only `en` and `es` have dedicated store distributions.
+> Other languages (`pt`, `fr`, `de`, `zh`, `ja`, `ar`) use the English store
+> layout (US, CA, GB, AU, DE, FR). This is a current limitation.
 
-### DimCurrency — Moneda primaria
+### DimCurrency — Primary Currency
 
-| Language | Moneda usada en FactSales |
-|----------|--------------------------|
+| Language | Currency Used in FactSales |
+|----------|---------------------------|
 | `en` | USD (CurrencyKey = 1) |
 | `es` | MXN (CurrencyKey = 6) |
 | `pt` | BRL (CurrencyKey = 7) |
@@ -91,20 +91,19 @@ usando la librería `holidays`:
 | `ja` | JPY (CurrencyKey = 11) |
 | `ar` | AED (CurrencyKey = 14) |
 
-> `DimCurrency` siempre contiene las 25 monedas del catálogo.
-> El `language` solo afecta cuál se usa como **moneda principal** en `FactSales`.
+> `DimCurrency` always contains all 25 currencies in the catalog.
+> The `language` only affects which one is used as the **primary currency** in `FactSales`.
 
 ---
 
-## ❌ Qué NO se traduce
+## ❌ What is NOT Translated
 
-### Headers de columna (SIEMPRE en inglés)
+### Column Headers (ALWAYS in English)
 
-Los nombres de las columnas del DataFrame **nunca cambian**, independientemente
-del idioma:
+DataFrame column names **never change**, regardless of the language:
 
-| Tabla | Columna (siempre) | NO será |
-|-------|-------------------|---------|
+| Table | Column (always) | Will NOT be |
+|-------|-----------------|-------------|
 | DimProduct | `ProductKey` | ~~`ClaveProducto`~~ |
 | DimProduct | `ProductName` | ~~`NombreProducto`~~ |
 | DimProduct | `CategoryName` | ~~`NombreCategoria`~~ |
@@ -113,64 +112,64 @@ del idioma:
 | DimCustomer | `CustomerKey` | ~~`ClaveCliente`~~ |
 | DimDate | `MonthName` | ~~`NombreMes`~~ |
 
-> ⚠️ **Esta es una limitación actual**. La localización de headers está planeada
-> como feature opt-in en una versión futura (ver ROADMAP).
+> ⚠️ **This is a current limitation**. Header localization is planned
+> as an opt-in feature in a future version (see ROADMAP).
 
-### Nombres de producto (parcialmente en inglés)
+### Product Names (partially in English)
 
-Los **nombres de producto** se generan desde los templates de cada YAML:
-- Las **marcas** siempre están en inglés: `Apple`, `Samsung`, `Dell`
-- Los **modelos y specs** están en inglés: `Laptop i7/32GB`, `OLED 4K UHD`
-- Solo `CategoryName` y `SubCategoryName` se traducen
+**Product names** are generated from templates in each YAML:
+- **Brands** are always in English: `Apple`, `Samsung`, `Dell`
+- **Models and specs** are in English: `Laptop i7/32GB`, `OLED 4K UHD`
+- Only `CategoryName` and `SubCategoryName` are translated
 
-Ejemplo con `language: es`:
+Example with `language: es`:
 ```
-ProductName:     "Dell Laptop i7/32GB/1TB"      ← inglés
-CategoryName:    "Electrónica"                   ← español ✅
-SubCategoryName: "Computadoras"                  ← español ✅
+ProductName:     "Dell Laptop i7/32GB/1TB"      ← English
+CategoryName:    "Electrónica"                   ← Spanish ✅
+SubCategoryName: "Computadoras"                  ← Spanish ✅
 ```
 
-### Otros valores que NO cambian
+### Other Values That Do NOT Change
 
-| Elemento | Valor | Razón |
-|----------|-------|-------|
-| `ProductCode` | `PROD-00001` | Formato fijo |
-| `Manufacturer` | `Contoso Ltd.` | Nombres de empresa globales |
-| `Color` | `Black`, `White`... | Lista estática en inglés |
-| `WeightUnit` | `lb`, `kg`... | Unidades estándar |
-| `CurrencyCode` | `USD`, `MXN`... | Códigos ISO |
-| `CurrencyName` | `US Dollar`... | Nombres en inglés |
-| `Status` (Store) | `Online`, `Current` | Enum fijo |
-| `Gender` | `M`, `F`, `Other` | Códigos fijos |
+| Element | Value | Reason |
+|---------|-------|--------|
+| `ProductCode` | `PROD-00001` | Fixed format |
+| `Manufacturer` | `Contoso Ltd.` | Global company names |
+| `Color` | `Black`, `White`... | Static English list |
+| `WeightUnit` | `lb`, `kg`... | Standard units |
+| `CurrencyCode` | `USD`, `MXN`... | ISO codes |
+| `CurrencyName` | `US Dollar`... | English names |
+| `Status` (Store) | `Online`, `Current` | Fixed enum |
+| `Gender` | `M`, `F`, `Other` | Fixed codes |
 
 ---
 
-## Tabla resumen de impacto por idioma
+## Language Impact Summary Table
 
 ```
 ╔══════════════════════════╦══════╦══════╦══════════════════════════╗
-║ Componente               ║ i18n ║ Tipo ║ Detalle                  ║
+║ Component                ║ i18n ║ Type ║ Detail                   ║
 ╠══════════════════════════╬══════╬══════╬══════════════════════════╣
-║ MonthName / DayName      ║  ✅  ║ Dato ║ Solo en/es/pt/fr/de      ║
-║ CategoryName             ║  ✅  ║ Dato ║ Según YAML display_names ║
-║ SubCategoryName          ║  ✅  ║ Dato ║ Según YAML display_names ║
-║ Ciudades (Customer)      ║  ✅  ║ Dato ║ Pool diferente por lang  ║
-║ Países (Customer/Store)  ║  ✅  ║ Dato ║ Distribución por lang    ║
-║ Moneda principal (Sales) ║  ✅  ║ FK   ║ USD→MXN→BRL→EUR...       ║
-║ Festivos (Calendar)      ║  ✅  ║ Dato ║ Según country config     ║
-║ Headers de columna       ║  ❌  ║  —   ║ Siempre en inglés        ║
-║ ProductName              ║  ❌  ║  —   ║ Templates en inglés      ║
-║ Manufacturer / Brand     ║  ❌  ║  —   ║ Nombres globales         ║
-║ Color / WeightUnit       ║  ❌  ║  —   ║ Lista estática inglés    ║
-║ CurrencyCode/Name        ║  ❌  ║  —   ║ Catálogo ISO fijo        ║
+║ MonthName / DayName      ║  ✅  ║ Data ║ Only en/es/pt/fr/de      ║
+║ CategoryName             ║  ✅  ║ Data ║ Per YAML display_names   ║
+║ SubCategoryName          ║  ✅  ║ Data ║ Per YAML display_names   ║
+║ Cities (Customer)        ║  ✅  ║ Data ║ Different pool per lang  ║
+║ Countries (Customer/Store)║ ✅  ║ Data ║ Distribution per lang    ║
+║ Primary Currency (Sales) ║  ✅  ║ FK   ║ USD→MXN→BRL→EUR...       ║
+║ Holidays (Calendar)      ║  ✅  ║ Data ║ Per country config       ║
+║ Column Headers           ║  ❌  ║  —   ║ Always in English        ║
+║ ProductName              ║  ❌  ║  —   ║ English templates        ║
+║ Manufacturer / Brand     ║  ❌  ║  —   ║ Global names             ║
+║ Color / WeightUnit       ║  ❌  ║  —   ║ Static English list      ║
+║ CurrencyCode/Name        ║  ❌  ║  —   ║ Fixed ISO catalog        ║
 ╚══════════════════════════╩══════╩══════╩══════════════════════════╝
 ```
 
 ---
 
-## Consideraciones para Power BI
+## Power BI Considerations
 
-1. **Headers en inglés** = compatibilidad directa con modelos Power BI existentes
-2. **Valores traducidos** = los slicers mostrarán "Electrónica" en vez de "Electronics"
-3. **Moneda local** = los valores monetarios usan la moneda del idioma seleccionado
-4. **Festivos locales** = las columnas `IsHoliday` y `HolidayName` reflejan el país correcto
+1. **English headers** = direct compatibility with existing Power BI models
+2. **Translated values** = slicers will show "Electrónica" instead of "Electronics"
+3. **Local currency** = monetary values use the selected language's currency
+4. **Local holidays** = the `IsHoliday` and `HolidayName` columns reflect the correct country

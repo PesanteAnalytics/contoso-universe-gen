@@ -152,10 +152,14 @@ See [`docs/category-plugins.md`](docs/category-plugins.md) for the full YAML sch
 
 | Doc | Description |
 | --- | --- |
-| [`docs/MANUAL.md`](docs/MANUAL.md) | Complete reference manual (ES) |
-| [`docs/category-plugins.md`](docs/category-plugins.md) | YAML plugin authoring guide |
+| [`docs/README.md`](docs/README.md) | Documentation index |
+| [`docs/installation.md`](docs/installation.md) | Prerequisites and setup guide |
+| [`docs/cli-reference.md`](docs/cli-reference.md) | CLI commands and options |
+| [`docs/toml-configuration.md`](docs/toml-configuration.md) | TOML configuration reference |
 | [`docs/output-formats.md`](docs/output-formats.md) | Format-specific configuration |
-| [`docs/temporal-realism.md`](docs/temporal-realism.md) | How CUG models time and seasonality |
+| [`docs/data-schema.md`](docs/data-schema.md) | Star schema and table definitions |
+| [`docs/category-plugins.md`](docs/category-plugins.md) | YAML plugin authoring guide |
+| [`docs/i18n-reference.md`](docs/i18n-reference.md) | Internationalization and locale guide |
 | [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) | AI agent skill (Antigravity / Gemini) |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
 

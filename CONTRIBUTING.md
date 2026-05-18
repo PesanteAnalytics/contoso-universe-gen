@@ -94,23 +94,45 @@ PRs that break existing tests will not be merged.
 
 ## Project structure
 
-```
+```text
 cug/
-├── __init__.py          # Version and public exports
-├── __main__.py          # CLI entrypoint
-├── config.py            # Pydantic config schema (AppConfig)
-├── engine.py            # Core orchestration engine
-├── generators/          # Per-table data generators
-│   ├── customers.py
-│   ├── products.py
-│   ├── sales.py
-│   └── ...
-├── writers/             # Output format writers
+├── __init__.py              # Version and public exports
+├── __main__.py              # CLI entrypoint
+├── cli.py                   # Typer CLI commands
+├── config.py                # Pydantic config schema (AppConfig)
+├── models.py                # Shared data models
+├── orchestrator.py          # Pipeline orchestration
+├── engine/                  # Core engine components
+│   ├── seeder.py            # Deterministic random seeding
+│   ├── temporal.py          # Date/time and seasonality logic
+│   ├── validator.py         # FK validation
+│   └── weights.py           # Distribution weights
+├── generators/              # Per-table data generators
+│   ├── calendar.py          # DimDate
+│   ├── currency.py          # DimCurrency
+│   ├── currency_exchange.py # DimCurrencyExchange
+│   ├── customers.py         # DimCustomer
+│   ├── products.py          # DimProduct
+│   ├── sales.py             # FactSales
+│   └── stores.py            # DimStore
+├── writers/                 # Output format writers (7 formats)
 │   ├── csv_writer.py
 │   ├── parquet_writer.py
-│   └── ...
-└── categories/
-    └── builtin/         # Built-in YAML category definitions
+│   ├── json_writer.py
+│   ├── excel_writer.py
+│   ├── delta_writer.py
+│   ├── duckdb_writer.py
+│   └── sqlserver_writer.py
+├── i18n/                    # Internationalization (8 locales)
+│   └── locales.py
+└── categories/              # Product category system
+    ├── base.py              # Category plugin base class
+    ├── registry.py          # Plugin discovery and loading
+    └── builtin/             # Built-in YAML definitions
+        ├── electronics.yaml
+        ├── gaming.yaml
+        ├── home.yaml
+        └── media.yaml
 ```
 
 ---

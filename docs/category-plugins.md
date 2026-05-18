@@ -1,39 +1,39 @@
-# Guía de Plugins de Categorías (YAML)
+# Category Plugins Guide (YAML)
 
-> CUG usa archivos YAML para definir categorías de productos. Este sistema permite
-> agregar categorías custom sin tocar código Python.
+> CUG uses YAML files to define product categories. This system allows you
+> to add custom categories without touching Python code.
 
 ---
 
-## Arquitectura del sistema
+## System Architecture
 
 ```
 cug/categories/
-├── base.py              ← Clases: CategoryPlugin, Subcategory, ProductTemplate
-├── registry.py          ← CategoryRegistry: carga builtins + custom
+├── base.py              ← Classes: CategoryPlugin, Subcategory, ProductTemplate
+├── registry.py          ← CategoryRegistry: loads builtins + custom
 └── builtin/
-    ├── electronics.yaml ← Ejemplo canónico (5 subcategorías)
+    ├── electronics.yaml ← Canonical example (5 subcategories)
     ├── gaming.yaml
     ├── home.yaml
     └── media.yaml
 ```
 
-### Flujo de carga
+### Loading Flow
 
-1. `CategoryRegistry` carga automáticamente los 4 builtins de `builtin/`
-2. Si `[categories].custom_paths` tiene rutas, las carga con `load_custom()`
-3. `CategoryPlugin.from_yaml(path)` parsea cada YAML → objetos Python
-4. `generate_dim_product()` itera sobre todas las categorías del registry
+1. `CategoryRegistry` automatically loads the 4 builtins from `builtin/`
+2. If `[categories].custom_paths` has paths, they are loaded with `load_custom()`
+3. `CategoryPlugin.from_yaml(path)` parses each YAML → Python objects
+4. `generate_dim_product()` iterates over all categories in the registry
 
 ---
 
-## Schema YAML completo
+## Complete YAML Schema
 
 ```yaml
-# ── Identificador único (snake_case, obligatorio) ────────────────────────
+# ── Unique identifier (snake_case, required) ─────────────────────────
 plugin_id: fashion
 
-# ── Nombres por idioma (obligatorio al menos "en") ──────────────────────
+# ── Names per language (at least "en" required) ─────────────────────
 display_names:
   en: Fashion & Apparel
   es: Moda y Ropa
@@ -44,32 +44,32 @@ display_names:
   ja: ファッション
   ar: أزياء
 
-# ── Subcategorías (al menos 1 obligatoria) ──────────────────────────────
+# ── Subcategories (at least 1 required) ──────────────────────────────
 subcategories:
 
-  - id: shoes                          # ID único snake_case
-    display_names:                     # Nombres localizados
+  - id: shoes                          # Unique ID snake_case
+    display_names:                     # Localized names
       en: Shoes
       es: Zapatos
       pt: Sapatos
-    brands: [Nike, Adidas, Puma, New Balance, Reebok]  # Marcas disponibles
-    price_range: [40.0, 350.0]         # [min, max] precio unitario USD
-    margin_range: [0.15, 0.45]         # [min, max] margen de ganancia (0-1)
-    trend:                             # Multiplicador de demanda por año
-      2018: 0.85                       # 0.85 = 15% menos que baseline
+    brands: [Nike, Adidas, Puma, New Balance, Reebok]  # Available brands
+    price_range: [40.0, 350.0]         # [min, max] unit price USD
+    margin_range: [0.15, 0.45]         # [min, max] profit margin (0-1)
+    trend:                             # Demand multiplier per year
+      2018: 0.85                       # 0.85 = 15% below baseline
       2019: 0.90
       2020: 0.60                       # COVID drop
       2021: 0.75
       2022: 1.00                       # baseline
       2023: 1.15
-      2024: 1.20                       # 20% más que baseline
+      2024: 1.20                       # 20% above baseline
       2025: 1.25
       2026: 1.30
-    products:                          # Templates para generar nombres
+    products:                          # Templates for name generation
       - name_template: "{brand} {model} {spec}"
         models: [Air Max, Superstar, RS-X, Classic, Gel-Kayano]
         specs: [Size 8, Size 9, Size 10, Size 11, Size 12]
-        brands: []                     # [] = usa brands de la subcategoría
+        brands: []                     # [] = uses subcategory brands
 
   - id: clothing
     display_names:
@@ -91,55 +91,55 @@ subcategories:
 
 ---
 
-## Referencia de campos
+## Field Reference
 
-### Nivel raíz
+### Root Level
 
-| Campo | Tipo | Obligatorio | Descripción |
-|-------|------|-------------|-------------|
-| `plugin_id` | `string` | ✅ | Identificador único, snake_case. Ejemplo: `fashion` |
-| `display_names` | `dict[str, str]` | ✅ | Mapa `idioma → nombre`. Mínimo: `en` |
-| `subcategories` | `list` | ✅ | Al menos 1 subcategoría |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `plugin_id` | `string` | ✅ | Unique identifier, snake_case. Example: `fashion` |
+| `display_names` | `dict[str, str]` | ✅ | Map `language → name`. Minimum: `en` |
+| `subcategories` | `list` | ✅ | At least 1 subcategory |
 
-### Subcategoría
+### Subcategory
 
-| Campo | Tipo | Obligatorio | Default | Descripción |
-|-------|------|-------------|---------|-------------|
-| `id` | `string` | ✅ | — | ID único snake_case |
-| `display_names` | `dict[str, str]` | ❌ | `{en: id}` | Nombres localizados |
-| `brands` | `list[str]` | ❌ | `[]` | Marcas disponibles |
-| `price_range` | `[float, float]` | ❌ | `[99, 999]` | Rango de precio [min, max] |
-| `margin_range` | `[float, float]` | ❌ | `[0.10, 0.30]` | Rango de margen [min, max] |
-| `trend` | `dict[int, float]` | ❌ | `{}` | Multiplicador demanda por año |
-| `products` | `list[ProductTemplate]` | ❌ | `[]` | Templates de nombre producto |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `id` | `string` | ✅ | — | Unique ID snake_case |
+| `display_names` | `dict[str, str]` | ❌ | `{en: id}` | Localized names |
+| `brands` | `list[str]` | ❌ | `[]` | Available brands |
+| `price_range` | `[float, float]` | ❌ | `[99, 999]` | Price range [min, max] |
+| `margin_range` | `[float, float]` | ❌ | `[0.10, 0.30]` | Margin range [min, max] |
+| `trend` | `dict[int, float]` | ❌ | `{}` | Demand multiplier per year |
+| `products` | `list[ProductTemplate]` | ❌ | `[]` | Product name templates |
 
 ### ProductTemplate
 
-| Campo | Tipo | Obligatorio | Default | Descripción |
-|-------|------|-------------|---------|-------------|
-| `name_template` | `string` | ❌ | `{brand} {model}` | Patrón de nombre con placeholders |
-| `models` | `list[str]` | ❌ | `[]` | Variantes de modelo |
-| `specs` | `list[str]` | ❌ | `[]` | Especificaciones técnicas |
-| `brands` | `list[str]` | ❌ | Hereda sub | `[]` usa brands de subcategoría |
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `name_template` | `string` | ❌ | `{brand} {model}` | Name pattern with placeholders |
+| `models` | `list[str]` | ❌ | `[]` | Model variants |
+| `specs` | `list[str]` | ❌ | `[]` | Technical specifications |
+| `brands` | `list[str]` | ❌ | Inherits sub | `[]` uses subcategory brands |
 
-### Placeholders de `name_template`
+### `name_template` Placeholders
 
-| Placeholder | Fuente | Ejemplo |
+| Placeholder | Source | Example |
 |-------------|--------|---------|
-| `{brand}` | `brands` de producto o subcategoría | `Nike` |
-| `{model}` | `models` del template | `Air Max` |
-| `{spec}` | `specs` del template | `256GB` |
-| `{size}` | Aleatorio: 43, 55, 65, 75, 85 (pulgadas) | `65"` |
+| `{brand}` | `brands` from product or subcategory | `Nike` |
+| `{model}` | `models` from template | `Air Max` |
+| `{spec}` | `specs` from template | `256GB` |
+| `{size}` | Random: 43, 55, 65, 75, 85 (inches) | `65"` |
 
 ---
 
-## Cómo usar un plugin custom
+## How to Use a Custom Plugin
 
-### Paso 1: Crear el archivo YAML
+### Step 1: Create the YAML File
 
-Guardar como `./my_plugins/fashion.yaml` (o cualquier ruta).
+Save as `./my_plugins/fashion.yaml` (or any path).
 
-### Paso 2: Configurar en TOML
+### Step 2: Configure in TOML
 
 ```toml
 [categories]
@@ -147,44 +147,44 @@ enabled = ["electronics", "home", "gaming", "media", "fashion"]
 custom_paths = ["./my_plugins/fashion.yaml"]
 ```
 
-> ⚠️ El `plugin_id` del YAML debe coincidir con el nombre en `enabled`.
+> ⚠️ The YAML `plugin_id` must match the name in `enabled`.
 
-### Paso 3: Ejecutar
+### Step 3: Run
 
 ```bash
-cug generate -c mi_config.toml
+cug generate -c my_config.toml
 ```
 
-### Paso 4: Verificar
+### Step 4: Verify
 
 ```bash
 cug categories
-# Debería mostrar: Electronics, Home, Gaming, Media, Fashion
+# Should show: Electronics, Home, Gaming, Media, Fashion
 
 cug categories -l es
-# Debería mostrar: Electrónica, Hogar, Gaming, Media, Moda y Ropa
+# Should show: Electrónica, Hogar, Gaming, Media, Moda y Ropa
 ```
 
 ---
 
-## Ejemplo: Categoría existente (Electronics)
+## Example: Existing Category (Electronics)
 
-El archivo `cug/categories/builtin/electronics.yaml` tiene:
+The `cug/categories/builtin/electronics.yaml` file has:
 
-- **5 subcategorías**: Computers, Cell Phones, Audio, Cameras, TV & Video
-- **8 idiomas**: en, es, pt, fr, de, zh, ja, ar
-- **Trends realistas**: COVID WFH boom en Computers (1.65x en 2020), caída en Cameras (0.35x)
-- **Templates con specs**: `{brand} {model} {spec}` → "Dell Laptop i7/32GB/1TB"
+- **5 subcategories**: Computers, Cell Phones, Audio, Cameras, TV & Video
+- **8 languages**: en, es, pt, fr, de, zh, ja, ar
+- **Realistic trends**: COVID WFH boom in Computers (1.65x in 2020), Camera drop (0.35x)
+- **Templates with specs**: `{brand} {model} {spec}` → "Dell Laptop i7/32GB/1TB"
 
-Para crear un plugin custom, usa este archivo como referencia:
+To create a custom plugin, use this file as reference:
 `cug/categories/builtin/electronics.yaml`
 
 ---
 
-## Notas importantes
+## Important Notes
 
-- Los **trends no cubiertos** usan interpolación lineal o el valor más cercano
-- Los **productos se generan**: 5-15 por subcategoría (aleatorio determinístico)
-- El **precio** se genera aleatoriamente dentro de `price_range`
-- El **margen** se genera aleatoriamente dentro de `margin_range`, determinando `Cost` = `Price * (1 - margin)`
-- Si `brands` en un ProductTemplate está vacío (`[]`), se heredan las brands de la subcategoría padre
+- **Uncovered trends** use linear interpolation or the nearest value
+- **Products are generated**: 5-15 per subcategory (deterministic random)
+- **Price** is randomly generated within `price_range`
+- **Margin** is randomly generated within `margin_range`, determining `Cost` = `Price * (1 - margin)`
+- If `brands` in a ProductTemplate is empty (`[]`), brands are inherited from the parent subcategory

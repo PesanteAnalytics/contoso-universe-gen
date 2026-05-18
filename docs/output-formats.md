@@ -1,40 +1,40 @@
-# Formatos de Salida
+# Output Formats
 
-> Los 7 formatos soportados por CUG, con opciones específicas de cada uno y recomendaciones de uso.
-
----
-
-## Resumen de Formatos
-
-| Formato | Extensión / Destino | Descripción | Caso de Uso Principal |
-|---------|-------------------|-------------|----------------------|
-| **parquet** ★ | `.parquet` | Columnar comprimido con tipos nativos | Power BI, Spark, Fabric Direct Lake |
-| **csv** | `.csv` / `.csv.gz` | Texto plano, opcionalmente comprimido | Compatibilidad universal |
-| **duckdb** | `.duckdb` | Base de datos analítica embebida | Consultas SQL inmediatas |
-| **delta** | Delta Lake | Tablas delta con versionado | Fabric, Databricks, Lakehouse |
-| **json** | `.json` / `.ndjson` | JSON array o NDJSON | APIs, integración web, debugging |
-| **excel** | `.xlsx` | Workbook Excel | Compartir con usuarios no-técnicos |
-| **sqlserver** | SQL Server DB | Tablas en base de datos SQL Server | Power BI DirectQuery, dashboards |
-
-> ★ = formato por defecto cuando no se especifica ninguno.
+> The 7 formats supported by CUG, with format-specific options and usage recommendations.
 
 ---
 
-## Combinar Formatos
+## Format Summary
 
-CUG puede generar múltiples formatos en una sola ejecución:
+| Format | Extension / Target | Description | Primary Use Case |
+|--------|-------------------|-------------|-----------------|
+| **parquet** ★ | `.parquet` | Compressed columnar with native types | Power BI, Spark, Fabric Direct Lake |
+| **csv** | `.csv` / `.csv.gz` | Plain text, optionally compressed | Universal compatibility |
+| **duckdb** | `.duckdb` | Embedded analytical database | Immediate SQL queries |
+| **delta** | Delta Lake | Delta tables with versioning | Fabric, Databricks, Lakehouse |
+| **json** | `.json` / `.ndjson` | JSON array or NDJSON | APIs, web integration, debugging |
+| **excel** | `.xlsx` | Excel workbook | Sharing with non-technical users |
+| **sqlserver** | SQL Server DB | Tables in SQL Server database | Power BI DirectQuery, dashboards |
+
+> ★ = default format when none is specified.
+
+---
+
+## Combining Formats
+
+CUG can generate multiple formats in a single run:
 
 ```bash
-# Un solo formato (default)
+# Single format (default)
 cug generate -f parquet
 
-# Dos formatos
+# Two formats
 cug generate -f parquet,csv
 
-# Tres formatos
+# Three formats
 cug generate -f parquet,duckdb,delta
 
-# Todos los que necesites
+# As many as you need
 cug generate -f parquet,csv,duckdb,sqlserver
 ```
 
@@ -42,239 +42,239 @@ cug generate -f parquet,csv,duckdb,sqlserver
 
 ## Parquet
 
-**El formato recomendado para la mayoría de casos analíticos.**
+**The recommended format for most analytical use cases.**
 
-Genera un archivo `.parquet` por tabla (e.g. `FactSales.parquet`, `DimCustomer.parquet`).
+Generates one `.parquet` file per table (e.g. `FactSales.parquet`, `DimCustomer.parquet`).
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Valores |
-|-------------|----------|---------|---------|
+| TOML Option | CLI Flag | Default | Values |
+|-------------|----------|---------|--------|
 | `parquet_compression` | `--parquet-compression` | `zstd` | `zstd`, `snappy`, `gzip`, `lz4`, `brotli`, `none` |
-| `parquet_row_group_size` | — | Auto | Entero positivo |
+| `parquet_row_group_size` | — | Auto | Positive integer |
 
-### Ejemplo
+### Example
 
 ```bash
-# Parquet con compresión snappy (más rápido, menos compresión)
+# Parquet with snappy compression (faster, less compression)
 cug generate -n 100000 -f parquet --parquet-compression snappy
 
-# Parquet default (zstd, mejor ratio compresión/velocidad)
+# Default Parquet (zstd, best compression/speed ratio)
 cug generate -n 500000 -f parquet
 ```
 
-### Cuándo usar Parquet
+### When to Use Parquet
 
-- **Power BI Import mode** — Carga rápida de datos
-- **Spark / Databricks** — Lectura eficiente columnar
-- **Microsoft Fabric Direct Lake** — Formato nativo
-- **Archivado** — Excelente compresión
+- **Power BI Import mode** — Fast data loading
+- **Spark / Databricks** — Efficient columnar reads
+- **Microsoft Fabric Direct Lake** — Native format
+- **Archival** — Excellent compression
 
 ---
 
 ## CSV
 
-Genera archivos `.csv` (o `.csv.gz` si `compress = true`) — uno por tabla.
+Generates `.csv` (or `.csv.gz` if `compress = true`) files — one per table.
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Descripción |
+| TOML Option | CLI Flag | Default | Description |
 |-------------|----------|---------|-------------|
-| `csv_separator` | `--csv-separator` | `,` | Delimitador de campos |
-| `csv_include_header` | — | `true` | Incluir fila de encabezados |
-| `csv_null_value` | — | `""` | Representación de valores NULL |
-| `csv_date_format` | — | ISO 8601 | Formato de fechas |
+| `csv_separator` | `--csv-separator` | `,` | Field delimiter |
+| `csv_include_header` | — | `true` | Include header row |
+| `csv_null_value` | — | `""` | NULL value representation |
+| `csv_date_format` | — | ISO 8601 | Date format |
 
-### Ejemplo
+### Example
 
 ```bash
-# CSV con punto y coma (para locales que usan coma decimal)
+# CSV with semicolon (for locales that use comma as decimal separator)
 cug generate -n 50000 -f csv --csv-separator ";"
 
-# CSV estándar
+# Standard CSV
 cug generate -n 100000 -f csv
 ```
 
-### Cuándo usar CSV
+### When to Use CSV
 
-- **Importar a Excel** manualmente
-- **Compatibilidad universal** con cualquier herramienta
-- **ETL pipelines** que esperan texto plano
-- **Intercambio de datos** entre sistemas heterogéneos
+- **Manual Excel import**
+- **Universal compatibility** with any tool
+- **ETL pipelines** expecting plain text
+- **Data exchange** between heterogeneous systems
 
 ---
 
 ## DuckDB
 
-Genera una base de datos DuckDB embebida (`.duckdb`) con todas las tablas cargadas.
+Generates an embedded DuckDB database (`.duckdb`) with all tables loaded.
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Descripción |
+| TOML Option | CLI Flag | Default | Description |
 |-------------|----------|---------|-------------|
-| `duckdb_db_name` | — | `contoso.duckdb` | Nombre del archivo de base de datos |
+| `duckdb_db_name` | — | `contoso.duckdb` | Database file name |
 
-### Ejemplo
+### Example
 
 ```bash
 cug generate -n 100000 -f duckdb
 ```
 
-### Consultar el DuckDB generado
+### Querying the Generated DuckDB
 
 ```sql
--- Con DuckDB CLI
+-- With DuckDB CLI
 .open ./output/contoso.duckdb
 SELECT COUNT(*) FROM FactSales;
 SELECT Year, SUM(Quantity) FROM FactSales f JOIN DimDate d ON f.OrderDateKey = d.DateKey GROUP BY Year;
 
--- Con Python
+-- With Python
 import duckdb
 conn = duckdb.connect("./output/contoso.duckdb")
 df = conn.sql("SELECT * FROM FactSales LIMIT 10").pl()
 ```
 
-### Cuándo usar DuckDB
+### When to Use DuckDB
 
-- **Consultas SQL inmediatas** sin necesidad de un servidor
-- **Notebooks de Python** — integración directa con Polars/Pandas
-- **Prototipado rápido** — base de datos analítica sin infraestructura
-- **DBeaver / DataGrip** — exploración con herramientas GUI
+- **Immediate SQL queries** without a server
+- **Python Notebooks** — Direct integration with Polars/Pandas
+- **Rapid prototyping** — Analytical database with zero infrastructure
+- **DBeaver / DataGrip** — Exploration with GUI tools
 
 ---
 
 ## Delta Lake
 
-Genera tablas en formato Delta Lake, ideal para lakehouses.
+Generates tables in Delta Lake format, ideal for lakehouses.
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Valores |
-|-------------|----------|---------|---------|
+| TOML Option | CLI Flag | Default | Values |
+|-------------|----------|---------|--------|
 | `delta_mode` | `--delta-mode` | `overwrite` | `overwrite`, `append`, `error` |
-| `delta_partition_by` | — | `None` | Lista de columnas (e.g. `["Year"]`) |
-| `delta_name` | — | `contoso` | Nombre en metadata |
+| `delta_partition_by` | — | `None` | List of columns (e.g. `["Year"]`) |
+| `delta_name` | — | `contoso` | Name in metadata |
 
-### Ejemplo
+### Example
 
 ```bash
-# Delta Lake con overwrite
+# Delta Lake with overwrite
 cug generate -n 500000 -f delta --delta-mode overwrite
 
-# Delta Lake con particionamiento por año
-# (configurar en TOML: delta_partition_by = ["Year"])
+# Delta Lake with year partitioning
+# (configure in TOML: delta_partition_by = ["Year"])
 cug generate -n 1000000 -f delta
 ```
 
-### Cuándo usar Delta
+### When to Use Delta
 
-- **Microsoft Fabric** — Lakehouses y Warehouses
-- **Databricks** — Formato nativo
-- **Apache Spark** — Versionado y ACID transactions
-- **Time travel** — Historial de versiones
+- **Microsoft Fabric** — Lakehouses and Warehouses
+- **Databricks** — Native format
+- **Apache Spark** — Versioning and ACID transactions
+- **Time travel** — Version history
 
 ---
 
 ## JSON / NDJSON
 
-Genera archivos JSON — ya sea como JSON array completo o como NDJSON (un registro por línea).
+Generates JSON files — either as a full JSON array or as NDJSON (one record per line).
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Descripción |
+| TOML Option | CLI Flag | Default | Description |
 |-------------|----------|---------|-------------|
 | `json_row_oriented` | `--json-rows` / `--json-ndjson` | `false` (NDJSON) | `true` = JSON array, `false` = NDJSON |
-| `json_pretty` | — | `false` | Pretty-print (solo con `row_oriented = true`) |
+| `json_pretty` | — | `false` | Pretty-print (only with `row_oriented = true`) |
 
-### Ejemplo
+### Example
 
 ```bash
-# NDJSON (default, un registro por línea)
+# NDJSON (default, one record per line)
 cug generate -n 50000 -f json
 
 # JSON array
 cug generate -n 10000 -f json --json-rows
 ```
 
-### Cuándo usar JSON
+### When to Use JSON
 
-- **APIs REST** — Payload de prueba
-- **Streaming** — NDJSON para ingesta línea por línea
-- **Debugging** — Inspección humana de datos
-- **Web apps** — Datos de prueba para frontends
+- **REST APIs** — Test payloads
+- **Streaming** — NDJSON for line-by-line ingestion
+- **Debugging** — Human inspection of data
+- **Web apps** — Test data for frontends
 
 ---
 
 ## Excel
 
-Genera archivos Excel `.xlsx` — todas las tablas en un solo workbook o uno por tabla.
+Generates Excel `.xlsx` files — all tables in a single workbook or one per table.
 
-### Opciones
+### Options
 
-| Opción TOML | CLI Flag | Default | Descripción |
+| TOML Option | CLI Flag | Default | Description |
 |-------------|----------|---------|-------------|
-| `excel_single_workbook` | `--excel-single` / `--excel-multi` | `true` | `true` = un workbook, `false` = uno por tabla |
-| `excel_workbook_name` | — | `contoso.xlsx` | Nombre del archivo Excel |
+| `excel_single_workbook` | `--excel-single` / `--excel-multi` | `true` | `true` = one workbook, `false` = one per table |
+| `excel_workbook_name` | — | `contoso.xlsx` | Excel file name |
 
-### Ejemplo
+### Example
 
 ```bash
-# Un solo workbook con todas las tablas como hojas
+# Single workbook with all tables as sheets
 cug generate -n 20000 -f excel
 
-# Un archivo .xlsx por tabla
+# One .xlsx file per table
 cug generate -n 20000 -f excel --excel-multi
 ```
 
 > [!WARNING]
-> Excel tiene un límite de ~1 millón de filas por hoja. Para datasets grandes, usa otro formato.
+> Excel has a limit of ~1 million rows per sheet. For large datasets, use another format.
 
-### Cuándo usar Excel
+### When to Use Excel
 
-- **Compartir con stakeholders** no-técnicos
-- **Exploración rápida** de datos
-- **Presentaciones** y reports ad-hoc
+- **Sharing with non-technical stakeholders**
+- **Quick data exploration**
+- **Presentations** and ad-hoc reports
 
 ---
 
 ## SQL Server
 
-Escribe directamente a una base de datos SQL Server vía ODBC.
+Writes directly to a SQL Server database via ODBC.
 
-Para documentación detallada, ver [sqlserver.md](sqlserver.md).
+For detailed documentation, see [sqlserver.md](sqlserver.md).
 
-### Opciones principales
+### Main Options
 
-| Opción TOML | CLI Flag | Default | Descripción |
+| TOML Option | CLI Flag | Default | Description |
 |-------------|----------|---------|-------------|
-| `sqlserver_server` | `--sqlserver-name` | `localhost` | Instancia SQL Server |
-| `sqlserver_database` | `--sqlserver-db` | `ContosoRetail` | Base de datos destino |
-| `sqlserver_schema` | `--sqlserver-schema` | `dbo` | Esquema destino |
+| `sqlserver_server` | `--sqlserver-name` | `localhost` | SQL Server instance |
+| `sqlserver_database` | `--sqlserver-db` | `ContosoRetail` | Target database |
+| `sqlserver_schema` | `--sqlserver-schema` | `dbo` | Target schema |
 | `sqlserver_if_exists` | `--sqlserver-mode` | `replace` | `replace`, `append`, `fail` |
-| `sqlserver_batch_size` | — | `5,000` | Filas por INSERT batch |
+| `sqlserver_batch_size` | — | `5,000` | Rows per INSERT batch |
 | `sqlserver_trusted` | — | `true` | Windows Authentication |
 
-### Ejemplo
+### Example
 
 ```bash
-# SQL Server Express local (Windows Auth)
+# Local SQL Server Express (Windows Auth)
 cug generate -n 100000 -f sqlserver \
   --sqlserver-name "localhost\SQLEXPRESS" \
   --sqlserver-db ContosoRetail
 
-# Parquet + SQL Server simultáneos
+# Parquet + SQL Server simultaneously
 cug generate -n 50000 -f parquet,sqlserver \
   --sqlserver-name "localhost\SQLEXPRESS" \
   --sqlserver-db ContosoDemo
 ```
 
-### Cuándo usar SQL Server
+### When to Use SQL Server
 
-- **Power BI DirectQuery** — Consultas en tiempo real
-- **Dashboards empresariales** — Datos centralizados
-- **SSAS Tabular** — Modelo semántico
-- **Integración con aplicaciones** que usan SQL Server
+- **Power BI DirectQuery** — Real-time queries
+- **Enterprise dashboards** — Centralized data
+- **SSAS Tabular** — Semantic model
+- **Application integration** using SQL Server
 
 ---
 
-← [Configuración TOML](configuracion-toml.md) | [Esquema de Datos →](esquema-datos.md)
+← [TOML Configuration](toml-configuration.md) | [Data Schema →](data-schema.md)
