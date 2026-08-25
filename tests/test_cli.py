@@ -88,3 +88,41 @@ def test_cli_info():
     """cug info must exit 0."""
     result = _cug("info")
     assert result.returncode == 0, f"cug info failed:\n{_combined(result)}"
+
+
+@pytest.mark.parametrize(
+    "flags, should_run",
+    [
+        (["--verify"],               True),   # asks for the check
+        (["--strict"],               True),   # aborting implies checking
+        ([],                         False),  # integrity_check defaults to false
+        (["--no-verify", "--strict"], False), # explicit opt-out wins
+    ],
+)
+def test_generate_verify_flag_controls_the_check(tmp_path, flags, should_run):
+    """--verify is the documented way to run FK validation from the CLI."""
+    out = tmp_path / "out"
+    result = _cug(
+        "generate", "-n", "300", "-f", "csv", "-o", str(out), "--seed", "42",
+        *flags, timeout=120,
+    )
+    assert result.returncode == 0, _combined(result)
+    ran = "Integrity check passed" in _combined(result)
+    assert ran is should_run, f"flags={flags} -> ran={ran}"
+
+
+@pytest.mark.parametrize("flags", [["--verify"], ["--strict"], []])
+def test_summary_panel_agrees_with_what_runs(tmp_path, flags):
+    """The panel used to print "disabled" while the check ran and passed."""
+    out = tmp_path / "out"
+    result = _cug(
+        "generate", "-n", "300", "-f", "csv", "-o", str(out), "--seed", "42",
+        *flags, timeout=120,
+    )
+    assert result.returncode == 0, _combined(result)
+    text = _combined(result)
+    announced_disabled = re.search(r"Integrity check\s*│\s*\x1b?\[?[\d;]*m?\s*disabled", text)
+    actually_ran = "Integrity check passed" in text
+    assert not (announced_disabled and actually_ran), (
+        "panel says disabled but the check ran"
+    )

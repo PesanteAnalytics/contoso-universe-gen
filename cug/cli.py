@@ -33,7 +33,7 @@ from rich.text import Text
 from rich import print as rprint
 
 from .config import load_config, AppConfig, SUPPORTED_FORMATS
-from .i18n import list_locales
+from .i18n import list_locales, locale_coverage
 from .categories.registry import CategoryRegistry
 
 
@@ -154,10 +154,15 @@ def generate(
         "--sqlserver-mode",
         help="If table exists: replace (default), append, fail.",
     ),
+    verify: Optional[bool] = typer.Option(
+        None,
+        "--verify/--no-verify",
+        help="Run FK integrity validation before writing. Overrides integrity_check.",
+    ),
     strict: Optional[bool] = typer.Option(
         None,
         "--strict/--no-strict",
-        help="Override integrity_strict from config.",
+        help="Abort on FK violations instead of reporting them. Implies --verify.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed progress."),
 ):
@@ -241,9 +246,11 @@ def generate(
             opts_str = ", ".join(f"{k}={v}" for k, v in non_default.items())
             summary_table.add_row(f"  └ {fmt}", f"[dim]{opts_str}[/dim]")
 
-    # Integrity check summary row
-    _ic_enabled = cfg.output.integrity_check
-    _ic_strict  = strict if strict is not None else cfg.output.integrity_strict
+    # Integrity check summary row — resolved by the same rule the pipeline uses,
+    # so the panel cannot claim "disabled" while the check runs.
+    from .orchestrator import resolve_integrity_check
+
+    _ic_enabled, _ic_strict = resolve_integrity_check(cfg, verify, strict)
     if _ic_enabled:
         _ic_label = "[bold red]strict[/bold red]" if _ic_strict else "[yellow]report-only[/yellow]"
         summary_table.add_row("Integrity check", _ic_label)
@@ -270,7 +277,12 @@ def generate(
             if verbose:
                 steps_done.append(f"  ✓ {step}")
 
-        result = run_generation(config=cfg, progress_callback=_on_progress, strict_override=strict)
+        result = run_generation(
+            config=cfg,
+            progress_callback=_on_progress,
+            strict_override=strict,
+            check_override=verify,
+        )
 
     # Results summary
     console.print()
@@ -366,15 +378,30 @@ def info():
     console.print(BANNER)
 
     lang_table = Table(title="Supported Languages", border_style="cyan")
-    lang_table.add_column("Code",    style="bold cyan")
-    lang_table.add_column("Name",    style="green")
-    lang_table.add_column("Locale",  style="dim")
-    lang_table.add_column("Country", style="dim")
+    lang_table.add_column("Code",     style="bold cyan")
+    lang_table.add_column("Name",     style="green")
+    lang_table.add_column("Locale",   style="dim")
+    lang_table.add_column("Country",  style="dim")
+    lang_table.add_column("Catalog",  justify="center")
+    lang_table.add_column("Calendar", justify="center")
+    lang_table.add_column("People",   justify="center")
+
+    def _mark(covered: bool) -> str:
+        return "[green]✔[/green]" if covered else "[dim]en[/dim]"
 
     for loc in list_locales():
-        lang_table.add_row(loc.code, loc.display_name, loc.faker_locale, loc.country_default)
+        cov = locale_coverage(loc.code)
+        lang_table.add_row(
+            loc.code, loc.display_name, loc.locale_tag, loc.country_default,
+            _mark(cov["catalog"]), _mark(cov["calendar"]), _mark(cov["people"]),
+        )
 
     console.print(lang_table)
+    console.print(
+        "[dim]Catalog = product categories · Calendar = month and day names · "
+        "People = customer names, cities and stores.\n"
+        "'en' marks a column that falls back to English for that language.[/dim]"
+    )
 
 
 # ─── categories ──────────────────────────────────────────────────────────────

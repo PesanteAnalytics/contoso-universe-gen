@@ -64,7 +64,7 @@ Complete calendar covering the entire configured time range (default: 2018-01-01
 
 ### `DimCustomer` — Customers
 
-Pool of synthetic customers, 100% NumPy-vectorized (no Faker).
+Pool of synthetic customers, 100% NumPy-vectorized.
 
 | Column | Type | Description |
 |--------|------|-------------|

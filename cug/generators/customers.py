@@ -1,6 +1,6 @@
 """
 Customer Generator — 100% vectorized with NumPy + pre-built lookup tables.
-Zero Faker calls — generates 100K customers in < 1 second.
+Generates 100K customers in under a second from static lookup tables.
 Schema aligned to Contoso Data Generator V2.
 """
 
@@ -9,9 +9,11 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
+from ..i18n.geography import _CONTINENTS, _GEO_BY_LANG
+
 
 # ─── Pre-built name / geo lookup tables ──────────────────────────────────────
-# Using static lists instead of Faker → 100x faster
+# Static lists keep the whole draw vectorized
 
 _FIRST_NAMES_M = [
     "Carlos", "Miguel", "José", "Juan", "Luis", "Pedro", "Andrés", "Roberto",
@@ -48,23 +50,6 @@ _LAST_NAMES = [
     "Dupont", "Martin", "Bernard", "Dubois", "Moreau", "Laurent", "Simon",
 ]
 
-_CITIES_ES = [
-    "Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Tijuana",
-    "León", "Juárez", "Mérida", "Cancún", "Querétaro", "Bogotá", "Medellín",
-    "Cali", "Buenos Aires", "Córdoba", "Rosario", "Santiago", "Lima", "Quito",
-    "Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga",
-]
-_CITIES_EN = [
-    "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia",
-    "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville",
-    "Toronto", "Vancouver", "Montreal", "Calgary", "London", "Manchester",
-    "Birmingham", "Leeds", "Sydney", "Melbourne", "Brisbane", "Perth",
-]
-_CITIES_PT = [
-    "São Paulo", "Rio de Janeiro", "Belo Horizonte", "Salvador", "Fortaleza",
-    "Curitiba", "Manaus", "Recife", "Porto Alegre", "Belém", "Lisboa", "Porto",
-]
-
 _STREET_TYPES = ["Calle", "Avenida", "Boulevard", "Calle", "Carrera", "Via",
                  "Street", "Avenue", "Road", "Drive", "Lane", "Way", "Blvd"]
 _STREET_NAMES = ["Principal", "Central", "Norte", "Sur", "Reforma", "Insurgentes",
@@ -92,33 +77,6 @@ _VEHICLES = [
 
 _TITLES = ["Sr.", "Sra.", "Dr.", "Dra.", "Ing.", "Lic.", ""]
 
-_GEO_BY_LANG: dict[str, list[tuple[str, str, float]]] = {
-    "es": [
-        ("MX", "México",    0.35), ("CO", "Colombia",  0.15),
-        ("AR", "Argentina", 0.12), ("ES", "España",    0.12),
-        ("CL", "Chile",     0.10), ("PE", "Perú",      0.08),
-        ("EC", "Ecuador",   0.08),
-    ],
-    "en": [
-        ("US", "United States", 0.55), ("CA", "Canada",         0.12),
-        ("GB", "United Kingdom",0.12), ("AU", "Australia",      0.08),
-        ("DE", "Germany",       0.07), ("FR", "France",         0.06),
-    ],
-    "pt": [
-        ("BR", "Brasil", 0.80), ("PT", "Portugal", 0.20),
-    ],
-}
-
-_CONTINENTS: dict[str, str] = {
-    "US": "North America", "CA": "North America", "MX": "North America",
-    "GB": "Europe",        "DE": "Europe",        "FR": "Europe",
-    "ES": "Europe",        "PT": "Europe",
-    "AU": "Oceania",
-    "CO": "South America", "AR": "South America", "CL": "South America",
-    "PE": "South America", "EC": "South America", "BR": "South America",
-}
-
-
 def generate_dim_customer(
     pool_size: int,
     language: str = "en",
@@ -126,7 +84,7 @@ def generate_dim_customer(
 ) -> pl.DataFrame:
     """
     Generate a Customer table — 100% NumPy vectorized.
-    Generates 1M customers/second (vs ~5K/s with Faker).
+    Generates roughly 1M customers per second.
     """
     rng = np.random.default_rng(seed)
 
@@ -165,11 +123,35 @@ def generate_dim_customer(
     cont_arr = np.array([_CONTINENTS.get(c, "North America") for c in country])
 
     # ── Cities ────────────────────────────────────────────────────────────────
-    city_pool = np.array(
-        _CITIES_ES if language == "es"
-        else (_CITIES_PT if language == "pt" else _CITIES_EN)
-    )
-    city = city_pool[rng.integers(0, len(city_pool), pool_size)]
+    # Draw the city from the country already assigned to the row, so City,
+    # State, Country and the coordinates all describe the same real place.
+    # Padded per-country matrices keep the draw vectorized.
+    city_counts = np.array([len(g[3]) for g in geo_list])
+    widest      = int(city_counts.max())
+
+    city_mat  = np.full((len(geo_list), widest), "", dtype=object)
+    scode_mat = np.full((len(geo_list), widest), "", dtype=object)
+    sfull_mat = np.full((len(geo_list), widest), "", dtype=object)
+    lat_mat   = np.zeros((len(geo_list), widest))
+    lon_mat   = np.zeros((len(geo_list), widest))
+
+    for i, (_, _, _, cities) in enumerate(geo_list):
+        for j, (city_name, state_code, state_name, lat_c, lon_c) in enumerate(cities):
+            city_mat[i, j]  = city_name
+            scode_mat[i, j] = state_code
+            sfull_mat[i, j] = state_name
+            lat_mat[i, j]   = lat_c
+            lon_mat[i, j]   = lon_c
+
+    city_pick  = (rng.random(pool_size) * city_counts[geo_idx]).astype(np.int64)
+    city       = city_mat[geo_idx, city_pick]
+    state      = scode_mat[geo_idx, city_pick]
+    state_full = sfull_mat[geo_idx, city_pick]
+
+    # Scatter customers around the city centre (~±5 km) instead of around the
+    # globe, so map visuals put them where their address says they live.
+    lat = np.round(lat_mat[geo_idx, city_pick] + rng.normal(0, 0.05, pool_size), 6)
+    lon = np.round(lon_mat[geo_idx, city_pick] + rng.normal(0, 0.05, pool_size), 6)
 
     # ── Addresses ─────────────────────────────────────────────────────────────
     st_types = np.array(_STREET_TYPES)
@@ -208,9 +190,6 @@ def generate_dim_customer(
     company    = comp_arr[rng.integers(0, len(comp_arr), pool_size)]
     vehicle    = veh_arr[rng.integers(0, len(veh_arr), pool_size)]
 
-    lat = np.round(rng.uniform(-60.0,   70.0, pool_size), 6)
-    lon = np.round(rng.uniform(-160.0, 160.0, pool_size), 6)
-
     # ── Build DataFrame ───────────────────────────────────────────────────────
     return pl.DataFrame({
         "CustomerKey":   np.arange(1, pool_size + 1, dtype=np.int32),
@@ -225,8 +204,8 @@ def generate_dim_customer(
         "Surname":       surname.tolist(),
         "StreetAddress": street.tolist(),
         "City":          city.tolist(),
-        "State":         [""] * pool_size,
-        "StateFull":     [""] * pool_size,
+        "State":         state.tolist(),
+        "StateFull":     state_full.tolist(),
         "ZipCode":       zip_codes.tolist(),
         "Country":       country.tolist(),
         "CountryFull":   country_full.tolist(),

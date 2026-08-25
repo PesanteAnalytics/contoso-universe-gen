@@ -8,30 +8,16 @@ from __future__ import annotations
 import random
 
 import polars as pl
-from faker import Faker
 
-from ..i18n import get_locale
+from ..i18n.geography import _GEO_BY_LANG
 
 
-_STORE_CONFIGS: dict[str, list[dict]] = {
-    "en": [
-        {"country": "US", "country_name": "United States",  "n_stores": 12, "weight": 0.55},
-        {"country": "CA", "country_name": "Canada",         "n_stores": 3,  "weight": 0.12},
-        {"country": "GB", "country_name": "United Kingdom", "n_stores": 4,  "weight": 0.12},
-        {"country": "AU", "country_name": "Australia",      "n_stores": 2,  "weight": 0.08},
-        {"country": "DE", "country_name": "Germany",        "n_stores": 2,  "weight": 0.07},
-        {"country": "FR", "country_name": "France",         "n_stores": 2,  "weight": 0.06},
-    ],
-    "es": [
-        {"country": "MX", "country_name": "México",         "n_stores": 8, "weight": 0.35},
-        {"country": "CO", "country_name": "Colombia",       "n_stores": 4, "weight": 0.15},
-        {"country": "AR", "country_name": "Argentina",      "n_stores": 3, "weight": 0.12},
-        {"country": "ES", "country_name": "España",         "n_stores": 3, "weight": 0.12},
-        {"country": "CL", "country_name": "Chile",          "n_stores": 2, "weight": 0.10},
-        {"country": "PE", "country_name": "Perú",           "n_stores": 2, "weight": 0.08},
-        {"country": "EC", "country_name": "Ecuador",        "n_stores": 2, "weight": 0.08},
-    ],
-}
+# Physical stores to open, split across countries by their share of the market.
+# The country list, the weights and the cities all come from the geography
+# registry, so DimStore and DimCustomer can never disagree about where the
+# business operates — they used to, and a German run put a store called
+# "Contoso Witzenhausen" in the United States.
+_TOTAL_PHYSICAL_STORES = 24
 
 # Square metres by store size (matches realistic retail footprints)
 _SQMT: dict[str, tuple[int, int]] = {
@@ -64,12 +50,10 @@ def generate_dim_store(
     Internal-only column kept for sales generator (not written to output):
       Weight       : float   (sampling weight — dropped at output time if needed)
     """
-    locale_info = get_locale(language)
-    fake = Faker(locale_info.faker_locale)
-    Faker.seed(seed)
     rng = random.Random(seed)
 
-    store_configs = _STORE_CONFIGS.get(language, _STORE_CONFIGS["en"])
+    geo_list = _GEO_BY_LANG.get(language, _GEO_BY_LANG["en"])
+    store_counts = _stores_per_country([g[2] for g in geo_list])
     sizes = ["Small", "Medium", "Large"]
     size_weights = [0.3, 0.5, 0.2]
 
@@ -94,30 +78,63 @@ def generate_dim_store(
     })
     store_key = 2
 
-    for config in store_configs:
+    for (country_code, country_name, weight, cities), n_stores in zip(geo_list, store_counts):
         geo_area_key += 1
-        for _ in range(config["n_stores"]):
+        # Spread the country's stores over distinct cities before repeating one.
+        city_order = _spread_over_cities(cities, n_stores, rng)
+
+        for city_name, _, state_name, _, _ in city_order:
             open_year  = rng.randint(2000, 2017)
             open_date  = f"{open_year}-{rng.randint(1,12):02d}-{rng.randint(1,28):02d}"
             size_label = rng.choices(sizes, weights=size_weights)[0]
             sq_min, sq_max = _SQMT[size_label]
             sq_mt      = rng.randint(sq_min, sq_max)
-            city       = fake.city()
+            city       = city_name
 
             rows.append({
                 "StoreKey":     store_key,
                 "StoreCode":    store_key,
                 "GeoAreaKey":   geo_area_key,
-                "CountryCode":  config["country"],
-                "CountryName":  config["country_name"],
-                "State":        fake.state() if hasattr(fake, "state") else "",
+                "CountryCode":  country_code,
+                "CountryName":  country_name,
+                "State":        state_name,
                 "OpenDate":     open_date,
                 "CloseDate":    None,
                 "Description":  f"Contoso {city} #{store_key}",
                 "SquareMeters": sq_mt,
                 "Status":       "Current",
-                "Weight":       config["weight"],  # used internally
+                "Weight":       weight,  # used internally
             })
             store_key += 1
 
     return pl.DataFrame(rows)
+
+
+def _stores_per_country(weights: list[float]) -> list[int]:
+    """Split the store count across countries by market share, one each minimum.
+
+    Largest-remainder, so the parts always add back up to the total instead of
+    drifting with rounding.
+    """
+    total_weight = sum(weights)
+    exact = [w / total_weight * _TOTAL_PHYSICAL_STORES for w in weights]
+    counts = [max(1, int(e)) for e in exact]
+
+    # Hand out what rounding left over, biggest fractional part first.
+    leftover = _TOTAL_PHYSICAL_STORES - sum(counts)
+    for i in sorted(range(len(exact)), key=lambda i: exact[i] - int(exact[i]), reverse=True):
+        if leftover <= 0:
+            break
+        counts[i] += 1
+        leftover -= 1
+    return counts
+
+
+def _spread_over_cities(cities: list, n_stores: int, rng: random.Random) -> list:
+    """Pick n_stores cities, exhausting the distinct ones before repeating."""
+    chosen: list = []
+    while len(chosen) < n_stores:
+        batch = list(cities)
+        rng.shuffle(batch)
+        chosen.extend(batch[: n_stores - len(chosen)])
+    return chosen

@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "contoso-universe-gen"
 version = "0.2.0"
-description = "High-performance synthetic retail data generator — Polars + DuckDB + Faker + i18n"
+description = "High-performance synthetic retail data generator — Polars + DuckDB + NumPy + i18n"
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.12"
 authors = [
     {name = "Pesante Analytics LLC"}
 ]
-keywords = ["data-generator", "synthetic-data", "polars", "duckdb", "faker", "retail", "power-bi"]
+keywords = ["data-generator", "synthetic-data", "polars", "duckdb", "retail", "power-bi", "contoso"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.12",
@@ -27,8 +27,6 @@ dependencies = [
     "numpy>=1.26.0",
     # Embedded analytical SQL engine
     "duckdb>=0.10.0",
-    # Synthetic data generation with multi-locale support
-    "faker>=24.0.0",
     # Config validation with type-safe schemas
     "pydantic>=2.6.0",
     # CLI framework — type-hint based, autocomplete

@@ -214,7 +214,13 @@ def generate_fact_sales(
     q_noise_seed = (row_quarters * 31337 + cfg.seed) & 0xFFFFFFFF
     q_rng        = np.random.default_rng(int(q_noise_seed.mean()))
     cogs_noise   = np.clip(q_rng.normal(0, 0.02, size=total_rows), -0.06, 0.06)
-    unit_costs   = np.round(unit_costs * (1 + cogs_noise), 2)
+    # Cap the noisy cost just under the list price. Thin-margin subcategories
+    # (gaming hardware starts at 2%) would otherwise be pushed past their own
+    # price by the +6% tail of the noise, producing a unit sold at a loss.
+    # Margin can be thin; it must not invert.
+    unit_costs   = np.round(
+        np.minimum(unit_costs * (1 + cogs_noise), unit_prices * 0.99), 2
+    )
 
     # ── 9. Quantity: exponential-like, capped 1-5 ────────────────────────────
     raw_qty  = rng.exponential(scale=1.0 / 1.2, size=total_rows)
