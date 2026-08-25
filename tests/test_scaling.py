@@ -11,6 +11,7 @@ import pytest
 
 
 def _generate_csv(tmp_path: Path, n: int) -> Path:
+    """Generate at scale n; the CSV writer nests its tables under output/csv/."""
     out = tmp_path / f"scale_{n}"
     result = subprocess.run(
         [sys.executable, "-m", "cug", "generate",
@@ -18,7 +19,7 @@ def _generate_csv(tmp_path: Path, n: int) -> Path:
         capture_output=True, text=True, timeout=120,
     )
     assert result.returncode == 0, f"Generation failed for n={n}:\n{result.stderr}"
-    return out
+    return out / "csv"
 
 
 @pytest.mark.parametrize("n_orders", [100, 1000, 5000])
