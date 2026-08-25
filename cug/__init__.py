@@ -4,7 +4,7 @@ High-performance synthetic retail data for analytics demos.
 """
 
 __version__ = "0.2.0"
-__author__  = "CSalcedoDataBI"
+__author__  = "Pesante Analytics LLC"
 
 from .config import load_config, AppConfig
 

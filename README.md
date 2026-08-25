@@ -4,7 +4,6 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![CI](https://github.com/CSalcedoDataBI/contoso-universe-gen/actions/workflows/ci.yml/badge.svg)](https://github.com/CSalcedoDataBI/contoso-universe-gen/actions/workflows/ci.yml)
 [![Polars](https://img.shields.io/badge/dataframe-Polars-orange)](https://pola.rs)
 [![DuckDB](https://img.shields.io/badge/engine-DuckDB-yellow)](https://duckdb.org)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -191,9 +190,9 @@ See [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) for full installati
 
 ---
 
-## 🏗️ From the PAL Data Team
+## 🏗️ From Pesante Analytics
 
-CUG started as an internal tool for the **PAL Data Team** — a Power BI consulting group
+CUG started as an internal tool at **[Pesante Analytics](https://www.pesanteanalytics.com/?utm_source=github&utm_medium=readme&utm_campaign=cug)** — a Power BI consulting firm
 that builds analytics solutions across industries: VMS/workforce staffing, healthcare,
 financial services, and retail.
 
