@@ -1,0 +1,119 @@
+name: Release
+
+# Tag-driven. `git tag v0.2.0 && git push --tags` builds, attaches the artifacts
+# to a GitHub Release, and publishes to PyPI.
+#
+# The PyPI job stays skipped until trusted publishing is configured and the
+# repository variable PYPI_TRUSTED_PUBLISHING is set to "true". That way tagging
+# already produces a downloadable release today, instead of a permanently red
+# run for a step that cannot succeed yet.
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Never cancel a release: a half-cancelled one leaves the tag, the GitHub
+  # Release and PyPI disagreeing about what shipped.
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install the project with dev extras
+        run: uv pip install -e ".[dev]" --system
+
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=short
+
+  build:
+    name: Build the distribution
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Check the tag matches the package version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)"
+          if [ "$tag" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match version $version in pyproject.toml"
+            exit 1
+          fi
+          echo "Releasing $version"
+
+      - name: Build the wheel and sdist
+        run: uv build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  github-release:
+    name: Publish the GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create the release with the artifacts attached
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: dist/*
+
+  pypi:
+    name: Publish to PyPI
+    needs: build
+    if: vars.PYPI_TRUSTED_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      # OIDC only — trusted publishing needs no PyPI token in secrets.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
