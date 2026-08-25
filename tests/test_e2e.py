@@ -97,7 +97,7 @@ def test_e2e_city_belongs_to_its_country(tmp_path):
     """
     import polars as pl_
 
-    from cug.generators.customers import _GEO_BY_LANG
+    from cug.i18n.geography import _GEO_BY_LANG
 
     out = _run_generate(tmp_path, n=2_000, lang="es")
     customers = pl_.read_csv(out / "DimCustomer.csv")
@@ -117,7 +117,7 @@ def test_e2e_coordinates_sit_near_the_city(tmp_path):
     """Latitude and longitude must place the customer in their own city."""
     import polars as pl_
 
-    from cug.generators.customers import _GEO_BY_LANG
+    from cug.i18n.geography import _GEO_BY_LANG
 
     out = _run_generate(tmp_path, n=2_000, lang="es")
     customers = pl_.read_csv(out / "DimCustomer.csv")
