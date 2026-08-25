@@ -35,7 +35,7 @@ def get_locale(language: str) -> LocaleInfo:
 
 def list_locales() -> list[LocaleInfo]:
     """Return all supported locales sorted by code."""
-    return sorted(LOCALE_MAP.values(), key=lambda l: l.code)
+    return sorted(LOCALE_MAP.values(), key=lambda loc: loc.code)
 
 
 def locale_coverage(language: str) -> dict[str, bool]:

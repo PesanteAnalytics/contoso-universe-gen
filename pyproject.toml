@@ -62,11 +62,18 @@ cug = "cug.cli:app"
 packages = ["cug"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# cug/cli.py reconfigures stdout and stderr to UTF-8 before anything else runs.
+# On Windows the default console codec is cp1252, which cannot encode the
+# box-drawing characters Rich prints. The shim has to execute above the imports,
+# and the import sorter would move it back down if it were an import itself.
+"cug/cli.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"

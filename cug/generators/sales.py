@@ -89,7 +89,6 @@ def generate_fact_sales(
 
     # ── 1. Build per-day metadata arrays ─────────────────────────────────────
     all_dates    = [start_dt + timedelta(days=i) for i in range(total_days)]
-    date_strs    = np.array([d.isoformat() for d in all_dates])
 
     # Years-elapsed from base (float, for inflation/growth)
     years_elapsed = np.array(
@@ -275,9 +274,6 @@ def generate_fact_sales(
 
     order_date_strs    = order_dates_np.astype("datetime64[D]").astype(str)
     delivery_date_strs = delivery_dates_np.astype("datetime64[D]").astype(str)
-
-    # ── 12. Return flag (~3%) ────────────────────────────────────────────────
-    return_flag = rng.random(size=total_rows) < 0.03
 
     # ── 13. Build Polars DataFrame ───────────────────────────────────────────
     order_keys = np.arange(1, total_rows + 1, dtype=np.int64)

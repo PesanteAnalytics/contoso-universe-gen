@@ -22,6 +22,13 @@ from typing import Any
 from ..config import SUPPORTED_FORMATS
 from ..models import GenerationResult
 
+# Re-exported for callers that import the writers directly. The heavier
+# formats (delta, excel, sqlserver) stay lazily imported inside write_format
+# so their dependencies only load when that format is actually requested.
+from .csv_writer import write_csv
+from .duckdb_writer import write_duckdb
+from .parquet_writer import write_parquet
+
 
 def write_format(
     fmt: str,
@@ -74,11 +81,6 @@ def write_format(
         from .sqlserver_writer import write_sqlserver
         write_sqlserver(result, output_path, **options)
 
-
-# Keep individual imports for backward compatibility
-from .csv_writer import write_csv
-from .duckdb_writer import write_duckdb
-from .parquet_writer import write_parquet
 
 __all__ = [
     "SUPPORTED_FORMATS",

@@ -89,20 +89,28 @@ def generate_dim_date(
         wday = current.weekday()
         month_idx = current.month - 1
 
+        # Fall back to the C library's names for a language without its own table.
+        has_month = month_idx < len(month_names)
+        has_day   = wday < len(day_names)
+        month_name  = month_names[month_idx] if has_month else current.strftime("%B")
+        month_short = month_names[month_idx][:3] if has_month else current.strftime("%b")
+        day_name    = day_names[wday] if has_day else current.strftime("%A")
+        day_short   = day_names[wday][:3] if has_day else current.strftime("%a")
+
         rows.append({
             "DateKey":            int(current.strftime("%Y%m%d")),
             "Date":               current,
             "Year":               current.year,
             "Quarter":            (current.month - 1) // 3 + 1,
             "Month":              current.month,
-            "MonthName":          month_names[month_idx] if month_idx < len(month_names) else current.strftime("%B"),
-            "MonthNameShort":     (month_names[month_idx][:3] if month_idx < len(month_names) else current.strftime("%b")),
+            "MonthName":          month_name,
+            "MonthNameShort":     month_short,
             "Week":               current.isocalendar().week,
             "DayOfYear":          current.timetuple().tm_yday,
             "DayOfMonth":         current.day,
             "DayOfWeek":          wday,
-            "DayName":            day_names[wday] if wday < len(day_names) else current.strftime("%A"),
-            "DayNameShort":       (day_names[wday][:3] if wday < len(day_names) else current.strftime("%a")),
+            "DayName":            day_name,
+            "DayNameShort":       day_short,
             "IsWeekend":          is_weekend,
             "IsHoliday":          is_holiday,
             "HolidayName":        holiday_name or None,
