@@ -51,7 +51,7 @@ dependencies = [
 dev = [
     "pytest>=8.1.0",
     "pytest-cov>=5.0.0",
-    "ruff>=0.3.0",
+    "ruff>=0.16.4",   # CI pins 0.16.4 — keep the floor in step with it
     "mypy>=1.9.0",
 ]
 
