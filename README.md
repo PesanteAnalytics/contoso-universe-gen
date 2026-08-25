@@ -4,6 +4,7 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/PesanteAnalytics/contoso-universe-gen/actions/workflows/ci.yml/badge.svg)](https://github.com/PesanteAnalytics/contoso-universe-gen/actions/workflows/ci.yml)
 [![Polars](https://img.shields.io/badge/dataframe-Polars-orange)](https://pola.rs)
 [![DuckDB](https://img.shields.io/badge/engine-DuckDB-yellow)](https://duckdb.org)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
