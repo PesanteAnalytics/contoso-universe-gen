@@ -87,3 +87,47 @@ def test_e2e_prices_are_positive(tmp_path):
     for col in ("UnitPrice", "NetPrice", "UnitCost"):
         if col in df.columns:
             assert (df[col] > 0).all(), f"{col} has non-positive values"
+
+
+def test_e2e_city_belongs_to_its_country(tmp_path):
+    """Every City / State / Country triple must describe one real place.
+
+    Cities used to be drawn from a flat per-language pool with no regard for the
+    country already assigned, which put Buenos Aires in Mexico.
+    """
+    import polars as pl_
+
+    from cug.generators.customers import _GEO_BY_LANG
+
+    out = _run_generate(tmp_path, n=2_000, lang="es")
+    customers = pl_.read_csv(out / "DimCustomer.csv")
+
+    valid = {
+        (country_full, city, state_full)
+        for _, country_full, _, cities in _GEO_BY_LANG["es"]
+        for city, _, state_full, _, _ in cities
+    }
+    seen = set(
+        customers.select(["CountryFull", "City", "StateFull"]).unique().iter_rows()
+    )
+    assert seen <= valid, f"impossible places: {sorted(seen - valid)}"
+
+
+def test_e2e_coordinates_sit_near_the_city(tmp_path):
+    """Latitude and longitude must place the customer in their own city."""
+    import polars as pl_
+
+    from cug.generators.customers import _GEO_BY_LANG
+
+    out = _run_generate(tmp_path, n=2_000, lang="es")
+    customers = pl_.read_csv(out / "DimCustomer.csv")
+
+    centres = {
+        city: (lat, lon)
+        for _, _, _, cities in _GEO_BY_LANG["es"]
+        for city, _, _, lat, lon in cities
+    }
+    for city, lat, lon in customers.select(["City", "Latitude", "Longitude"]).iter_rows():
+        centre_lat, centre_lon = centres[city]
+        assert abs(lat - centre_lat) < 1.0, f"{city}: latitude {lat} is not near {centre_lat}"
+        assert abs(lon - centre_lon) < 1.0, f"{city}: longitude {lon} is not near {centre_lon}"
