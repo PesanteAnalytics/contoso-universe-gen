@@ -26,7 +26,6 @@ from rich.console import Console
 
 from ..models import GenerationResult
 
-
 console = Console()
 
 

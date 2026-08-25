@@ -23,7 +23,6 @@ from datetime import date, timedelta
 
 import polars as pl
 
-
 # ─── Reference rates vs USD ──────────────────────────────────────────────────
 # Approximate mid-market rates (synthetic, realistic order of magnitude).
 _BASE_RATES: dict[str, float] = {

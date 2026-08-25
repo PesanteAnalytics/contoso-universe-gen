@@ -14,7 +14,6 @@ from typing import Any
 
 from ..models import GenerationResult
 
-
 _TABLES = [
     "DimDate", "DimCustomer", "DimProduct", "DimStore",
     "DimCurrency", "DimCurrencyExchange", "FactSales",

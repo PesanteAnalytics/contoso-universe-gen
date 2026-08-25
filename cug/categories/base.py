@@ -5,8 +5,7 @@ All category plugins (builtin or external) must follow this interface.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +43,7 @@ class CategoryPlugin:
         return self.display_names.get(language) or self.display_names.get("en", self.plugin_id)
 
     @classmethod
-    def from_yaml(cls, path: Path) -> "CategoryPlugin":
+    def from_yaml(cls, path: Path) -> CategoryPlugin:
         """Load a CategoryPlugin from a YAML file."""
         with open(path, encoding="utf-8") as f:
             data: dict[str, Any] = yaml.safe_load(f)

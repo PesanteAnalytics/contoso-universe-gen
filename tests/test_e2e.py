@@ -3,14 +3,15 @@ End-to-end tests — run a full generation pipeline at small scale.
 Verifies that all tables are produced with valid FK relationships.
 """
 
-import pytest
-import polars as pl
 from pathlib import Path
+
+import polars as pl
 
 
 def _run_generate(tmp_path: Path, n: int = 100, fmt: str = "csv", lang: str = "en") -> Path:
     """Run cug generate via subprocess; writers nest tables under output/<fmt>/."""
-    import subprocess, sys
+    import subprocess
+    import sys
     out = tmp_path / f"out_{n}"
     result = subprocess.run(
         [sys.executable, "-m", "cug", "generate",

@@ -11,7 +11,6 @@ import polars as pl
 
 from ..i18n.geography import _CONTINENTS, _GEO_BY_LANG
 
-
 # ─── Pre-built name / geo lookup tables ──────────────────────────────────────
 # Static lists keep the whole draw vectorized
 

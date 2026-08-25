@@ -11,7 +11,6 @@ import polars as pl
 
 from ..i18n.geography import _GEO_BY_LANG
 
-
 # Physical stores to open, split across countries by their share of the market.
 # The country list, the weights and the cities all come from the geography
 # registry, so DimStore and DimCustomer can never disagree about where the

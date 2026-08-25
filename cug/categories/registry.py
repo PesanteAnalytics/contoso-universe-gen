@@ -23,7 +23,7 @@ class CategoryRegistry:
     def __init__(self) -> None:
         self._plugins: dict[str, CategoryPlugin] = {}
 
-    def load_builtins(self, enabled: list[str] | None = None) -> "CategoryRegistry":
+    def load_builtins(self, enabled: list[str] | None = None) -> CategoryRegistry:
         """Load builtin category plugins by their ID.
         If *enabled* is None, loads all available builtin categories.
         """
@@ -41,7 +41,7 @@ class CategoryRegistry:
             self._plugins[plugin.plugin_id] = plugin
         return self
 
-    def load_custom(self, paths: list[Path]) -> "CategoryRegistry":
+    def load_custom(self, paths: list[Path]) -> CategoryRegistry:
         """Load custom YAML plugins from user-defined paths."""
         for path in paths:
             path = Path(path)
@@ -67,7 +67,7 @@ class CategoryRegistry:
         return sorted(p.stem for p in _BUILTIN_DIR.glob("*.yaml"))
 
     @classmethod
-    def from_config(cls, enabled: list[str], custom: list[Path]) -> "CategoryRegistry":
+    def from_config(cls, enabled: list[str], custom: list[Path]) -> CategoryRegistry:
         """Convenience constructor that loads all plugins in one call."""
         reg = cls()
         reg.load_builtins(enabled)

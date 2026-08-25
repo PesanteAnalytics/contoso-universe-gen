@@ -6,12 +6,11 @@ Pydantic v2 models for parsing and validating TOML configuration files.
 from __future__ import annotations
 
 import tomllib
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-
 
 # Canonical set of supported output formats.
 # Defined here (not in writers) to avoid circular imports.
@@ -39,7 +38,7 @@ class GeneralConfig(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_date_range(self) -> "GeneralConfig":
+    def validate_date_range(self) -> GeneralConfig:
         start = date.fromisoformat(self.start_date)
         end   = date.fromisoformat(self.end_date)
         if start >= end:
@@ -193,7 +192,7 @@ class OutputConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def migrate_duckdb_name(self) -> "OutputConfig":
+    def migrate_duckdb_name(self) -> OutputConfig:
         """If user sets duckdb_db_name at output level, forward it to format_options."""
         if self.duckdb_db_name is not None:
             self.format_options.duckdb_db_name = self.duckdb_db_name
@@ -274,7 +273,7 @@ class AppConfig(BaseModel):
     weekday_factors: WeekdayFactorsConfig = Field(default_factory=WeekdayFactorsConfig)
 
     @classmethod
-    def from_toml(cls, path: Path | str) -> "AppConfig":
+    def from_toml(cls, path: Path | str) -> AppConfig:
         """Load and validate configuration from a TOML file."""
         path = Path(path)
         if not path.exists():
@@ -284,7 +283,7 @@ class AppConfig(BaseModel):
         return cls.model_validate(raw)
 
     @classmethod
-    def defaults(cls) -> "AppConfig":
+    def defaults(cls) -> AppConfig:
         """Return an AppConfig instance with all default values."""
         return cls()
 

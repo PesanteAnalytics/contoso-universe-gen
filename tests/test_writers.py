@@ -8,18 +8,16 @@ Note: Writers create subdirectories per format:
   - write_json → output_path/json/
 """
 
-import json
-import pytest
-import polars as pl
-from pathlib import Path
 from datetime import date
 
+import polars as pl
+
+from cug.categories.registry import CategoryRegistry
 from cug.generators.calendar import generate_dim_date
 from cug.generators.currency import generate_dim_currency
 from cug.generators.customers import generate_dim_customer
-from cug.generators.stores import generate_dim_store
-from cug.categories.registry import CategoryRegistry
 from cug.generators.products import generate_dim_product
+from cug.generators.stores import generate_dim_store
 from cug.models import GenerationResult
 
 

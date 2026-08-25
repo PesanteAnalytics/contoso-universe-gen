@@ -5,8 +5,9 @@ with target_orders, and that DimCurrencyExchange is constant (date-range based).
 
 import subprocess
 import sys
-import polars as pl
 from pathlib import Path
+
+import polars as pl
 import pytest
 
 
