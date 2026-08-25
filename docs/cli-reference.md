@@ -129,7 +129,7 @@ cug generate -n 500000 -f delta --delta-mode overwrite
 cug info
 ```
 
-Displays a table with all supported languages, their code, name, and associated Faker locale.
+Displays a table with all supported languages, their code, name, locale tag, and what each one actually localizes (catalogue, calendar, people).
 
 **Supported languages:** `en` (English), `es` (Español), `pt` (Português), `fr` (Français), `de` (Deutsch), `zh` (中文), `ja` (日本語), `ar` (العربية)
 

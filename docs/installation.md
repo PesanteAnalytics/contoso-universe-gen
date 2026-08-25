@@ -67,7 +67,7 @@ CUG automatically installs the following dependencies:
 |---------|---------|
 | `polars` | High-speed DataFrame engine |
 | `duckdb` | Embedded analytical database |
-| `faker` | Generation of names, addresses, and synthetic data |
+| `numpy` | Vectorized RNG behind customer and sales generation |
 | `pydantic` | Configuration validation |
 | `typer` | CLI framework |
 | `rich` | Rich-formatted console output |

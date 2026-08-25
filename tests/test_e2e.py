@@ -131,3 +131,30 @@ def test_e2e_coordinates_sit_near_the_city(tmp_path):
         centre_lat, centre_lon = centres[city]
         assert abs(lat - centre_lat) < 1.0, f"{city}: latitude {lat} is not near {centre_lat}"
         assert abs(lon - centre_lon) < 1.0, f"{city}: longitude {lon} is not near {centre_lon}"
+
+
+def test_e2e_language_coverage_matches_the_data(tmp_path):
+    """What `cug info` claims a language localizes must be what it produces.
+
+    The README used to advertise "8 languages: names, cities and categories
+    fully localized" while five of them generated a US customer base.
+    """
+    import polars as pl_
+
+    from cug.i18n import locale_coverage
+    from cug.i18n.geography import _GEO_BY_LANG
+
+    # ja has a translated catalogue but no geography of its own.
+    assert locale_coverage("ja") == {"catalog": True, "calendar": False, "people": False}
+
+    out = _run_generate(tmp_path, n=500, lang="ja")
+    customers = pl_.read_csv(out / "DimCustomer.csv")
+    products = pl_.read_csv(out / "DimProduct.csv")
+
+    fallback_countries = {country for _, country, _, _ in _GEO_BY_LANG["en"]}
+    assert set(customers["CountryFull"].unique()) <= fallback_countries, (
+        "people coverage is reported False, so the customer base must fall back to en"
+    )
+    assert not products["CategoryName"].str.contains("Electronics").any(), (
+        "catalog coverage is reported True, so categories must be translated"
+    )

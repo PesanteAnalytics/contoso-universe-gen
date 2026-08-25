@@ -1,6 +1,6 @@
 """
 Customer Generator — 100% vectorized with NumPy + pre-built lookup tables.
-Zero Faker calls — generates 100K customers in < 1 second.
+Generates 100K customers in under a second from static lookup tables.
 Schema aligned to Contoso Data Generator V2.
 """
 
@@ -13,7 +13,7 @@ from ..i18n.geography import _CONTINENTS, _GEO_BY_LANG
 
 
 # ─── Pre-built name / geo lookup tables ──────────────────────────────────────
-# Using static lists instead of Faker → 100x faster
+# Static lists keep the whole draw vectorized
 
 _FIRST_NAMES_M = [
     "Carlos", "Miguel", "José", "Juan", "Luis", "Pedro", "Andrés", "Roberto",
@@ -84,7 +84,7 @@ def generate_dim_customer(
 ) -> pl.DataFrame:
     """
     Generate a Customer table — 100% NumPy vectorized.
-    Generates 1M customers/second (vs ~5K/s with Faker).
+    Generates roughly 1M customers per second.
     """
     rng = np.random.default_rng(seed)
 

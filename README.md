@@ -24,8 +24,8 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 | Problem with DG V2 | CUG solution |
 | --- | --- |
 | Requires .NET SDK (~75 MB runtime) | 100% Python — `pip install` and go |
-| English-only names and categories | 8 languages: EN, ES, PT, FR, DE, ZH, JA, AR |
-| Downloads real data from SQLBI servers | Fully offline — Faker generates everything locally |
+| English-only names and categories | Product catalogue in 8 languages; calendar in 5; people and geography in 3 ([coverage](#language-coverage)) |
+| Downloads real data from SQLBI servers | Fully offline — nothing is fetched at generation time |
 | Fixed product schema (`data.xlsx`) | YAML category plugins — extend without touching code |
 | CSV / Parquet / Delta only | + DuckDB, JSON, Excel, SQL Server |
 | No integrity checks | `--verify` + `--strict` for FK-safe datasets |
@@ -40,7 +40,7 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 
 | | Feature | Detail |
 | --- | --- | --- |
-| 🌍 | **Multi-language** | 8 locales — names, cities, and categories fully localized |
+| 🌍 | **Multi-language** | 8 locales — see [language coverage](#language-coverage) for what each one translates |
 | ⚡ | **Polars engine** | Vectorized generation — 5–10× faster than Pandas-based tools |
 | 📦 | **7 output formats** | Parquet, CSV, DuckDB, Delta Lake, JSON, Excel, SQL Server |
 | 🔌 | **YAML category plugins** | Add any industry vertical without changing a line of code |
@@ -135,13 +135,45 @@ See [`docs/category-plugins.md`](docs/category-plugins.md) for the full YAML sch
 
 ---
 
+## Language coverage
+
+Translation depth is not uniform, and the difference matters when you are
+picking a locale for a demo. Run `cug info` to see this table for your install —
+it is computed from the data, not maintained by hand.
+
+| Code | Language | Product catalogue | Calendar | People & geography |
+| --- | --- | :---: | :---: | :---: |
+| `en` | English | ✅ | ✅ | ✅ |
+| `es` | Español | ✅ | ✅ | ✅ |
+| `pt` | Português | ✅ | ✅ | ✅ |
+| `fr` | Français | ✅ | ✅ | → `en` |
+| `de` | Deutsch | ✅ | ✅ | → `en` |
+| `zh` | 中文 | ✅ | → `en` | → `en` |
+| `ja` | 日本語 | ✅ | → `en` | → `en` |
+| `ar` | العربية | ✅ | → `en` | → `en` |
+
+- **Product catalogue** — category and subcategory names, from the YAML plugins.
+- **Calendar** — `MonthName` and `DayName` in `DimDate`. Holiday names come from
+  the [`holidays`](https://pypi.org/project/holidays/) package and follow its own
+  language support.
+- **People & geography** — customer names, cities, subdivisions, coordinates and
+  store locations. A language without its own geography generates a US/European
+  customer base; the product catalogue is still translated.
+
+Adding a language means extending `_GEO_BY_LANG` in
+[`cug/i18n/geography.py`](cug/i18n/geography.py) and the name pools in
+[`cug/generators/customers.py`](cug/generators/customers.py). Contributions
+welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
+
 ## Stack
 
 | Library | Role |
 | --- | --- |
 | [Polars](https://pola.rs) | DataFrame engine — vectorized, blazing fast |
 | [DuckDB](https://duckdb.org) | Embedded analytical SQL engine |
-| [Faker](https://faker.readthedocs.io) | Synthetic names, addresses, companies — 8 locales |
+| [NumPy](https://numpy.org) | Vectorized RNG behind customer and sales generation |
 | [Pydantic v2](https://docs.pydantic.dev) | Config validation |
 | [Typer](https://typer.tiangolo.com) | CLI framework |
 | [Rich](https://rich.readthedocs.io) | Terminal UI with progress bars and tables |

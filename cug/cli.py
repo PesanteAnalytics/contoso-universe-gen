@@ -33,7 +33,7 @@ from rich.text import Text
 from rich import print as rprint
 
 from .config import load_config, AppConfig, SUPPORTED_FORMATS
-from .i18n import list_locales
+from .i18n import list_locales, locale_coverage
 from .categories.registry import CategoryRegistry
 
 
@@ -378,15 +378,30 @@ def info():
     console.print(BANNER)
 
     lang_table = Table(title="Supported Languages", border_style="cyan")
-    lang_table.add_column("Code",    style="bold cyan")
-    lang_table.add_column("Name",    style="green")
-    lang_table.add_column("Locale",  style="dim")
-    lang_table.add_column("Country", style="dim")
+    lang_table.add_column("Code",     style="bold cyan")
+    lang_table.add_column("Name",     style="green")
+    lang_table.add_column("Locale",   style="dim")
+    lang_table.add_column("Country",  style="dim")
+    lang_table.add_column("Catalog",  justify="center")
+    lang_table.add_column("Calendar", justify="center")
+    lang_table.add_column("People",   justify="center")
+
+    def _mark(covered: bool) -> str:
+        return "[green]✔[/green]" if covered else "[dim]en[/dim]"
 
     for loc in list_locales():
-        lang_table.add_row(loc.code, loc.display_name, loc.faker_locale, loc.country_default)
+        cov = locale_coverage(loc.code)
+        lang_table.add_row(
+            loc.code, loc.display_name, loc.locale_tag, loc.country_default,
+            _mark(cov["catalog"]), _mark(cov["calendar"]), _mark(cov["people"]),
+        )
 
     console.print(lang_table)
+    console.print(
+        "[dim]Catalog = product categories · Calendar = month and day names · "
+        "People = customer names, cities and stores.\n"
+        "'en' marks a column that falls back to English for that language.[/dim]"
+    )
 
 
 # ─── categories ──────────────────────────────────────────────────────────────

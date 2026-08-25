@@ -36,7 +36,7 @@ def test_locale_map_has_8_languages():
 def test_get_locale_en():
     from cug.i18n import get_locale
     loc = get_locale("en")
-    assert loc.faker_locale == "en_US"
+    assert loc.locale_tag == "en_US"
 
 
 def test_get_locale_unknown_falls_back():

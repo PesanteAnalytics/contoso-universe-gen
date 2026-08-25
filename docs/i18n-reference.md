@@ -7,7 +7,7 @@
 
 ## Supported Languages
 
-| Code | Language | Faker Locale | Default Country | Primary Currency |
+| Code | Language | Locale Tag | Default Country | Primary Currency |
 |------|----------|-------------|-----------------|-----------------|
 | `en` | English | `en_US` | US | USD |
 | `es` | Español | `es_MX` | MX | MXN |
@@ -69,14 +69,18 @@ using the `holidays` library:
 
 ### DimStore — Countries and Stores
 
-| Component | `en` | `es` |
-|-----------|------|------|
-| Countries | US (12), CA (3), GB (4)... | MX (8), CO (4), AR (3)... |
-| City Names | Faker locale cities | Faker locale cities |
+Stores read the same geography registry as customers, so the two tables always
+agree on which countries the business operates in and which cities exist there.
 
-> ⚠️ **Fallback**: Only `en` and `es` have dedicated store distributions.
-> Other languages (`pt`, `fr`, `de`, `zh`, `ja`, `ar`) use the English store
-> layout (US, CA, GB, AU, DE, FR). This is a current limitation.
+| Component | `en` | `es` | `pt` |
+|-----------|------|------|------|
+| Countries | US, CA, GB, AU, DE, FR | MX, CO, AR, ES, CL, PE, EC | BR, PT |
+| Store count | 24 physical + 1 online, split by market share |  |  |
+| City names | Drawn from the country's own city list |  |  |
+
+> ⚠️ **Fallback**: only `en`, `es` and `pt` have their own geography. Every other
+> language uses the `en` layout for both stores and customers, while still
+> translating the product catalogue. See the coverage table in the README.
 
 ### DimCurrency — Primary Currency
 
