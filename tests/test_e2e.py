@@ -9,17 +9,17 @@ from pathlib import Path
 
 
 def _run_generate(tmp_path: Path, n: int = 100, fmt: str = "csv", lang: str = "en") -> Path:
-    """Run cug generate via subprocess and return output directory."""
+    """Run cug generate via subprocess; writers nest tables under output/<fmt>/."""
     import subprocess, sys
     out = tmp_path / f"out_{n}"
     result = subprocess.run(
         [sys.executable, "-m", "cug", "generate",
          "-n", str(n), "-f", fmt, "-l", lang,
          "-o", str(out), "--seed", "42"],
-        capture_output=True, text=True, timeout=120,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120,
     )
     assert result.returncode == 0, f"cug generate failed:\n{result.stderr}"
-    return out
+    return out / fmt
 
 
 EXPECTED_TABLES = [

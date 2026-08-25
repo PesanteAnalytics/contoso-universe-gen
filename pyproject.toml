@@ -23,6 +23,8 @@ classifiers = [
 dependencies = [
     # Core DataFrame engine — vectorized, fast, lazy evaluation
     "polars>=0.20.0",
+    # Vectorized RNG and array ops behind the customer generator
+    "numpy>=1.26.0",
     # Embedded analytical SQL engine
     "duckdb>=0.10.0",
     # Synthetic data generation with multi-locale support
