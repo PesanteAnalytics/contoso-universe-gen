@@ -5,27 +5,24 @@ Orchestrator — wires all generators together and produces the final datasets.
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
-from typing import Callable
 
-import polars as pl
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
 
-from .config import AppConfig, load_config
-from .models import GenerationResult
 from .categories.registry import CategoryRegistry
-from .generators.calendar       import generate_dim_date
-from .generators.customers      import generate_dim_customer
-from .generators.products       import generate_dim_product
-from .generators.stores         import generate_dim_store
-from .generators.currency       import generate_dim_currency
+from .config import AppConfig, load_config
+from .engine.validator import print_integrity_report, validate_integrity
+from .generators.calendar import generate_dim_date
+from .generators.currency import generate_dim_currency
 from .generators.currency_exchange import generate_dim_currency_exchange
-from .generators.sales          import generate_fact_sales
-from .writers                   import write_format
-from .engine.validator           import validate_integrity, print_integrity_report
-
+from .generators.customers import generate_dim_customer
+from .generators.products import generate_dim_product
+from .generators.sales import generate_fact_sales
+from .generators.stores import generate_dim_store
+from .models import GenerationResult
+from .writers import write_format
 
 console = Console()
 

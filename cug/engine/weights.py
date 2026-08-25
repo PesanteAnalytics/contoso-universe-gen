@@ -8,13 +8,11 @@ Provides WeightEngine: a class that computes:
 
 from __future__ import annotations
 
-import math
 from datetime import date, timedelta
 
 import polars as pl
 
 from ..config import AppConfig
-
 
 # ---------------------------------------------------------------------------
 # Low-level helpers

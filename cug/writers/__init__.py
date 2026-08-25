@@ -16,13 +16,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from ..models import GenerationResult
-
 # ── Format registry ──────────────────────────────────────────────────────────
 # Maps format name → writer function.  Each writer has signature:
 #   (result: GenerationResult, output_path: Path, **options) -> None | Path
-
 from ..config import SUPPORTED_FORMATS
+from ..models import GenerationResult
 
 
 def write_format(
@@ -78,9 +76,9 @@ def write_format(
 
 
 # Keep individual imports for backward compatibility
-from .csv_writer     import write_csv
+from .csv_writer import write_csv
+from .duckdb_writer import write_duckdb
 from .parquet_writer import write_parquet
-from .duckdb_writer  import write_duckdb
 
 __all__ = [
     "SUPPORTED_FORMATS",

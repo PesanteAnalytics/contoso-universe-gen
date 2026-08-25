@@ -1,6 +1,6 @@
 """Entry point for `python -m cug`."""
-import sys
 import io
+import sys
 
 # Force UTF-8 output on Windows terminals that default to cp1252
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":

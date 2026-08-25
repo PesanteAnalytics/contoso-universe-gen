@@ -22,20 +22,15 @@ for _stream_name in ("stdout", "stderr"):
     if hasattr(_stream, "buffer") and getattr(_stream, "encoding", "").lower() != "utf-8":
         setattr(sys, _stream_name, io.TextIOWrapper(_stream.buffer, encoding="utf-8", errors="replace"))
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
-from rich.text import Text
-from rich import print as rprint
 
-from .config import load_config, AppConfig, SUPPORTED_FORMATS
-from .i18n import list_locales, locale_coverage
 from .categories.registry import CategoryRegistry
-
+from .config import SUPPORTED_FORMATS, load_config
+from .i18n import list_locales, locale_coverage
 
 console = Console(highlight=True)
 app = typer.Typer(
@@ -71,29 +66,29 @@ def main(ctx: typer.Context):
 
 @app.command()
 def generate(
-    config: Optional[Path] = typer.Option(
+    config: Path | None = typer.Option(
         None,
         "--config", "-c",
         help="Path to TOML config file. Defaults to built-in default.toml.",
         exists=True,
         file_okay=True,
     ),
-    output: Optional[Path] = typer.Option(
+    output: Path | None = typer.Option(
         None,
         "--output", "-o",
         help="Output directory. Overrides config.",
     ),
-    language: Optional[str] = typer.Option(
+    language: str | None = typer.Option(
         None,
         "--language", "-l",
         help="Language code (en, es, pt, fr, de, zh, ja, ar). Overrides config.",
     ),
-    orders: Optional[int] = typer.Option(
+    orders: int | None = typer.Option(
         None,
         "--orders", "-n",
         help="Target order count. Overrides config.",
     ),
-    formats: Optional[str] = typer.Option(
+    formats: str | None = typer.Option(
         None,
         "--formats", "-f",
         help=(
@@ -102,64 +97,64 @@ def generate(
             "Default: parquet"
         ),
     ),
-    seed: Optional[int] = typer.Option(
+    seed: int | None = typer.Option(
         None,
         "--seed",
         help="Random seed for reproducibility.",
     ),
     # ── Format-specific CLI overrides ─────────────────────────────────────────
-    parquet_compression: Optional[str] = typer.Option(
+    parquet_compression: str | None = typer.Option(
         None,
         "--parquet-compression",
         help="Parquet compression: zstd (default), snappy, gzip, lz4, brotli, none.",
     ),
-    csv_separator: Optional[str] = typer.Option(
+    csv_separator: str | None = typer.Option(
         None,
         "--csv-separator",
         help="CSV field delimiter (default: comma).",
     ),
-    delta_mode: Optional[str] = typer.Option(
+    delta_mode: str | None = typer.Option(
         None,
         "--delta-mode",
         help="Delta Lake write mode: overwrite (default), append, error.",
     ),
-    json_row_oriented: Optional[bool] = typer.Option(
+    json_row_oriented: bool | None = typer.Option(
         None,
         "--json-rows/--json-ndjson",
         help="JSON: array of objects vs NDJSON (default: NDJSON).",
     ),
-    excel_single_workbook: Optional[bool] = typer.Option(
+    excel_single_workbook: bool | None = typer.Option(
         None,
         "--excel-single/--excel-multi",
         help="Excel: one workbook (default) vs one per table.",
     ),
     # ── SQL Server CLI overrides ──────────────────────────────────────────────
-    sqlserver_server: Optional[str] = typer.Option(
+    sqlserver_server: str | None = typer.Option(
         None,
         "--sqlserver-name",
         help="SQL Server instance (default: localhost). E.g. localhost\\SQLEXPRESS.",
     ),
-    sqlserver_database: Optional[str] = typer.Option(
+    sqlserver_database: str | None = typer.Option(
         None,
         "--sqlserver-db",
         help="Target database name (default: ContosoRetail).",
     ),
-    sqlserver_schema: Optional[str] = typer.Option(
+    sqlserver_schema: str | None = typer.Option(
         None,
         "--sqlserver-schema",
         help="Target schema (default: dbo).",
     ),
-    sqlserver_if_exists: Optional[str] = typer.Option(
+    sqlserver_if_exists: str | None = typer.Option(
         None,
         "--sqlserver-mode",
         help="If table exists: replace (default), append, fail.",
     ),
-    verify: Optional[bool] = typer.Option(
+    verify: bool | None = typer.Option(
         None,
         "--verify/--no-verify",
         help="Run FK integrity validation before writing. Overrides integrity_check.",
     ),
-    strict: Optional[bool] = typer.Option(
+    strict: bool | None = typer.Option(
         None,
         "--strict/--no-strict",
         help="Abort on FK violations instead of reporting them. Implies --verify.",

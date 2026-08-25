@@ -7,7 +7,6 @@ same country always agree on which cities and subdivisions exist there.
 
 from __future__ import annotations
 
-
 # ─── Geography ───────────────────────────────────────────────────────────────
 # Cities hang off the country they belong to, so a customer's City, State,
 # Country and coordinates always describe one real place. Each city carries its

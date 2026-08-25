@@ -3,10 +3,7 @@ Smoke tests — fast checks for all core modules.
 Run: pytest tests/ -v
 """
 
-import pytest
 import polars as pl
-from pathlib import Path
-
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -18,7 +15,7 @@ def test_default_config_loads():
 
 
 def test_config_override():
-    from cug.config import load_config, AppConfig
+    from cug.config import load_config
     cfg = load_config()
     cfg.general.language = "es"
     cfg.output.target_orders = 1000
@@ -66,8 +63,9 @@ def test_electronics_plugin():
 # ─── Engine ───────────────────────────────────────────────────────────────────
 
 def test_seeder_deterministic():
-    from cug.engine.seeder import DeterministicSeeder
     import datetime
+
+    from cug.engine.seeder import DeterministicSeeder
     s = DeterministicSeeder(42)
     d = datetime.date(2024, 1, 1)
     seed1 = s.day_seed(d)
@@ -76,8 +74,9 @@ def test_seeder_deterministic():
 
 
 def test_temporal_online_pct():
-    from cug.engine.temporal import interpolate_online_pct
     import datetime
+
+    from cug.engine.temporal import interpolate_online_pct
     pct_early = interpolate_online_pct(datetime.date(2015, 1, 1), 0.10, 0.55)
     pct_late  = interpolate_online_pct(datetime.date(2026, 1, 1), 0.10, 0.55)
     assert pct_early < pct_late
@@ -88,8 +87,9 @@ def test_temporal_online_pct():
 # ─── Generators ──────────────────────────────────────────────────────────────
 
 def test_dim_date_shape():
-    from cug.generators.calendar import generate_dim_date
     from datetime import date
+
+    from cug.generators.calendar import generate_dim_date
     df = generate_dim_date(date(2024, 1, 1), date(2024, 3, 31))
     assert len(df) == 91  # Jan(31) + Feb(29 leap) + Mar(31)
     assert "DateKey" in df.columns
@@ -151,14 +151,16 @@ def test_delta_null_column_cast():
 
 def test_duckdb_writer_creates_views(tmp_path):
     """DuckDB writer must create 3 analytical views."""
-    import duckdb
     from datetime import date
+
+    import duckdb
+
+    from cug.categories.registry import CategoryRegistry
     from cug.generators.calendar import generate_dim_date
     from cug.generators.currency import generate_dim_currency
     from cug.generators.customers import generate_dim_customer
-    from cug.generators.stores import generate_dim_store
-    from cug.categories.registry import CategoryRegistry
     from cug.generators.products import generate_dim_product
+    from cug.generators.stores import generate_dim_store
     from cug.models import GenerationResult
     from cug.writers.duckdb_writer import write_duckdb
 

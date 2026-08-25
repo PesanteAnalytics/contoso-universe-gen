@@ -7,9 +7,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-import polars as pl
 import holidays as hol
-
+import polars as pl
 
 _MONTH_NAMES = {
     "en": ["January","February","March","April","May","June",

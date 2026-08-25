@@ -28,17 +28,12 @@ V2-compatible output columns:
 
 from __future__ import annotations
 
-import math
 from datetime import date, timedelta
 
 import numpy as np
 import polars as pl
 
 from ..config import AppConfig
-from ..engine.weights import WeightEngine
-from ..engine.temporal import interpolate_online_pct
-from ..generators.currency import get_currency_key
-
 
 # ─── Constants ───────────────────────────────────────────────────────────────
 

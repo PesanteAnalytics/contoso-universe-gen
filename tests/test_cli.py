@@ -6,10 +6,11 @@ We force UTF-8 via PYTHONIOENCODING and PYTHONUTF8=1, and use stderr + stdout
 combined since Rich routes most output through stderr when piped.
 """
 
-import subprocess
-import sys
 import os
 import re
+import subprocess
+import sys
+
 import pytest
 
 

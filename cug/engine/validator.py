@@ -16,9 +16,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import polars as pl
+from rich import box
 from rich.console import Console
 from rich.table import Table
-from rich import box
 
 if TYPE_CHECKING:
     from ..models import GenerationResult
@@ -75,7 +75,7 @@ _FK_CHECKS = [
 
 
 def validate_integrity(
-    result: "GenerationResult",
+    result: GenerationResult,
     strict: bool = True,
 ) -> list[IntegrityIssue]:
     """

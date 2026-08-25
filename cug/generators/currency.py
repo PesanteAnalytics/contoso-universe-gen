@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import polars as pl
 
-
 # ─── Static currency catalogue ──────────────────────────────────────────────
 
 _CURRENCIES: list[dict] = [
