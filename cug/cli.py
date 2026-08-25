@@ -154,10 +154,15 @@ def generate(
         "--sqlserver-mode",
         help="If table exists: replace (default), append, fail.",
     ),
+    verify: Optional[bool] = typer.Option(
+        None,
+        "--verify/--no-verify",
+        help="Run FK integrity validation before writing. Overrides integrity_check.",
+    ),
     strict: Optional[bool] = typer.Option(
         None,
         "--strict/--no-strict",
-        help="Override integrity_strict from config.",
+        help="Abort on FK violations instead of reporting them. Implies --verify.",
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed progress."),
 ):
@@ -241,9 +246,11 @@ def generate(
             opts_str = ", ".join(f"{k}={v}" for k, v in non_default.items())
             summary_table.add_row(f"  └ {fmt}", f"[dim]{opts_str}[/dim]")
 
-    # Integrity check summary row
-    _ic_enabled = cfg.output.integrity_check
-    _ic_strict  = strict if strict is not None else cfg.output.integrity_strict
+    # Integrity check summary row — resolved by the same rule the pipeline uses,
+    # so the panel cannot claim "disabled" while the check runs.
+    from .orchestrator import resolve_integrity_check
+
+    _ic_enabled, _ic_strict = resolve_integrity_check(cfg, verify, strict)
     if _ic_enabled:
         _ic_label = "[bold red]strict[/bold red]" if _ic_strict else "[yellow]report-only[/yellow]"
         summary_table.add_row("Integrity check", _ic_label)
@@ -270,7 +277,12 @@ def generate(
             if verbose:
                 steps_done.append(f"  ✓ {step}")
 
-        result = run_generation(config=cfg, progress_callback=_on_progress, strict_override=strict)
+        result = run_generation(
+            config=cfg,
+            progress_callback=_on_progress,
+            strict_override=strict,
+            check_override=verify,
+        )
 
     # Results summary
     console.print()

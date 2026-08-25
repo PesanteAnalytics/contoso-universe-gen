@@ -30,12 +30,34 @@ from .engine.validator           import validate_integrity, print_integrity_repo
 console = Console()
 
 
+def resolve_integrity_check(
+    config: AppConfig,
+    check_override: bool | None = None,
+    strict_override: bool | None = None,
+) -> tuple[bool, bool]:
+    """Decide whether the FK check runs, and whether it aborts on violations.
+
+    Single source of truth: the CLI reads this to label its summary panel and
+    the pipeline reads it to act, so the two can never disagree.
+
+    `--strict` implies running the check — asking to abort on violations is
+    meaningless if nothing looks for them. An explicit `--no-verify` still wins.
+    """
+    run_check = (
+        check_override
+        if check_override is not None
+        else (config.output.integrity_check or strict_override is not None)
+    )
+    strict = strict_override if strict_override is not None else config.output.integrity_strict
+    return run_check, strict
+
 
 def run_generation(
     config_path: str | Path | None = None,
     config: AppConfig | None = None,
     progress_callback: Callable[[str, float], None] | None = None,
     strict_override: bool | None = None,
+    check_override: bool | None = None,
 ) -> GenerationResult:
     """
     Execute the full generation pipeline.
@@ -46,6 +68,8 @@ def run_generation(
         progress_callback: Optional function(step_name, fraction) for UI updates.
         strict_override: If not None, overrides `output.integrity_strict` from config.
                          Useful for the --strict / --no-strict CLI flags.
+        check_override:  If not None, overrides `output.integrity_check` from config.
+                         Useful for the --verify / --no-verify CLI flags.
 
     Returns:
         GenerationResult with all generated DataFrames.
@@ -130,9 +154,8 @@ def run_generation(
     )
 
     # ── 4. Integrity validation (pre-write) ──────────────────────────────────
-    run_check = config.output.integrity_check or (strict_override is not None)
+    run_check, strict = resolve_integrity_check(config, check_override, strict_override)
     if run_check:
-        strict = strict_override if strict_override is not None else config.output.integrity_strict
         _step("Integrity check", 0.72)
         issues = validate_integrity(result, strict=strict)
         if not issues:
