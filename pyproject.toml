@@ -10,7 +10,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.12"
 authors = [
-    {name = "CSalcedoDataBI / PAL Data Team"}
+    {name = "Pesante Analytics LLC"}
 ]
 keywords = ["data-generator", "synthetic-data", "polars", "duckdb", "faker", "retail", "power-bi"]
 classifiers = [

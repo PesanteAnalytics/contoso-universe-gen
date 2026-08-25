@@ -18,7 +18,7 @@ deep respect for that work: same spirit, different stack, expanded scope.
 - A **completely original Python reimplementation** of synthetic retail data generation
 - Written from scratch using: Polars, DuckDB, Faker, Pydantic v2, Typer, Rich
 - Extended with 8-language support, a YAML plugin system, 7 output formats, and AI-agent integration
-- Built and maintained by **Cristóbal Salcedo** (PAL Data Team) with AI-assisted development (Antigravity / Google DeepMind)
+- Built and maintained by **Cristóbal Salcedo** (Pesante Analytics LLC) with AI-assisted development (Antigravity / Google DeepMind)
 
 ## What This Project IS NOT
 

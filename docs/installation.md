@@ -19,7 +19,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/CSalcedoDataBI/contoso-universe-gen.git
+git clone https://github.com/PesanteAnalytics/contoso-universe-gen.git
 cd contoso-universe-gen
 
 # Create virtual environment
@@ -41,7 +41,7 @@ cug --help
 
 ```bash
 # Clone the repository
-git clone https://github.com/CSalcedoDataBI/contoso-universe-gen.git
+git clone https://github.com/PesanteAnalytics/contoso-universe-gen.git
 cd contoso-universe-gen
 
 # Create virtual environment with uv

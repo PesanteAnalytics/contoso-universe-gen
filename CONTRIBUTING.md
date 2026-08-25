@@ -9,7 +9,7 @@ Thank you for your interest in contributing! CUG is a Python-native synthetic da
 We use [`uv`](https://docs.astral.sh/uv/) for dependency management.
 
 ```bash
-git clone https://github.com/CSalcedoDataBI/contoso-universe-gen.git
+git clone https://github.com/PesanteAnalytics/contoso-universe-gen.git
 cd contoso-universe-gen
 
 # Create venv and install with dev extras
