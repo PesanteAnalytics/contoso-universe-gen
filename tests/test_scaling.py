@@ -58,11 +58,17 @@ def test_dim_currency_exchange_is_constant(tmp_path):
 
 
 def test_no_negative_prices(tmp_path):
-    """At no scale should UnitCost exceed UnitPrice (negative margin check)."""
-    out = _generate_csv(tmp_path, 500)
+    """At no scale should UnitCost exceed UnitPrice (negative margin check).
+
+    Runs at 5,000 orders on purpose. Thin-margin subcategories (gaming hardware
+    starts at a 2% margin) only collide with the quarterly COGS noise in roughly
+    one row in 1,300, so a 500-order sample clears this by luck rather than by
+    correctness.
+    """
+    out = _generate_csv(tmp_path, 5_000)
     df = pl.read_csv(out / "FactSales.csv")
-    if "UnitPrice" in df.columns and "UnitCost" in df.columns:
-        negative_margin = df.filter(pl.col("UnitCost") > pl.col("UnitPrice"))
-        assert len(negative_margin) == 0, (
-            f"{len(negative_margin)} rows have UnitCost > UnitPrice"
-        )
+    assert {"UnitPrice", "UnitCost"} <= set(df.columns)
+    negative_margin = df.filter(pl.col("UnitCost") > pl.col("UnitPrice"))
+    assert len(negative_margin) == 0, (
+        f"{len(negative_margin)} of {len(df)} rows have UnitCost > UnitPrice"
+    )
