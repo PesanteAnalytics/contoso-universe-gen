@@ -29,7 +29,7 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}
-      TITLE: "Alguien está esperando respuesta"
+      TITLE: "Someone is waiting on a reply"
 
     steps:
       - uses: actions/checkout@v7
@@ -52,7 +52,7 @@ jobs:
           if [ -s report.md ]; then
             if [ -n "$existing" ]; then
               gh issue edit "$existing" --repo "$REPO" --body-file report.md
-              echo "Actualizado el issue #$existing."
+              echo "Updated issue #$existing."
             else
               gh issue create --repo "$REPO" --title "$TITLE" \
                 --label waiting-on-maintainer \
@@ -61,10 +61,10 @@ jobs:
             fi
           elif [ -n "$existing" ]; then
             gh issue close "$existing" --repo "$REPO" \
-              --comment "La cola quedó vacía: nadie está esperando respuesta. Se reabrirá solo si vuelve a haber alguien."
-            echo "Cerrado el issue #$existing."
+              --comment "Queue is empty: nobody is waiting on a reply. This reopens by itself if that changes."
+            echo "Closed issue #$existing."
           else
-            echo "Nadie esperando y no hay issue abierto. Nada que hacer."
+            echo "Nobody waiting and no open issue. Nothing to do."
           fi
 
       - name: Show the report in the run summary
@@ -73,5 +73,5 @@ jobs:
           if [ -s report.md ]; then
             cat report.md >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Nadie esperando." >> "$GITHUB_STEP_SUMMARY"
+            echo "Nobody waiting." >> "$GITHUB_STEP_SUMMARY"
           fi
