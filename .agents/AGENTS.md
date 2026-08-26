@@ -72,7 +72,8 @@ tool-calling agent that can read files and run shell commands.
 
 ### Setup (once per machine)
 
-1. Install CUG: `pip install contoso-universe-gen` (or `uv add contoso-universe-gen`)
+1. Install CUG from a clone — it is not on PyPI yet:
+   `git clone https://github.com/PesanteAnalytics/contoso-universe-gen.git && cd contoso-universe-gen && uv pip install -e .`
 2. Copy `config/CUG-CONFIG.template.md` → `CUG-CONFIG.md` at your project root
 3. Edit the three placeholders in `SKILL.md` (project_root, python, sql_server_instance)
 4. Ask the agent: *"Generate a test dataset"* — the skill handles the rest

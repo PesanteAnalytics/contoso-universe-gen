@@ -23,8 +23,8 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 
 | Problem with DG V2 | CUG solution |
 | --- | --- |
-| Requires .NET SDK (~75 MB runtime) | 100% Python — `pip install` and go |
-| English-only names and categories | Product catalogue in 8 languages; calendar in 5; people and geography in 3 ([coverage](#language-coverage)) |
+| Requires .NET SDK (~75 MB runtime) | 100% Python — no separate runtime to install |
+| English-only names and categories | Product catalogue, calendar, names and geography all localized — see [coverage](#language-coverage) for the depth per language |
 | Downloads real data from SQLBI servers | Fully offline — nothing is fetched at generation time |
 | Fixed product schema (`data.xlsx`) | YAML category plugins — extend without touching code |
 | CSV / Parquet / Delta only | + DuckDB, JSON, Excel, SQL Server |
@@ -53,8 +53,13 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 
 ## Quick Start
 
+> **Not on PyPI yet** — install from a clone. A published package is planned;
+> until then `pip install contoso-universe-gen` will not find anything.
+
 ```bash
-# Install (uv recommended)
+# Clone and install (uv recommended)
+git clone https://github.com/PesanteAnalytics/contoso-universe-gen.git
+cd contoso-universe-gen
 uv pip install -e .
 
 # Generate 10,000 retail orders in English (Parquet)
