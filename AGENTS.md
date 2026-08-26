@@ -28,7 +28,7 @@ AI agents working here can read, modify, execute, and create files freely.
 
 ```bash
 # Generate data
-python -m cug generate -c configs/default.toml
+python -m cug generate -c cug/configs/default.toml
 
 # Run tests
 python -m pytest tests/

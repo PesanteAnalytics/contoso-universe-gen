@@ -442,7 +442,10 @@ def init(
 ):
     """Copy the default config template to a directory for customization."""
     import shutil
-    src = Path(__file__).parent.parent / "configs" / "default.toml"
+
+    from .config import default_config_path
+
+    src = default_config_path()
     dest = Path(output_dir) / "my_config.toml"
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(src, dest)

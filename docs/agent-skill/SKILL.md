@@ -166,7 +166,7 @@ Parse the user's message to extract any requested changes:
 
 Once the user confirms, translate all values from `CUG-CONFIG.md`:
 
-1. **Copy** `configs/default.toml` → `configs/_session.toml`
+1. **Copy** `cug/configs/default.toml` → `configs/_session.toml`
 2. **Apply ALL values** from `CUG-CONFIG.md` to the session TOML:
 
 **Mapping from CUG-CONFIG.md → TOML sections:**
@@ -445,7 +445,7 @@ currency codes, store status values.
 
 | Config                       | Description            |
 | ---------------------------- | ---------------------- |
-| `configs/default.toml`       | Standard config, 100K  |
+| `cug/configs/default.toml`       | Standard config, 100K  |
 | `configs/quicktest.toml`     | Quick test, ~5K orders |
 | `configs/retail_1M_en.toml`  | 1M orders, English     |
 | `configs/retail_1M_es.toml`  | 1M orders, Spanish     |

@@ -36,7 +36,7 @@ touching the generators it is the thing that matters most.
 ## If this adds a product category
 
 - [ ] The YAML lives in `cug/categories/builtin/` and its filename matches its `plugin_id`
-- [ ] It is listed in `enabled` in `configs/default.toml` — otherwise generation ignores it
+- [ ] It is listed in `enabled` in `cug/configs/default.toml` — otherwise generation ignores it
 - [ ] Every `display_names` block has all eight languages
 - [ ] It shows up in `DimProduct`, not only in `cug categories`
 

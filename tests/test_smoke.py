@@ -14,6 +14,22 @@ def test_default_config_loads():
     assert cfg.output.target_orders > 0
 
 
+def test_builtin_config_is_found_not_silently_skipped():
+    """`load_config(None)` must read the shipped TOML, not fall back to code.
+
+    The fallback in `load_config` is silent by design, which made an earlier bug
+    invisible: the path resolved to the repository root in a clone and to a
+    nonexistent `site-packages/configs` once installed, so an installed CUG
+    quietly ran on hardcoded defaults that nobody maintained. Asserting the file
+    is actually found is what separates the two.
+    """
+    from cug.config import AppConfig, default_config_path, load_config
+
+    path = default_config_path()
+    assert path.exists(), f"built-in default.toml not found at {path}"
+    assert load_config(None) == AppConfig.from_toml(path)
+
+
 def test_config_override():
     from cug.config import load_config
     cfg = load_config()

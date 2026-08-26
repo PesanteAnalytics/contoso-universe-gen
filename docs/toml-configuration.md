@@ -10,7 +10,7 @@ Configuration files are located in `configs/`:
 
 | File | Description |
 |------|-------------|
-| `configs/default.toml` | Standard configuration, 100K orders |
+| `cug/configs/default.toml` | Standard configuration, 100K orders |
 | `configs/quicktest.toml` | Quick test, ~5K orders |
 | `configs/retail_1M_en.toml` | 1M orders in English |
 | `configs/retail_1M_es.toml` | 1M orders in Spanish |

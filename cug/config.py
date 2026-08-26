@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import tomllib
 from datetime import date
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,18 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 # Canonical set of supported output formats.
 # Defined here (not in writers) to avoid circular imports.
 SUPPORTED_FORMATS = {"csv", "parquet", "duckdb", "delta", "json", "excel", "sqlserver"}
+
+
+def default_config_path() -> Path:
+    """Locate the built-in default.toml, wherever CUG happens to be installed.
+
+    It lives inside the package rather than beside it. An earlier version
+    resolved it as `Path(__file__).parent.parent / "configs"`, which is the
+    repository root in a clone and `site-packages/configs` — nonexistent — in an
+    installed package. `cug generate` fell back to hardcoded defaults without
+    saying so, and `cug init` raised FileNotFoundError.
+    """
+    return Path(str(resources.files("cug") / "configs" / "default.toml"))
 
 
 # ---------------------------------------------------------------------------
@@ -304,8 +317,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         A validated AppConfig instance.
     """
     if path is None:
-        # Try the bundled default.toml
-        builtin = Path(__file__).parent.parent / "configs" / "default.toml"
+        builtin = default_config_path()
         if builtin.exists():
             return AppConfig.from_toml(builtin)
         return AppConfig.defaults()
