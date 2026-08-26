@@ -1,0 +1,77 @@
+name: Waiting on maintainer
+
+# Twice a day on weekdays, 08:00 and 15:00 America/Bogota.
+# Keeps a single open issue listing whoever is blocked waiting for a reply, and
+# closes it the moment the queue empties. Opening the issue is what sends the
+# notification; while it stays open, its existence is the signal.
+on:
+  schedule:
+    - cron: "0 13,20 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: waiting-on-maintainer
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  actions: read
+
+jobs:
+  check:
+    name: Who is waiting
+    # Never run from a fork: it would report on the wrong repository.
+    if: github.repository == 'PesanteAnalytics/contoso-universe-gen'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      TITLE: "Alguien está esperando respuesta"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Build the report
+        run: python .github/scripts/check_waiting.py > report.md
+
+      - name: Open, update or close the tracking issue
+        run: |
+          gh label create waiting-on-maintainer --repo "$REPO" --force \
+            --color d93f0b --description "Someone is blocked waiting for a reply" > /dev/null
+
+          existing="$(gh issue list --repo "$REPO" --state open \
+            --label waiting-on-maintainer --limit 1 --json number --jq '.[0].number // empty')"
+
+          if [ -s report.md ]; then
+            if [ -n "$existing" ]; then
+              gh issue edit "$existing" --repo "$REPO" --body-file report.md
+              echo "Actualizado el issue #$existing."
+            else
+              gh issue create --repo "$REPO" --title "$TITLE" \
+                --label waiting-on-maintainer \
+                --assignee "${{ github.repository_owner }}" \
+                --body-file report.md
+            fi
+          elif [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$REPO" \
+              --comment "La cola quedó vacía: nadie está esperando respuesta. Se reabrirá solo si vuelve a haber alguien."
+            echo "Cerrado el issue #$existing."
+          else
+            echo "Nadie esperando y no hay issue abierto. Nada que hacer."
+          fi
+
+      - name: Show the report in the run summary
+        if: always()
+        run: |
+          if [ -s report.md ]; then
+            cat report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Nadie esperando." >> "$GITHUB_STEP_SUMMARY"
+          fi
