@@ -227,3 +227,16 @@ def test_duckdb_writer_creates_views(tmp_path):
     # Must include the 3 analytical views
     for view in ("v_sales_summary", "v_top_products", "v_category_trend"):
         assert view in tables, f"Missing view: {view}"
+
+
+def test_banner_version_matches_the_package():
+    """The version shown to users must be the version that was packaged.
+
+    The banner used to carry a hand-written `v0.2.0`, which is exactly the kind
+    of duplicate that drifts: the release workflow validates the tag against
+    pyproject.toml and would never have noticed the banner disagreeing.
+    """
+    from cug import __version__
+    from cug.cli import BANNER
+
+    assert f"v{__version__}" in BANNER

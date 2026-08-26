@@ -74,4 +74,4 @@ CUG generates a star schema with 7 tables:
 
 ---
 
-_Contoso Universe Generator v0.2.0_
+_Contoso Universe Generator — see the [releases](https://github.com/PesanteAnalytics/contoso-universe-gen/releases) for the current version._
