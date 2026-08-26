@@ -25,7 +25,7 @@ jobs:
       - name: Lint (ruff)
         # Pinned: a floating linter turns an unrelated ruff release into a red
         # PR for a contributor who changed nothing. Bump deliberately.
-        run: uvx ruff@0.16.4 check cug/ tests/
+        run: uvx ruff@0.16.4 check cug/ tests/ .github/scripts/
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
