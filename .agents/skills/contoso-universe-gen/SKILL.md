@@ -232,7 +232,7 @@ cd <project_root>
 | `<sql_server_instance>` | Your SQL Server instance | `localhost\SQLEXPRESS` |
 
 - **Invoke**: `<python> -m cug <command>` (from project root)
-- **Or globally**: `cug <command>` (if installed via `pip install contoso-universe-gen`)
+- **Or globally**: `cug <command>` (available once CUG is installed with `pip install -e .` from a clone; it is not on PyPI yet)
 - **Python**: 3.12+ with a virtual environment (uv recommended)
 
 ---

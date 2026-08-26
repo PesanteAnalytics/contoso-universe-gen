@@ -83,7 +83,8 @@ Common scenarios and trigger phrases for everyday use.
    ```
 
 > **Note**: SQL Server output requires the `pyodbc` optional dependency.
-> Install with: `pip install contoso-universe-gen[sqlserver]`
+> Install it into the same environment as CUG: `pip install pyodbc`
+> (CUG is not on PyPI yet, so there is no `[sqlserver]` extra to install.)
 
 ---
 
