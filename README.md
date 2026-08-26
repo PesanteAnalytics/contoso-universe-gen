@@ -9,6 +9,12 @@
 [![DuckDB](https://img.shields.io/badge/engine-DuckDB-yellow)](https://duckdb.org)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
+![CUG generating a 50,000-order retail star schema in Spanish, then reporting what each language actually localizes](assets/demo.gif)
+
+*One command: seven tables, foreign keys verified, in about a second. The demo is
+a [VHS](https://github.com/charmbracelet/vhs) script — [`assets/demo.tape`](assets/demo.tape) —
+so it can be re-rendered whenever the CLI changes rather than going quietly out of date.*
+
 ---
 
 ## Why CUG?
