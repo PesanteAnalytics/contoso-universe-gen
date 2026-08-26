@@ -27,6 +27,59 @@ jobs:
         # PR for a contributor who changed nothing. Bump deliberately.
         run: uvx ruff@0.16.4 check cug/ tests/ .github/scripts/
 
+  package:
+    name: Installed package works
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build the wheel
+        run: uv build --wheel
+
+      # The suite runs against the source tree, so it cannot see a file that
+      # fails to make it into the distribution. Install the built wheel into a
+      # clean environment, outside the checkout, and exercise the CLI there.
+      - name: Install the wheel somewhere else entirely
+        run: |
+          mkdir -p /tmp/pkgcheck
+          uv venv /tmp/pkgcheck/.venv
+          VIRTUAL_ENV=/tmp/pkgcheck/.venv uv pip install dist/*.whl
+
+      - name: The built-in config must survive packaging
+        working-directory: /tmp/pkgcheck
+        run: |
+          .venv/bin/cug init .
+          test -f my_config.toml || { echo "::error::cug init produced nothing"; exit 1; }
+          .venv/bin/python - <<'PY'
+          import tomllib
+          from cug.config import default_config_path, load_config
+
+          path = default_config_path()
+          assert path.exists(), f"default.toml missing from the installed package: {path}"
+
+          shipped = tomllib.loads(path.read_text(encoding="utf-8"))
+          enabled = load_config(None).categories.enabled
+          assert enabled == shipped["categories"]["enabled"], (
+              f"installed CUG ran on {enabled}, the shipped config says "
+              f"{shipped['categories']['enabled']}"
+          )
+          print(f"built-in config honoured: {enabled}")
+          PY
+
+      - name: Generate from a clean install
+        working-directory: /tmp/pkgcheck
+        run: .venv/bin/cug generate -n 2000 -f csv -o out --strict
+
   test:
     name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest

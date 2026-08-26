@@ -109,7 +109,7 @@ cug generate -n 100000 -f parquet,duckdb,delta
 cug generate -n 50000 -f sqlserver --sqlserver-name "localhost\SQLEXPRESS" --sqlserver-db MyDatabase
 
 # Force strict mode (validates FK and aborts on errors)
-cug generate -c configs/default.toml --strict
+cug generate -c cug/configs/default.toml --strict
 
 # Guaranteed reproducibility with specific seed
 cug generate --seed 2024 -o ./output/v1

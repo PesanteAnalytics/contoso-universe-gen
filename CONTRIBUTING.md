@@ -68,7 +68,7 @@ There are two kinds of plugin, and they are wired up differently:
 
 2. **Create the file** as `cug/categories/builtin/<plugin_id>.yaml`. The filename must match the `plugin_id` inside it — that is how the loader finds it.
 
-3. **Enable it** in [`configs/default.toml`](configs/default.toml). This step is easy to miss and nothing will warn you:
+3. **Enable it** in [`cug/configs/default.toml`](cug/configs/default.toml). This step is easy to miss and nothing will warn you:
 
    ```toml
    [categories]
