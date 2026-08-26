@@ -65,7 +65,7 @@ online_pct_start  = 0.05   # fraction of orders online at start_date
 online_pct_end    = 0.55   # fraction of orders online at end_date
 
 [categories]
-enabled      = ["electronics", "home", "gaming", "media"]
+enabled      = ["electronics", "home", "gaming", "media", "fashion"]
 custom_paths = []
 
 # ─── Annual recurring sales events ───────────────────────────────────────────
