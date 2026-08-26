@@ -74,6 +74,8 @@ _LAST_NAMES_BY_LANG: dict[str, list[str]] = {
     "en": [
         "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Wilson",
         "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris",
+        "Kim", "Park", "Lee", "Choi", "Zhang", "Wang", "Li", "Chen", "Liu",
+        "Müller", "Schmidt", "Weber", "Meyer", "Wagner", "Becker", "Schulz",
     ],
     "pt": [
         "Silva", "Santos", "Oliveira", "Souza", "Lima", "Ferreira", "Pereira",

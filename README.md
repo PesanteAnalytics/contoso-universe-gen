@@ -146,7 +146,7 @@ it is computed from the data, not maintained by hand.
 | `en` | English | ✅ | ✅ | ✅ |
 | `es` | Español | ✅ | ✅ | ✅ |
 | `pt` | Português | ✅ | ✅ | ✅ |
-| `fr` | Français | ✅ | ✅ | → `en` |
+| `fr` | Français | ✅ | ✅ | ✅ |
 | `de` | Deutsch | ✅ | ✅ | → `en` |
 | `zh` | 中文 | ✅ | → `en` | → `en` |
 | `ja` | 日本語 | ✅ | → `en` | → `en` |
