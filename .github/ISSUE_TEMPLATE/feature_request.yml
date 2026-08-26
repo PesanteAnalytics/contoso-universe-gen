@@ -1,0 +1,53 @@
+name: Feature request
+description: Something CUG should be able to do and cannot
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the use case rather than the implementation where you can — the
+        problem usually survives longer than any particular solution to it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: >
+        The dataset, demo or workflow you need. What CUG produces today and why
+        it falls short.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would it look like?
+      description: A flag, a config key, a YAML plugin field — as concrete as you can be.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of CUG?
+      options:
+        - Product categories (YAML plugins)
+        - Languages and localization
+        - Output formats
+        - Data realism (prices, trends, seasonality)
+        - CLI and configuration
+        - Agent skill
+        - Something else
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **Two things worth knowing before you write:**
+
+        A new **product category** needs no code at all — see
+        [`docs/category-plugins.md`](../../docs/category-plugins.md) and the
+        contribution steps in [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
+
+        A new **language** is mostly data too: geography and name pools. The
+        coverage table in the README shows which languages are complete today
+        and which fall back to English.
