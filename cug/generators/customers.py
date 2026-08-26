@@ -14,40 +14,82 @@ from ..i18n.geography import _CONTINENTS, _GEO_BY_LANG
 # ─── Pre-built name / geo lookup tables ──────────────────────────────────────
 # Static lists keep the whole draw vectorized
 
-_FIRST_NAMES_M = [
-    "Carlos", "Miguel", "José", "Juan", "Luis", "Pedro", "Andrés", "Roberto",
-    "Fernando", "Jorge", "Ricardo", "Eduardo", "Francisco", "Alejandro", "Sergio",
-    "David", "Daniel", "Pablo", "Antonio", "Javier", "Héctor", "Raúl", "Mario",
-    "Gustavo", "Ernesto", "Manuel", "Arturo", "Gabriel", "Rodrigo", "Enrique",
-    "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph",
-    "Thomas", "Charles", "Chris", "Kevin", "Brian", "George", "Edward", "Ronald",
-    "João", "Pedro", "Lucas", "Mateus", "Rafael", "Felipe", "Bruno", "Thiago",
-    "Liam", "Noah", "Oliver", "Elijah", "Aiden", "Caden", "Ethan", "Mason",
-]
+_FIRST_NAMES_M_BY_LANG: dict[str, list[str]] = {
+    "es": [
+        "Carlos", "Miguel", "José", "Juan", "Luis", "Pedro", "Andrés", "Roberto",
+        "Fernando", "Jorge", "Ricardo", "Eduardo", "Francisco", "Alejandro", "Sergio",
+        "David", "Daniel", "Pablo", "Antonio", "Javier", "Héctor", "Raúl", "Mario",
+        "Gustavo", "Ernesto", "Manuel", "Arturo", "Gabriel", "Rodrigo", "Enrique",
+    ],
+    "en": [
+        "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph",
+        "Thomas", "Charles", "Chris", "Kevin", "Brian", "George", "Edward", "Ronald",
+        "Liam", "Noah", "Oliver", "Elijah", "Aiden", "Caden", "Ethan", "Mason",
+    ],
+    "pt": [
+        "João", "Pedro", "Lucas", "Mateus", "Rafael", "Felipe", "Bruno", "Thiago",
+        "Carlos", "Miguel", "José", "Luís", "António", "Francisco", "Diogo", "Tiago",
+    ],
+    "fr": [
+        "Jean", "Pierre", "Louis", "Jacques", "Michel", "Philippe", "François", "Alain",
+        "Nicolas", "Christophe", "Julien", "Thomas", "Alexandre", "Guillaume", "Maxime",
+        "Antoine", "Benoît", "Laurent", "Stéphane", "Olivier", "Frédéric", "Éric",
+        "Thierry", "Patrick", "Bernard", "Claude", "Henri", "René", "Paul", "Marcel",
+    ],
+}
+_FIRST_NAMES_M = _FIRST_NAMES_M_BY_LANG["en"]  # fallback
 
-_FIRST_NAMES_F = [
-    "María", "Ana", "Laura", "Sofía", "Valeria", "Gabriela", "Fernanda", "Daniela",
-    "Alejandra", "Carolina", "Paola", "Claudia", "Verónica", "Leticia", "Sandra",
-    "Karla", "Diana", "Patricia", "Lucía", "Isabel", "Elena", "Rosa", "Teresa",
-    "Mónica", "Silvia", "Adriana", "Natalia", "Carmen", "Beatriz", "Rebeca",
-    "Jennifer", "Lisa", "Sandra", "Ashley", "Dorothy", "Kimberly", "Emily", "Donna",
-    "Michelle", "Carol", "Amanda", "Melissa", "Deborah", "Stephanie", "Rebecca",
-    "Ana", "Beatriz", "Camila", "Daniela", "Eduarda", "Fernanda", "Gabriela",
-    "Emma", "Olivia", "Ava", "Isabella", "Sophia", "Charlotte", "Amelia", "Mia",
-]
+_FIRST_NAMES_F_BY_LANG: dict[str, list[str]] = {
+    "es": [
+        "María", "Ana", "Laura", "Sofía", "Valeria", "Gabriela", "Fernanda", "Daniela",
+        "Alejandra", "Carolina", "Paola", "Claudia", "Verónica", "Leticia", "Sandra",
+        "Karla", "Diana", "Patricia", "Lucía", "Isabel", "Elena", "Rosa", "Teresa",
+        "Mónica", "Silvia", "Adriana", "Natalia", "Carmen", "Beatriz", "Rebeca",
+    ],
+    "en": [
+        "Jennifer", "Lisa", "Sandra", "Ashley", "Dorothy", "Kimberly", "Emily", "Donna",
+        "Michelle", "Carol", "Amanda", "Melissa", "Deborah", "Stephanie", "Rebecca",
+        "Emma", "Olivia", "Ava", "Isabella", "Sophia", "Charlotte", "Amelia", "Mia",
+    ],
+    "pt": [
+        "Ana", "Beatriz", "Camila", "Daniela", "Eduarda", "Fernanda", "Gabriela",
+        "Maria", "Juliana", "Patrícia", "Carolina", "Inês", "Mariana", "Leonor",
+    ],
+    "fr": [
+        "Marie", "Isabelle", "Catherine", "Nathalie", "Sophie", "Monique", "Sylvie",
+        "Françoise", "Martine", "Christine", "Valérie", "Sandrine", "Stéphanie", "Céline",
+        "Aurélie", "Émilie", "Camille", "Chloé", "Manon", "Léa", "Juliette", "Louise",
+        "Adèle", "Marguerite", "Colette", "Simone", "Jacqueline", "Madeleine", "Yvonne", "Renée",
+    ],
+}
+_FIRST_NAMES_F = _FIRST_NAMES_F_BY_LANG["en"]  # fallback
 
-_LAST_NAMES = [
-    "García", "Martínez", "López", "Hernández", "González", "Pérez", "Rodríguez",
-    "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Cruz",
-    "Morales", "Reyes", "Gutiérrez", "Ortiz", "Chávez", "Ramos", "Mendoza",
-    "Ruiz", "Álvarez", "Castillo", "Jiménez", "Vargas", "Moreno", "Romero",
-    "Silva", "Santos", "Oliveira", "Souza", "Lima", "Costa", "Ferreira",
-    "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Wilson",
-    "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris",
-    "Kim", "Park", "Lee", "Choi", "Zhang", "Wang", "Li", "Chen", "Liu",
-    "Müller", "Schmidt", "Weber", "Meyer", "Wagner", "Becker", "Schulz",
-    "Dupont", "Martin", "Bernard", "Dubois", "Moreau", "Laurent", "Simon",
-]
+_LAST_NAMES_BY_LANG: dict[str, list[str]] = {
+    "es": [
+        "García", "Martínez", "López", "Hernández", "González", "Pérez", "Rodríguez",
+        "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Cruz",
+        "Morales", "Reyes", "Gutiérrez", "Ortiz", "Chávez", "Ramos", "Mendoza",
+        "Ruiz", "Álvarez", "Castillo", "Jiménez", "Vargas", "Moreno", "Romero",
+    ],
+    "en": [
+        "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Wilson",
+        "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris",
+        "Kim", "Park", "Lee", "Choi", "Zhang", "Wang", "Li", "Chen", "Liu",
+        "Müller", "Schmidt", "Weber", "Meyer", "Wagner", "Becker", "Schulz",
+    ],
+    "pt": [
+        "Silva", "Santos", "Oliveira", "Souza", "Lima", "Ferreira", "Pereira",
+        "Rodrigues", "Almeida", "Nascimento", "Carvalho", "Ribeiro", "Martins", "Costa",
+    ],
+    "fr": [
+        "Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit",
+        "Durand", "Leroy", "Moreau", "Simon", "Laurent", "Lefebvre", "Michel",
+        "Garcia", "David", "Bertrand", "Roux", "Vincent", "Fournier", "Morel",
+        "Girard", "André", "Mercier", "Dupont", "Lambert", "Bonnet", "François",
+        "Martinez", "Léger",
+    ],
+}
+_LAST_NAMES = _LAST_NAMES_BY_LANG["en"]  # fallback
 
 _STREET_TYPES = ["Calle", "Avenida", "Boulevard", "Calle", "Carrera", "Via",
                  "Street", "Avenue", "Road", "Drive", "Lane", "Way", "Blvd"]
@@ -92,9 +134,13 @@ def generate_dim_customer(
     gender = np.where(gender_roll < 0.48, "M", np.where(gender_roll < 0.96, "F", "Other"))
 
     # ── Names ─────────────────────────────────────────────────────────────────
-    fn_m = np.array(_FIRST_NAMES_M)
-    fn_f = np.array(_FIRST_NAMES_F)
-    ln   = np.array(_LAST_NAMES)
+    fn_m_pool = _FIRST_NAMES_M_BY_LANG.get(language, _FIRST_NAMES_M_BY_LANG["en"])
+    fn_f_pool = _FIRST_NAMES_F_BY_LANG.get(language, _FIRST_NAMES_F_BY_LANG["en"])
+    ln_pool   = _LAST_NAMES_BY_LANG.get(language, _LAST_NAMES_BY_LANG["en"])
+
+    fn_m = np.array(fn_m_pool)
+    fn_f = np.array(fn_f_pool)
+    ln   = np.array(ln_pool)
     tt   = np.array(_TITLES)
     mid  = np.array(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
 

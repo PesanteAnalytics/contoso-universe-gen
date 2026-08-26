@@ -134,6 +134,54 @@ def test_e2e_coordinates_sit_near_the_city(tmp_path):
         assert abs(lon - centre_lon) < 1.0, f"{city}: longitude {lon} is not near {centre_lon}"
 
 
+
+
+def test_e2e_french_locale(tmp_path):
+    """Generation in French must succeed and produce the same 7 tables."""
+    out = _run_generate(tmp_path, n=100, lang="fr")
+    for table in EXPECTED_TABLES:
+        assert (out / f"{table}.csv").exists(), f"Missing: {table}.csv (fr locale)"
+
+
+def test_e2e_french_city_belongs_to_its_country(tmp_path):
+    """Every City / State / Country triple in fr must describe one real place."""
+    import polars as pl_
+
+    from cug.i18n.geography import _GEO_BY_LANG
+
+    out = _run_generate(tmp_path, n=2_000, lang="fr")
+    customers = pl_.read_csv(out / "DimCustomer.csv")
+
+    valid = {
+        (country_full, city, state_full)
+        for _, country_full, _, cities in _GEO_BY_LANG["fr"]
+        for city, _, state_full, _, _ in cities
+    }
+    seen = set(
+        customers.select(["CountryFull", "City", "StateFull"]).unique().iter_rows()
+    )
+    assert seen <= valid, f"impossible places: {sorted(seen - valid)}"
+
+
+def test_e2e_french_coordinates_sit_near_the_city(tmp_path):
+    """Latitude and longitude must place the customer in their own city (fr)."""
+    import polars as pl_
+
+    from cug.i18n.geography import _GEO_BY_LANG
+
+    out = _run_generate(tmp_path, n=2_000, lang="fr")
+    customers = pl_.read_csv(out / "DimCustomer.csv")
+
+    centres = {
+        city: (lat, lon)
+        for _, _, _, cities in _GEO_BY_LANG["fr"]
+        for city, _, _, lat, lon in cities
+    }
+    for city, lat, lon in customers.select(["City", "Latitude", "Longitude"]).iter_rows():
+        centre_lat, centre_lon = centres[city]
+        assert abs(lat - centre_lat) < 1.0, f"{city}: latitude {lat} is not near {centre_lat}"
+        assert abs(lon - centre_lon) < 1.0, f"{city}: longitude {lon} is not near {centre_lon}"
+
 def test_e2e_language_coverage_matches_the_data(tmp_path):
     """What `cug info` claims a language localizes must be what it produces.
 
