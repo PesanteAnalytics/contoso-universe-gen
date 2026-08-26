@@ -28,6 +28,7 @@ from rich.console import Console
 from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
 
+from . import __version__
 from .categories.registry import CategoryRegistry
 from .config import SUPPORTED_FORMATS, load_config
 from .i18n import list_locales, locale_coverage
@@ -43,7 +44,7 @@ app = typer.Typer(
 
 # ─── ASCII Banner ──────────────────────────────────────────────────────────────
 
-BANNER = """
+BANNER = f"""
 [bold cyan]
  ██████╗██╗   ██╗ ██████╗
 ██╔════╝██║   ██║██╔════╝
@@ -51,7 +52,7 @@ BANNER = """
 ██║     ██║   ██║██║   ██║
 ╚██████╗╚██████╔╝╚██████╔╝
  ╚═════╝ ╚═════╝  ╚═════╝
-[/bold cyan][dim]Contoso Universe Generator  •  v0.2.0[/dim]
+[/bold cyan][dim]Contoso Universe Generator  •  v{__version__}[/dim]
 """
 
 
