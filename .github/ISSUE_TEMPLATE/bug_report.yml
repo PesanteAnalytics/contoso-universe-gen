@@ -1,0 +1,75 @@
+name: Bug report
+description: Something in CUG does not behave the way it says it does
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The most useful bug report is one somebody else
+        can reproduce, so the command you ran matters more than the description.
+
+  - type: textarea
+    id: command
+    attributes:
+      label: The command you ran
+      description: Exactly as typed, including the flags.
+      render: shell
+      placeholder: cug generate -n 50000 -f parquet -l fr --strict
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+      description: >
+        If a document or the CLI help promised the behaviour you expected, please
+        say which one. Documentation that disagrees with the code is a bug here,
+        not a misunderstanding on your part.
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The error, traceback, or the wrong data. Trim it to the relevant part.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: CUG version or commit
+      description: "`cug --version`, or the commit SHA if you installed from a clone."
+      placeholder: v0.2.0 / 2549d81
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12.7"
+    validations:
+      required: true
+
+  - type: input
+    id: seed
+    attributes:
+      label: Seed
+      description: >
+        If the bug is about the generated data, the seed is what makes it
+        reproducible. Note that catalogue size varies by seed on purpose — that
+        one is not a bug.
+      placeholder: "42"
