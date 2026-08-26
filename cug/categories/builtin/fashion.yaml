@@ -1,0 +1,128 @@
+plugin_id: fashion
+display_names:
+  en: Fashion and Apparel
+  es: Moda y Ropa
+  pt: Moda e Vestuário
+  fr: Mode et Vêtements
+  de: Mode und Bekleidung
+  zh: 时尚与服装
+  ja: ファッションとアパレル
+  ar: الموضة والملابس
+
+subcategories:
+
+  - id: mens_clothing
+    display_names:
+      en: Men's Clothing
+      es: Ropa de Hombre
+      pt: Roupas Masculinas
+      fr: Vêtements Homme
+      de: Herrenbekleidung
+      zh: 男装
+      ja: メンズウェア
+      ar: ملابس رجالية
+    brands: [Nike, Adidas, Levi's, Ralph Lauren, Tommy Hilfiger, Uniqlo, Zara, H&M]
+    price_range: [19, 299]
+    margin_range: [0.40, 0.65]
+    trend:
+      2018: 1.00
+      2019: 1.05
+      2020: 0.55   # COVID lockdown reduced apparel spending
+      2021: 1.30   # Return to office + social events
+      2022: 1.25
+      2023: 1.10
+      2024: 1.05
+      2025: 1.00
+      2026: 0.98
+    products:
+      - name_template: "{brand} {model}"
+        models: [T-Shirt, Polo Shirt, Dress Shirt, Jeans, Chinos, Jacket, Hoodie, Suit]
+        specs: []
+        brands: []
+
+  - id: womens_clothing
+    display_names:
+      en: Women's Clothing
+      es: Ropa de Mujer
+      pt: Roupas Femininas
+      fr: Vêtements Femme
+      de: Damenbekleidung
+      zh: 女装
+      ja: レディースウェア
+      ar: ملابس نسائية
+    brands: [Zara, H&M, Nike, Adidas, Levi's, Mango, Uniqlo, Gap]
+    price_range: [19, 349]
+    margin_range: [0.42, 0.68]
+    trend:
+      2018: 1.00
+      2019: 1.08
+      2020: 0.50   # COVID lockdown reduced apparel spending
+      2021: 1.35   # Return to social events
+      2022: 1.28
+      2023: 1.12
+      2024: 1.08
+      2025: 1.02
+      2026: 1.00
+    products:
+      - name_template: "{brand} {model}"
+        models: [Blouse, Dress, Jeans, Leggings, Skirt, Jacket, Cardigan, T-Shirt]
+        specs: []
+        brands: []
+
+  - id: footwear
+    display_names:
+      en: Footwear
+      es: Calzado
+      pt: Calçados
+      fr: Chaussures
+      de: Schuhe
+      zh: 鞋类
+      ja: フットウェア
+      ar: أحذية
+    brands: [Nike, Adidas, New Balance, Puma, Converse, Vans, Timberland, Clarks]
+    price_range: [39, 249]
+    margin_range: [0.35, 0.55]
+    trend:
+      2018: 1.00
+      2019: 1.10
+      2020: 0.70   # Reduced outdoor activity
+      2021: 1.25   # Sneaker culture boom
+      2022: 1.20
+      2023: 1.08
+      2024: 1.05
+      2025: 1.02
+      2026: 1.00
+    products:
+      - name_template: "{brand} {model}"
+        models: [Running Shoes, Sneakers, Boots, Sandals, Loafers, Dress Shoes, Hiking Boots]
+        specs: []
+        brands: []
+
+  - id: accessories
+    display_names:
+      en: Accessories
+      es: Accesorios
+      pt: Acessórios
+      fr: Accessoires
+      de: Accessoires
+      zh: 配饰
+      ja: アクセサリー
+      ar: إكسسوارات
+    brands: [Ray-Ban, Casio, Fossil, Michael Kors, Coach, Swatch, Polaroid]
+    price_range: [15, 199]
+    margin_range: [0.50, 0.72]
+    trend:
+      2018: 1.00
+      2019: 1.05
+      2020: 0.60
+      2021: 1.15
+      2022: 1.10
+      2023: 1.05
+      2024: 1.02
+      2025: 1.00
+      2026: 0.98
+    products:
+      - name_template: "{brand} {model}"
+        models: [Sunglasses, Watch, Belt, Wallet, Handbag, Backpack, Scarf, Hat]
+        specs: []
+        brands: []
