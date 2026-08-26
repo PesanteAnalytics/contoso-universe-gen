@@ -46,10 +46,10 @@ def parse(ts: str) -> datetime:
 def humanise(delta: timedelta) -> str:
     hours = delta.total_seconds() / 3600
     if hours < 1:
-        return "menos de una hora"
+        return "under an hour"
     if hours < 48:
-        return f"{int(hours)} h"
-    return f"{int(hours // 24)} días"
+        return f"{int(hours)}h"
+    return f"{int(hours // 24)} days"
 
 
 def is_outsider(association: str) -> bool:
@@ -91,11 +91,11 @@ def pull_requests_waiting(now: datetime, seen: set[int]) -> list[str]:
             continue  # the ball is in their court, not ours
 
         never_answered = last_maintainer is None
-        note = "sin ninguna respuesta todavía" if never_answered else "esperando desde tu última respuesta"
+        note = "with no reply at all yet" if never_answered else "since your last reply"
         seen.add(pr["number"])
         found.append(
             f"- [ ] **[#{pr['number']}]({pr['url']})** — {pr['title']}\n"
-            f"      {pr['login']} lleva **{humanise(now - last_outsider)}** {note}."
+            f"      {pr['login']} has been waiting **{humanise(now - last_outsider)}** {note}."
         )
 
     return found
@@ -108,8 +108,8 @@ def runs_blocked() -> list[str]:
         "--json", "databaseId,conclusion,headBranch,event,url",
     )
     return [
-        f"- [ ] **CI bloqueado** en `{r['headBranch']}` — [aprobar el run]({r['url']})\n"
-        f"      GitHub exige aprobación manual en cada push de un contribuidor primerizo."
+        f"- [ ] **CI is blocked** on `{r['headBranch']}` — [approve the run]({r['url']})\n"
+        f"      GitHub holds every push from a first-time contributor for manual approval."
         for r in runs
         if r["conclusion"] == "action_required"
     ]
@@ -148,8 +148,8 @@ def comments_unanswered(now: datetime, already_reported: set[int]) -> list[str]:
         if c["bot"] or not is_outsider(c["side"]) or number in already_reported:
             continue
         out.append(
-            f"- [ ] **Sin responder** en #{number} — "
-            f"[{c['who']}]({c['url']}) escribió hace {humanise(now - parse(c['at']))}."
+            f"- [ ] **Unanswered** on #{number} — "
+            f"[{c['who']}]({c['url']}) wrote {humanise(now - parse(c['at']))} ago."
         )
     return out
 
@@ -159,15 +159,15 @@ def main() -> None:
     reported: set[int] = set()
 
     sections = [
-        ("Pull requests esperándote", pull_requests_waiting(now, reported)),
-        ("Integración continua parada", runs_blocked()),
-        ("Comentarios sin respuesta", comments_unanswered(now, reported)),
+        ("Pull requests waiting on you", pull_requests_waiting(now, reported)),
+        ("Continuous integration blocked", runs_blocked()),
+        ("Comments with no reply", comments_unanswered(now, reported)),
     ]
 
     if not any(items for _, items in sections):
         return  # nothing waiting: print nothing, and the workflow closes the issue
 
-    print("Alguien está esperando una respuesta tuya.\n")
+    print("Someone is waiting on a reply from you.\n")
     for heading, items in sections:
         if items:
             print(f"### {heading}\n")
@@ -175,8 +175,8 @@ def main() -> None:
             print()
     print(
         "---\n"
-        f"Revisado {now:%Y-%m-%d %H:%M} UTC. Este issue se cierra solo cuando la cola queda vacía; "
-        "no hace falta que lo cierres a mano."
+        f"Checked {now:%Y-%m-%d %H:%M} UTC. This issue closes itself once the queue is empty, "
+        "so there is no need to close it by hand."
     )
 
 
