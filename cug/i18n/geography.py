@@ -117,6 +117,38 @@ _GEO_BY_LANG: dict[str, list[tuple[str, str, float, list[_City]]]] = {
             ("Toulouse",  "OCC", "Occitanie",                  43.60, 1.44),
         ]),
     ],
+    "fr": [
+        ("FR", "France", 0.70, [
+            ("Paris",      "IDF", "Île-de-France",              48.8566,  2.3522),
+            ("Lyon",       "ARA", "Auvergne-Rhône-Alpes",        45.7640,  4.8357),
+            ("Marseille",  "PAC", "Provence-Alpes-Côte d'Azur",  43.2965,  5.3698),
+            ("Toulouse",   "OCC", "Occitanie",                   43.6047,  1.4442),
+            ("Nice",       "PAC", "Provence-Alpes-Côte d'Azur",  43.7102,  7.2620),
+            ("Nantes",     "PDL", "Pays de la Loire",            47.2184, -1.5536),
+            ("Strasbourg", "GES", "Grand Est",                   48.5734,  7.7521),
+            ("Bordeaux",   "NAQ", "Nouvelle-Aquitaine",          44.8378, -0.5792),
+            ("Lille",      "HDF", "Hauts-de-France",             50.6292,  3.0573),
+            ("Rennes",     "BRE", "Bretagne",                    48.1173, -1.6778),
+        ]),
+        ("BE", "Belgique", 0.10, [
+            ("Bruxelles", "BRU", "Bruxelles-Capitale",  50.8503,  4.3517),
+            ("Anvers",    "VAN", "Vlaanderen",          51.2194,  4.4025),
+            ("Liège",     "WLG", "Wallonie",            50.6326,  5.5797),
+        ]),
+        ("CH", "Suisse", 0.08, [
+            ("Genève",   "GE", "Genève",  46.2044,  6.1432),
+            ("Lausanne", "VD", "Vaud",    46.5197,  6.6323),
+            ("Zürich",   "ZH", "Zürich",  47.3769,  8.5417),
+        ]),
+        ("CA", "Canada", 0.07, [
+            ("Montréal", "QC", "Québec",  45.5017, -73.5673),
+            ("Québec",   "QC", "Québec",  46.8139, -71.2080),
+            ("Ottawa",   "ON", "Ontario", 45.4215, -75.6972),
+        ]),
+        ("LU", "Luxembourg", 0.05, [
+            ("Luxembourg", "LU", "Luxembourg",  49.6116,  6.1319),
+        ]),
+    ],
     "pt": [
         ("BR", "Brasil", 0.80, [
             ("São Paulo",      "SP", "São Paulo",         -23.55, -46.63),
@@ -142,7 +174,8 @@ _GEO_BY_LANG: dict[str, list[tuple[str, str, float, list[_City]]]] = {
 _CONTINENTS: dict[str, str] = {
     "US": "North America", "CA": "North America", "MX": "North America",
     "GB": "Europe",        "DE": "Europe",        "FR": "Europe",
-    "ES": "Europe",        "PT": "Europe",
+    "ES": "Europe",        "PT": "Europe",        "BE": "Europe",
+    "CH": "Europe",        "LU": "Europe",
     "AU": "Oceania",
     "CO": "South America", "AR": "South America", "CL": "South America",
     "PE": "South America", "EC": "South America", "BR": "South America",
