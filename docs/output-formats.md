@@ -141,6 +141,16 @@ df = conn.sql("SELECT * FROM FactSales LIMIT 10").pl()
 - **Rapid prototyping** — Analytical database with zero infrastructure
 - **DBeaver / DataGrip** — Exploration with GUI tools
 
+> **DuckDB is not a Power BI path.** This format is for SQL exploration only.
+> If your destination is a report, use **Parquet** — it is native to Power BI
+> (Import mode, Spark, Fabric Direct Lake), free, and needs no extra drivers.
+> Connecting Power BI to a local `.duckdb` file currently requires a custom
+> connector or an ODBC driver on every machine that opens the report (e.g.
+> MotherDuck's Power Query connector, which is legacy and whose Power BI
+> Service refresh is experimental and gateway-dependent), which defeats the
+> project's zero-infrastructure pitch. Parquet gets you into Power BI with
+> none of that friction.
+
 ---
 
 ## Delta Lake
