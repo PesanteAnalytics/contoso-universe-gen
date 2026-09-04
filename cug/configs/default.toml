@@ -60,9 +60,49 @@ excel_workbook_name     = "contoso.xlsx"
 
 [customers]
 pool_size         = 50_000
-active_pct        = 0.30
+active_pct        = 0.30   # share of the pool that ever buys; the rest stay dormant
 online_pct_start  = 0.05   # fraction of orders online at start_date
 online_pct_end    = 0.55   # fraction of orders online at end_date
+
+# Basket shape. 1.0 = one line per order (the classic CUG fact table).
+# Raise it for receipts with several products; rows ~= target_orders x this.
+avg_lines_per_order = 1.0
+max_lines_per_order = 8
+
+# ─── Customer segments ────────────────────────────────────────────────────────
+# Cuts the ACTIVE base into tiers. `share` must add up to 1.0.
+#   demand_weight       relative order frequency (smallest tier = 1.0)
+#   lines_multiplier    relative basket size
+#   quantity_multiplier relative units per line
+# The defaults put ~72% of orders on the top 20% of active customers — the
+# concentration real retail reports, and the reason a uniform draw looks fake.
+[[customers.segments]]
+name                = "Key Account"
+share               = 0.01
+demand_weight       = 60.0
+lines_multiplier    = 2.2
+quantity_multiplier = 1.8
+
+[[customers.segments]]
+name                = "Large"
+share               = 0.04
+demand_weight       = 18.0
+lines_multiplier    = 1.6
+quantity_multiplier = 1.35
+
+[[customers.segments]]
+name                = "Medium"
+share               = 0.15
+demand_weight       = 5.0
+lines_multiplier    = 1.2
+quantity_multiplier = 1.1
+
+[[customers.segments]]
+name                = "Small"
+share               = 0.80
+demand_weight       = 1.0
+lines_multiplier    = 1.0
+quantity_multiplier = 1.0
 
 [categories]
 enabled      = ["electronics", "home", "gaming", "media", "fashion"]

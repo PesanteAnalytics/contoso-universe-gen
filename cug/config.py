@@ -17,6 +17,10 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 # Defined here (not in writers) to avoid circular imports.
 SUPPORTED_FORMATS = {"csv", "parquet", "duckdb", "delta", "json", "excel", "sqlserver"}
 
+# Label for pool members that never place an order. Shared by the customer
+# generator (which writes it) and the sales generator (which gives it weight 0).
+INACTIVE_SEGMENT = "Inactive"
+
 
 def default_config_path() -> Path:
     """Locate the built-in default.toml, wherever CUG happens to be installed.
@@ -230,11 +234,62 @@ class OutputConfig(BaseModel):
         return [f.strip().lower() for f in v]
 
 
+class CustomerSegmentConfig(BaseModel):
+    """One tier of the customer base — how many, and how much they buy.
+
+    Real retail revenue is not spread evenly over the customer list: a small
+    head of heavy buyers carries most of it. A segment says how big its slice
+    of the *active* base is (`share`) and how often one of its customers
+    appears on an order relative to the smallest tier (`demand_weight`).
+    """
+    name: str
+    share: float             = Field(gt=0.0, le=1.0, description="Fraction of the ACTIVE customer base")
+    demand_weight: float     = Field(gt=0.0, description="Relative order frequency (smallest tier = 1.0)")
+    lines_multiplier: float  = Field(default=1.0, gt=0.0, description="Relative basket size (lines per order)")
+    quantity_multiplier: float = Field(default=1.0, gt=0.0, description="Relative units per line")
+
+
+def default_customer_segments() -> list[CustomerSegmentConfig]:
+    """A Pareto-shaped base: the top 20% of active customers place ~72% of orders."""
+    return [
+        CustomerSegmentConfig(name="Key Account", share=0.01, demand_weight=60.0,
+                              lines_multiplier=2.2, quantity_multiplier=1.8),
+        CustomerSegmentConfig(name="Large",       share=0.04, demand_weight=18.0,
+                              lines_multiplier=1.6, quantity_multiplier=1.35),
+        CustomerSegmentConfig(name="Medium",      share=0.15, demand_weight=5.0,
+                              lines_multiplier=1.2, quantity_multiplier=1.1),
+        CustomerSegmentConfig(name="Small",       share=0.80, demand_weight=1.0,
+                              lines_multiplier=1.0, quantity_multiplier=1.0),
+    ]
+
+
 class CustomersConfig(BaseModel):
     pool_size: int        = Field(default=50_000, gt=0)
     active_pct: float     = Field(default=0.30, ge=0.01, le=1.0)
     online_pct_start: float = Field(default=0.05, ge=0.0, le=1.0)
     online_pct_end: float   = Field(default=0.55, ge=0.0, le=1.0)
+
+    # Basket shape. 1.0 keeps the historical one-line-per-order fact table.
+    avg_lines_per_order: float = Field(default=1.0, ge=1.0, le=20.0)
+    max_lines_per_order: int   = Field(default=8, ge=1, le=50)
+
+    segments: list[CustomerSegmentConfig] = Field(default_factory=default_customer_segments)
+
+    @field_validator("segments")
+    @classmethod
+    def validate_segment_shares(cls, v: list[CustomerSegmentConfig]) -> list[CustomerSegmentConfig]:
+        if not v:
+            raise ValueError("customers.segments must list at least one segment")
+        names = [s.name for s in v]
+        if len(set(names)) != len(names):
+            raise ValueError(f"Duplicate segment names: {names}")
+        total = sum(s.share for s in v)
+        if abs(total - 1.0) > 0.001:
+            raise ValueError(
+                f"customers.segments shares must sum to 1.0, got {total:.4f} "
+                f"({', '.join(f'{s.name}={s.share}' for s in v)})"
+            )
+        return v
 
 
 class CategoriesConfig(BaseModel):

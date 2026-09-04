@@ -9,6 +9,10 @@ Architecture (VECTORIZED — no Python row loops):
   4. Compute prices, discounts, margins with NumPy array ops
   5. Concat into Polars DataFrame at the very end
 
+Grain: one row per ORDER LINE. An order (OrderKey) groups 1..n lines that
+share customer, date, channel and store; LineNumber runs 1..n within it.
+`customers.avg_lines_per_order = 1.0` collapses that back to one line per order.
+
 V2-compatible output columns:
   OrderKey        : int
   LineNumber      : int
@@ -33,7 +37,7 @@ from datetime import date, timedelta
 import numpy as np
 import polars as pl
 
-from ..config import AppConfig
+from ..config import INACTIVE_SEGMENT, AppConfig
 
 # ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -141,19 +145,66 @@ def generate_fact_sales(
         noise   = rng.normal(0, 1, size=total_days)
         n_per_day = np.maximum(1, np.round(lambdas + noise * lambdas * 0.15)).astype(np.int64)
 
-    total_rows = int(n_per_day.sum())
+    # -- 4. Order-level attributes --------------------------------------------
+    # From here to step 9 everything is per ORDER. A real order is one customer,
+    # one day, one channel, one store -- several product lines. Drawing those
+    # once per order and expanding afterwards is what makes the basket coherent
+    # instead of a pile of unrelated rows that happen to share an OrderKey.
+    total_orders  = int(n_per_day.sum())
+    order_day_idx = np.repeat(np.arange(total_days), n_per_day)
 
-    # ── 3. Expand date index across all rows ─────────────────────────────────
-    # day_idx[i] = which day does row i belong to
-    day_idx = np.repeat(np.arange(total_days), n_per_day)
-
-    # ── 4. Assign customers ──────────────────────────────────────────────────
+    # -- 5. Assign customers, weighted by segment ------------------------------
+    # Uniform sampling would give every registered customer the same revenue,
+    # which no retailer has ever seen. Each segment's demand_weight decides how
+    # often one of its members shows up; dormant customers weigh 0 and never do.
     customer_keys = dim_customer["CustomerKey"].to_numpy()
-    cust_indices  = rng.integers(0, len(customer_keys), size=total_rows)
-    order_customer_keys = customer_keys[cust_indices].astype(np.int32)
+    weight_map    = {seg.name: seg.demand_weight for seg in cust_cfg.segments}
+    weight_map[INACTIVE_SEGMENT] = 0.0
 
-    # ── 5. Assign channels (online vs store) ─────────────────────────────────
-    # Linearly interpolate online_pct for each row's date
+    has_segments = "CustomerSegment" in dim_customer.columns
+
+    def _per_customer(mapping: dict[str, float]) -> np.ndarray:
+        """Map each customer's segment label onto its numeric behaviour."""
+        if not has_segments:
+            return np.ones(len(customer_keys))
+        return (
+            dim_customer
+            .select(pl.col("CustomerSegment").replace_strict(mapping, default=1.0))
+            .to_series()
+            .cast(pl.Float64)
+            .to_numpy()
+        )
+
+    if has_segments:
+        cust_weights = (
+            dim_customer
+            .select(pl.col("CustomerSegment").replace_strict(weight_map, default=0.0))
+            .to_series()
+            .cast(pl.Float64)
+            .to_numpy()
+        )
+    else:
+        cust_weights = np.ones(len(customer_keys))
+
+    if cust_weights.sum() <= 0:
+        # Every customer came out dormant (possible with a tiny pool and a low
+        # active_pct). Fall back to uniform rather than emitting zero orders.
+        cust_weights = np.ones(len(customer_keys))
+    cust_p = cust_weights / cust_weights.sum()
+
+    order_cust_idx  = rng.choice(len(customer_keys), size=total_orders, p=cust_p)
+    order_cust_keys = customer_keys[order_cust_idx].astype(np.int32)
+
+    # Basket behaviour, read back from the same segment definition.
+    lines_map = {seg.name: seg.lines_multiplier for seg in cust_cfg.segments}
+    qty_map   = {seg.name: seg.quantity_multiplier for seg in cust_cfg.segments}
+    lines_map[INACTIVE_SEGMENT] = 1.0
+    qty_map[INACTIVE_SEGMENT]   = 1.0
+    cust_lines_mult = _per_customer(lines_map)
+    cust_qty_mult   = _per_customer(qty_map)
+
+    # -- 6. Assign channels (online vs store), per order -----------------------
+    # Linearly interpolate online_pct for each order's date
     start_d = date.fromisoformat(cfg.start_date)
     end_d   = date.fromisoformat(cfg.end_date)
     total_d = max((end_d - start_d).days, 1)
@@ -162,26 +213,65 @@ def generate_fact_sales(
         cust_cfg.online_pct_start
         + elapsed_frac * (cust_cfg.online_pct_end - cust_cfg.online_pct_start)
     )
-    online_pcts = online_pcts_per_day[day_idx]
-    is_online   = rng.random(size=total_rows) < online_pcts
+    online_pcts     = online_pcts_per_day[order_day_idx]
+    order_is_online = rng.random(size=total_orders) < online_pcts
 
-    # Channels as string array
-    channels = np.where(is_online, "Online", "Store")
-
-    # ── 6. Assign stores ─────────────────────────────────────────────────────
+    # -- 7. Assign stores, per order -------------------------------------------
     phys_stores  = dim_store.filter(pl.col("Status") == "Current")
     phys_keys    = phys_stores["StoreKey"].to_numpy()
     phys_weights = phys_stores["Weight"].to_numpy().astype(float)
     phys_w_norm  = phys_weights / phys_weights.sum()
 
-    # Online orders → StoreKey=1, physical → weighted random
-    n_phys   = int((~is_online).sum())
+    # Online orders -> StoreKey=1, physical -> weighted random
+    n_phys   = int((~order_is_online).sum())
     phys_sel = rng.choice(phys_keys, size=n_phys, p=phys_w_norm)
 
-    store_keys = np.ones(total_rows, dtype=np.int32)     # default = 1 (online)
-    store_keys[~is_online] = phys_sel.astype(np.int32)
+    order_store_keys = np.ones(total_orders, dtype=np.int32)   # default = 1 (online)
+    order_store_keys[~order_is_online] = phys_sel.astype(np.int32)
 
-    # ── 7. Assign products ───────────────────────────────────────────────────
+    # -- 8. Delivery offset, per order -----------------------------------------
+    # Online: Poisson(lambda=4), capped 1-14; Physical: same day (0).
+    # An order ships as one parcel, so the offset belongs to the order, not the line.
+    order_offsets = np.zeros(total_orders, dtype=np.int32)
+    n_online = int(order_is_online.sum())
+    if n_online > 0:
+        delivery_days = np.clip(rng.poisson(lam=4.0, size=n_online), 1, 14)
+        order_offsets[order_is_online] = delivery_days
+
+    # -- 9. Basket size -> expand orders into lines ----------------------------
+    # Lines beyond the first are Poisson, scaled by the customer's segment: a
+    # key account fills a bigger cart than a one-off shopper. With
+    # avg_lines_per_order = 1.0 the lambda is zero and every order stays a
+    # single line, which is the shape CUG produced before baskets existed.
+    # The multipliers are relative, so they are normalised by their own
+    # order-weighted mean before scaling. Without that, raising a segment's
+    # basket size would quietly drag the whole table's average up and
+    # `avg_lines_per_order` would stop being the number it claims to be.
+    order_lines_mult = cust_lines_mult[order_cust_idx]
+    order_lines_mult = order_lines_mult / max(order_lines_mult.mean(), 1e-9)
+    extra_lam = max(cust_cfg.avg_lines_per_order - 1.0, 0.0) * order_lines_mult
+    if extra_lam.max() > 0:
+        n_lines = 1 + rng.poisson(extra_lam)
+        n_lines = np.clip(n_lines, 1, cust_cfg.max_lines_per_order).astype(np.int64)
+    else:
+        n_lines = np.ones(total_orders, dtype=np.int64)
+
+    total_rows    = int(n_lines.sum())
+    row_order_idx = np.repeat(np.arange(total_orders), n_lines)
+
+    # LineNumber = 1..n within each order
+    line_starts = np.repeat(np.cumsum(n_lines) - n_lines, n_lines)
+    line_number = (np.arange(total_rows) - line_starts + 1).astype(np.int32)
+
+    # Expand the order-level draws down to line level
+    day_idx             = order_day_idx[row_order_idx]
+    order_customer_keys = order_cust_keys[row_order_idx]
+    store_keys          = order_store_keys[row_order_idx]
+    is_online           = order_is_online[row_order_idx]
+    channels            = np.where(is_online, "Online", "Store")
+    row_qty_mult        = cust_qty_mult[order_cust_idx][row_order_idx]
+
+    # -- 10. Assign products (one draw per LINE) -------------------------------
     product_keys   = dim_product["ProductKey"].to_numpy()
     product_prices = dim_product["Price"].to_numpy(allow_copy=True).astype(float)
     product_costs  = dim_product["Cost"].to_numpy(allow_copy=True).astype(float)
@@ -195,16 +285,16 @@ def generate_fact_sales(
     base_prices      = product_prices[prod_indices]
     base_costs       = product_costs[prod_indices]
 
-    # ── 8. Apply inflation ───────────────────────────────────────────────────
+    # -- 11. Apply inflation ---------------------------------------------------
     row_years_elapsed  = years_elapsed[day_idx]
     inflation          = _inflation_factor(row_years_elapsed)
     unit_prices        = np.round(base_prices * inflation, 2)
     unit_costs         = np.round(base_costs  * inflation, 2)
 
-    # Quarterly COGS noise ±4% (vectorized via per-quarter seed)
+    # Quarterly COGS noise +/-4% (vectorized via per-quarter seed)
     quarters    = np.array([(d.year * 4 + (d.month - 1) // 3) for d in all_dates])
     row_quarters = quarters[day_idx]
-    # Deterministic noise: hash quarter index → small gaussian
+    # Deterministic noise: hash quarter index -> small gaussian
     q_noise_seed = (row_quarters * 31337 + cfg.seed) & 0xFFFFFFFF
     q_rng        = np.random.default_rng(int(q_noise_seed.mean()))
     cogs_noise   = np.clip(q_rng.normal(0, 0.02, size=total_rows), -0.06, 0.06)
@@ -216,11 +306,11 @@ def generate_fact_sales(
         np.minimum(unit_costs * (1 + cogs_noise), unit_prices * 0.99), 2
     )
 
-    # ── 9. Quantity: exponential-like, capped 1-5 ────────────────────────────
-    raw_qty  = rng.exponential(scale=1.0 / 1.2, size=total_rows)
-    quantity = np.clip(np.ceil(raw_qty).astype(np.int8), 1, 5)
+    # -- 12. Quantity: exponential-like, scaled by segment ----------------------
+    raw_qty  = rng.exponential(scale=1.0 / 1.2, size=total_rows) * row_qty_mult
+    quantity = np.clip(np.ceil(raw_qty), 1, 10).astype(np.int8)
 
-    # ── 10. Discounts ────────────────────────────────────────────────────────
+    # -- 13. Discounts ---------------------------------------------------------
     months     = np.array([d.month for d in all_dates])
     days_of_m  = np.array([d.day   for d in all_dates])
     row_months = months[day_idx]
@@ -248,26 +338,16 @@ def generate_fact_sales(
     discounts  = np.round(unit_prices * disc_pct, 2)
     net_prices = np.round(unit_prices - discounts, 2)
 
-    # ── 11. Delivery dates ───────────────────────────────────────────────────
-    # Online: Poisson(lambda=4), capped 1-14; Physical: same day (0)
-    order_day_offsets = np.zeros(total_rows, dtype=np.int32)
-    n_online = int(is_online.sum())
-    if n_online > 0:
-        delivery_days         = rng.poisson(lam=4.0, size=n_online)
-        delivery_days         = np.clip(delivery_days, 1, 14)
-        order_day_offsets[is_online] = delivery_days
-
-    # Convert day_idx + offset → string dates
-    # Base date as epoch offset for vectorized arithmetic
-    base_epoch = start_dt.toordinal()
+    # -- 14. Order / delivery dates as strings ---------------------------------
+    base_epoch        = start_dt.toordinal()
     order_ordinals    = base_epoch + day_idx
-    delivery_ordinals = order_ordinals + order_day_offsets
+    delivery_ordinals = order_ordinals + order_offsets[row_order_idx]
     max_ordinal       = end_dt.toordinal() + 14   # allow 14 days past end
 
     # Clamp delivery dates to end_dt + 14
     delivery_ordinals = np.minimum(delivery_ordinals, max_ordinal)
 
-    # Vectorized ordinal → date string via numpy datetime
+    # Vectorized ordinal -> date string via numpy datetime
     epoch = np.datetime64("0001-01-01")
     order_dates_np    = epoch + (order_ordinals    - 1).astype("timedelta64[D]")
     delivery_dates_np = epoch + (delivery_ordinals - 1).astype("timedelta64[D]")
@@ -275,12 +355,12 @@ def generate_fact_sales(
     order_date_strs    = order_dates_np.astype("datetime64[D]").astype(str)
     delivery_date_strs = delivery_dates_np.astype("datetime64[D]").astype(str)
 
-    # ── 13. Build Polars DataFrame ───────────────────────────────────────────
-    order_keys = np.arange(1, total_rows + 1, dtype=np.int64)
+    # -- 15. Build Polars DataFrame --------------------------------------------
+    order_keys = (row_order_idx + 1).astype(np.int64)
 
     df = pl.DataFrame({
         "OrderKey":     order_keys,
-        "LineNumber":   np.ones(total_rows, dtype=np.int32),
+        "LineNumber":   line_number,
         "OrderDate":    order_date_strs.tolist(),
         "DeliveryDate": delivery_date_strs.tolist(),
         "CustomerKey":  order_customer_keys,

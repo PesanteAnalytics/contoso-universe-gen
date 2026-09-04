@@ -9,6 +9,7 @@ from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 
+import polars as pl
 from rich.console import Console
 
 from .categories.registry import CategoryRegistry
@@ -47,6 +48,33 @@ def resolve_integrity_check(
     )
     strict = strict_override if strict_override is not None else config.output.integrity_strict
     return run_check, strict
+
+
+def _align_start_dates(dim_customer, fact_sales):
+    """Pull StartDT back to a customer's first order when the two disagree.
+
+    Customers get a random acquisition date, and orders are drawn independently
+    of it, so a customer whose record starts in 2024 could still show a 2023
+    purchase. Nobody buys before they exist. Taking the earlier of the two makes
+    StartDT mean what its name says — the date the relationship began — and
+    leaves dormant customers, who have no orders, exactly as generated.
+    """
+    if fact_sales is None or dim_customer is None:
+        return dim_customer
+
+    first_order = (
+        fact_sales
+        .group_by("CustomerKey")
+        .agg(pl.col("OrderDate").min().alias("_FirstOrder"))
+    )
+    return (
+        dim_customer
+        .join(first_order, on="CustomerKey", how="left")
+        .with_columns(
+            pl.min_horizontal("StartDT", "_FirstOrder").alias("StartDT")
+        )
+        .drop("_FirstOrder")
+    )
 
 
 def run_generation(
@@ -125,6 +153,8 @@ def run_generation(
         pool_size=effective_pool,
         language=config.general.language,
         seed=config.general.seed,
+        active_pct=config.customers.active_pct,
+        segments=config.customers.segments,
     )
 
     _step("DimProduct", 0.30)
@@ -149,6 +179,9 @@ def run_generation(
         dim_product=result.dim_product,
         dim_store=result.dim_store,
     )
+
+    _step("Aligning customer acquisition dates", 0.70)
+    result.dim_customer = _align_start_dates(result.dim_customer, result.fact_sales)
 
     # ── 4. Integrity validation (pre-write) ──────────────────────────────────
     run_check, strict = resolve_integrity_check(config, check_override, strict_override)
