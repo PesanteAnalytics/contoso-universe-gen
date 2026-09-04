@@ -37,23 +37,40 @@ dependencies = [
     "pyyaml>=6.0.1",
     # Parquet + Arrow backend (used by Polars internally)
     "pyarrow>=15.0.0",
-    # Delta Lake Python writer for Fabric output
-    "deltalake>=0.17.0",
-    # Excel workbook writer for .xlsx output
-    "xlsxwriter>=3.1.0",
-    # SQL Server output via ODBC
-    "pyodbc>=5.0.0",
     # Holidays by country for DimDate calendar
     "holidays>=0.46",
 ]
 
+# The three heavier writers are extras, not core. `pyodbc` needs an ODBC stack
+# and a compiler on some platforms, so shipping it as a hard requirement means a
+# failed `pip install` for the many people who only ever want Parquet. Every one
+# of these is imported lazily, inside the writer that needs it, and raises a
+# message naming the extra when it is missing.
 [project.optional-dependencies]
+delta = ["deltalake>=0.17.0"]        # Delta Lake output for Fabric / Databricks
+excel = ["xlsxwriter>=3.1.0"]        # .xlsx workbooks
+sqlserver = ["pyodbc>=5.0.0"]        # SQL Server output over ODBC
+all = [
+    "deltalake>=0.17.0",
+    "xlsxwriter>=3.1.0",
+    "pyodbc>=5.0.0",
+]
 dev = [
     "pytest>=8.1.0",
     "pytest-cov>=5.0.0",
     "ruff>=0.16.4",   # CI pins 0.16.4 — keep the floor in step with it
     "mypy>=1.9.0",
+    # The suite exercises every writer, so dev carries the format extras too.
+    "deltalake>=0.17.0",
+    "xlsxwriter>=3.1.0",
+    "pyodbc>=5.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/PesanteAnalytics/contoso-universe-gen"
+Repository = "https://github.com/PesanteAnalytics/contoso-universe-gen"
+Issues = "https://github.com/PesanteAnalytics/contoso-universe-gen/issues"
+Changelog = "https://github.com/PesanteAnalytics/contoso-universe-gen/releases"
 
 [project.scripts]
 cug = "cug.cli:app"

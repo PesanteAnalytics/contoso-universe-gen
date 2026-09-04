@@ -2,7 +2,7 @@
 Delta Lake Writer — exports all tables as Delta Lake tables.
 
 Perfect for Microsoft Fabric, Databricks, and Spark-based analytics.
-Requires: deltalake >= 0.17.0 (already in project dependencies)
+Requires the 'delta' extra: pip install 'contoso-universe-gen[delta]'
 
 Options:
     mode          : str — write mode: "overwrite" | "append" | "error" (default: "overwrite")
@@ -58,8 +58,8 @@ def write_delta(
         from deltalake import write_deltalake  # noqa: F401
     except ImportError as exc:
         raise ImportError(
-            "Delta Lake writer requires 'deltalake' package. "
-            "Install with: pip install deltalake>=0.17.0"
+            "The Delta Lake writer needs 'deltalake', which ships as an extra.\n"
+            "  pip install 'contoso-universe-gen[delta]'"
         ) from exc
 
     dest = output_path / "delta"

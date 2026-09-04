@@ -185,8 +185,8 @@ def write_sqlserver(
         import pyodbc
     except ImportError as exc:
         raise ImportError(
-            "SQL Server writer requires 'pyodbc'. "
-            "Install with: pip install pyodbc"
+            "The SQL Server writer needs 'pyodbc', which ships as an extra.\n"
+            "  pip install 'contoso-universe-gen[sqlserver]'"
         ) from exc
 
     # ── Build connection string ──────────────────────────────────────────────

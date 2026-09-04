@@ -273,12 +273,26 @@ def generate(
             if verbose:
                 steps_done.append(f"  ✓ {step}")
 
-        result = run_generation(
-            config=cfg,
-            progress_callback=_on_progress,
-            strict_override=strict,
-            check_override=verify,
-        )
+        try:
+            result = run_generation(
+                config=cfg,
+                progress_callback=_on_progress,
+                strict_override=strict,
+                check_override=verify,
+            )
+        except ImportError as exc:
+            # A format whose extra is not installed. The writer already knows
+            # which one and how to install it, so show that instead of burying
+            # the one useful line in a traceback the user did not ask for.
+            progress.stop()
+            console.print()
+            console.print('[bold red]x[/bold red]', end=' ')
+            # markup=False: the message carries the extra in square brackets
+            # ([excel], [delta]), which Rich would otherwise read as a style tag
+            # and silently swallow -- leaving the user a pip command that
+            # installs the wrong thing.
+            console.print(str(exc), markup=False)
+            raise typer.Exit(code=1) from None
 
     # Results summary
     console.print()
