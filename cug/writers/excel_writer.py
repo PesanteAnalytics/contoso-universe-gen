@@ -47,6 +47,14 @@ def write_excel(
     tables, prefer parquet or delta formats. This writer will truncate
     with a warning if the limit is exceeded.
     """
+    try:
+        import xlsxwriter
+    except ImportError as exc:
+        raise ImportError(
+            "The Excel writer needs 'xlsxwriter', which ships as an extra.\n"
+            "  pip install 'contoso-universe-gen[excel]'"
+        ) from exc
+
     dest = output_path / "excel"
     dest.mkdir(parents=True, exist_ok=True)
 
@@ -56,8 +64,6 @@ def write_excel(
 
     if single_workbook:
         # Write all tables as sheets in a single workbook
-        import xlsxwriter
-
         wb_path = dest / workbook_name
         workbook = xlsxwriter.Workbook(str(wb_path))
 

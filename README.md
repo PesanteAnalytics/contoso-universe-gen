@@ -76,7 +76,7 @@ cug generate -n 10000 -f parquet
 # Multiple formats + Spanish locale
 cug generate -n 50000 -f parquet,csv,duckdb -l es
 
-# Direct to SQL Server
+# Direct to SQL Server (needs the sqlserver extra, below)
 cug generate -n 100000 -f sqlserver \
   --sqlserver-name "localhost\SQLEXPRESS" \
   --sqlserver-db ContosoRetail
@@ -90,6 +90,23 @@ cug categories       # list product categories
 cug categories -l es # categories in Spanish
 cug info             # show current config
 ```
+
+### Optional formats
+
+Parquet, CSV, DuckDB and JSON work out of the box. The other three writers pull
+dependencies heavy enough that making them mandatory would break the install for
+people who never use them — `pyodbc` in particular wants an ODBC stack, and a
+compiler on some platforms. They are extras:
+
+```bash
+uv pip install -e ".[delta]"      # Delta Lake — Fabric, Databricks, Spark
+uv pip install -e ".[excel]"      # .xlsx workbooks
+uv pip install -e ".[sqlserver]"  # SQL Server over ODBC
+uv pip install -e ".[all]"        # all three
+```
+
+Ask for a format whose extra is missing and CUG names it, and the command that
+installs it, before generating anything.
 
 ---
 
