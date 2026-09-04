@@ -97,7 +97,8 @@ The template contains **ALL** configurable options organized in these sections:
 | 🔧 General                | start_date, end_date, language, country, seed, chunk_days        |
 | 📤 Output                 | output_path, formats, target_orders, compress, integrity, strict |
 | 📄 Format Options         | parquet, csv, duckdb, delta, json, excel, sqlserver              |
-| 👥 Customers              | pool_size, active_pct, online_pct_start, online_pct_end          |
+| 👥 Customers              | pool_size, active_pct, online_pct_start/end, avg_lines_per_order  |
+| 🏷️ Customer Segments      | name, share, demand_weight, lines_multiplier, quantity_multiplier |
 | 📂 Categories             | enabled categories, custom_paths                                 |
 | 📅 Annual Events          | name, month, day, factor                                         |
 | 📅 Historical Events      | name, date_start, date_end, factor                               |
@@ -168,7 +169,7 @@ Parse the user's message to extract any requested changes:
 
 Once the user confirms, translate all values from `CUG-CONFIG.md`:
 
-1. **Copy** `configs/default.toml` → `configs/_session.toml`
+1. **Copy** `cug/configs/default.toml` → `configs/_session.toml`
 2. **Apply ALL values** from `CUG-CONFIG.md` to the session TOML:
 
 **Mapping from CUG-CONFIG.md → TOML sections:**
@@ -179,6 +180,7 @@ Once the user confirms, translate all values from `CUG-CONFIG.md`:
 | 📤 Output              | `[output]` — **except** `integrity_check` and `integrity_strict` |
 | 📄 Format Options      | `[output.format_options]`                                        |
 | 👥 Customers           | `[customers]`                                                    |
+| 🏷️ Customer Segments   | `[[customers.segments]]` (one block per row; shares sum to 1.0)   |
 | 📂 Categories          | `[categories]`                                                   |
 | 📅 Annual Events       | `[[events.annual]]` (one block per row)                          |
 | 📅 Historical Events   | `[[events.one_time]]` (one block per row)                        |

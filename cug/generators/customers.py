@@ -6,9 +6,12 @@ Schema aligned to Contoso Data Generator V2.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 import polars as pl
 
+from ..config import INACTIVE_SEGMENT, CustomerSegmentConfig, default_customer_segments
 from ..i18n.geography import _CONTINENTS, _GEO_BY_LANG
 
 # ─── Pre-built name / geo lookup tables ──────────────────────────────────────
@@ -122,10 +125,19 @@ def generate_dim_customer(
     pool_size: int,
     language: str = "en",
     seed: int = 42,
+    active_pct: float = 1.0,
+    segments: Sequence[CustomerSegmentConfig] | None = None,
 ) -> pl.DataFrame:
     """
     Generate a Customer table — 100% NumPy vectorized.
     Generates roughly 1M customers per second.
+
+    `active_pct` is the slice of the pool that ever buys anything; the rest are
+    registered but dormant, which is what a real CRM looks like. The active
+    slice is then cut into `segments` (Key Account / Large / Medium / Small by
+    default), written out as the `CustomerSegment` column. The sales generator
+    reads that column back to weight who appears on an order, so the two stay
+    in agreement without DimCustomer carrying generator internals.
     """
     rng = np.random.default_rng(seed)
 
@@ -235,6 +247,16 @@ def generate_dim_customer(
     company    = comp_arr[rng.integers(0, len(comp_arr), pool_size)]
     vehicle    = veh_arr[rng.integers(0, len(veh_arr), pool_size)]
 
+    # ── Segmentation: active vs dormant, then tier within the active base ─────
+    segs = list(segments) if segments else default_customer_segments()
+    seg_names  = np.array([s.name for s in segs], dtype=object)
+    seg_shares = np.array([s.share for s in segs], dtype=float)
+    seg_shares = seg_shares / seg_shares.sum()
+
+    is_active = rng.random(pool_size) < active_pct
+    seg_pick  = rng.choice(len(segs), size=pool_size, p=seg_shares)
+    segment   = np.where(is_active, seg_names[seg_pick], INACTIVE_SEGMENT)
+
     # ── Build DataFrame ───────────────────────────────────────────────────────
     return pl.DataFrame({
         "CustomerKey":   np.arange(1, pool_size + 1, dtype=np.int32),
@@ -259,6 +281,7 @@ def generate_dim_customer(
         "Occupation":    occupation.tolist(),
         "Company":       company.tolist(),
         "Vehicle":       vehicle.tolist(),
+        "CustomerSegment": segment.tolist(),
         "Latitude":      lat,
         "Longitude":     lon,
     })

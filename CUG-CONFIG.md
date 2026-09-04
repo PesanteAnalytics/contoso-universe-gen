@@ -93,12 +93,36 @@
 
 ## 👥 Customers
 
-| Parameter        | Value | Options                                      |
-| ---------------- | ----- | -------------------------------------------- |
-| pool_size        | 50000 | Integer > 0 — total unique customers         |
-| active_pct       | 0.30  | 0.01 – 1.0 — % that make at least 1 purchase |
-| online_pct_start | 0.05  | 0.0 – 1.0 — % online orders at start_date    |
-| online_pct_end   | 0.55  | 0.0 – 1.0 — % online orders at end_date      |
+| Parameter           | Value | Options                                            |
+| ------------------- | ----- | -------------------------------------------------- |
+| pool_size           | 50000 | Integer > 0 — total unique customers               |
+| active_pct          | 0.30  | 0.01 – 1.0 — % that make at least 1 purchase       |
+| online_pct_start    | 0.05  | 0.0 – 1.0 — % online orders at start_date          |
+| online_pct_end      | 0.55  | 0.0 – 1.0 — % online orders at end_date            |
+| avg_lines_per_order | 1.0   | 1.0 – 20.0 — 1.0 = one line per order              |
+| max_lines_per_order | 8     | 1 – 50 — cap on basket size                        |
+
+> `avg_lines_per_order` sets the basket. At 1.0 the fact table has one row per
+> order, as it always did. Raise it and `FactSales` rows ≈ orders × this value.
+
+## 🏷️ Customer Segments
+
+> Cuts the **active** base into spend tiers, written out as `CustomerSegment`
+> on `DimCustomer`. `Share` must add up to 1.0. `Demand` is how often a member
+> shows up on an order relative to the smallest tier; `Lines` and `Qty` scale
+> the basket and the units per line. Dormant customers are labelled `Inactive`
+> and never appear in `FactSales`.
+>
+> The defaults put ~72% of orders — and ~80% of revenue — on the top 20% of the
+> active base, which is the concentration real retail reports. To flatten it,
+> move the demand weights toward 1.0.
+
+| Segment     | Share | Demand | Lines | Qty  |
+| ----------- | ----- | ------ | ----- | ---- |
+| Key Account | 0.01  | 60.0   | 2.2   | 1.8  |
+| Large       | 0.04  | 18.0   | 1.6   | 1.35 |
+| Medium      | 0.15  | 5.0    | 1.2   | 1.1  |
+| Small       | 0.80  | 1.0    | 1.0   | 1.0  |
 
 ## 📂 Categories
 

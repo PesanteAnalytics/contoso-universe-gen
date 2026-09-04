@@ -52,6 +52,8 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 | 🔌 | **YAML category plugins** | Add any industry vertical without changing a line of code |
 | 🎯 | **Deterministic** | Seed-per-day reproducibility — same config = same data, always |
 | 🕐 | **Temporal realism** | COVID dip, Black Friday spikes, eCommerce growth, Poisson delivery |
+| 👥 | **Customer segments** | Pareto-shaped spend tiers + dormant customers — [details](#customer-segments-and-baskets) |
+| 🧺 | **Multi-line orders** | Real baskets: one `OrderKey`, several coherent lines |
 | ✅ | **FK integrity checks** | `--verify` catches orphaned rows before you load to Power BI |
 | 🤖 | **AI-agent native** | Configure and run via natural language through the bundled Skill |
 
@@ -112,14 +114,57 @@ CUG produces a classic **retail star schema**:
 
 | Table | Key columns |
 | --- | --- |
-| `FactSales` | `OrderKey`, `CustomerKey`, `ProductKey`, `StoreKey`, `OrderDate`, `UnitPrice`, `NetPrice`, `UnitCost` |
+| `FactSales` | `OrderKey`, `LineNumber`, `CustomerKey`, `ProductKey`, `StoreKey`, `OrderDate`, `UnitPrice`, `NetPrice`, `UnitCost` |
 | `DimProduct` | `ProductKey`, `ProductName`, `Category`, `Subcategory`, `Brand`, `Price`, `Cost` |
-| `DimCustomer` | `CustomerKey`, `GivenName`, `Surname`, `Email`, `City`, `CountryCode` |
+| `DimCustomer` | `CustomerKey`, `GivenName`, `Surname`, `Email`, `City`, `CountryCode`, `CustomerSegment` |
 | `DimStore` | `StoreKey`, `StoreName`, `Country`, `StoreType` |
 | `DimDate` | `DateKey`, `Date`, `Year`, `Month`, `Quarter`, `IsHoliday`, `IsWorkingDay` |
 | `DimCurrencyExchange` | `CurrencyKey`, `DateKey`, `Exchange` |
 
 ---
+
+## Customer Segments and Baskets
+
+A synthetic fact table gives itself away in two places, and both are about
+shape rather than volume.
+
+**Revenue spread evenly over the customer list.** CUG cuts the *active* base
+into spend tiers and weights who lands on an order, so a small head of heavy
+buyers carries most of the revenue — the way a real customer base behaves. The
+tier is written out as `CustomerSegment` on `DimCustomer`, so you can slice by
+it directly. `active_pct` decides how much of the pool ever buys at all; the
+rest stay registered and dormant, labelled `Inactive`, and never reach
+`FactSales`.
+
+```toml
+[customers]
+active_pct = 0.30          # 70% of the pool is registered but dormant
+
+[[customers.segments]]
+name = "Key Account"
+share = 0.01               # 1% of the ACTIVE base...
+demand_weight = 60.0       # ...ordering 60x as often as the smallest tier
+lines_multiplier = 2.2     # with a basket twice the size
+quantity_multiplier = 1.8
+```
+
+Shares must add up to 1.0. Out of the box the top 20% of active customers place
+about 72% of the orders and take about 80% of the revenue.
+
+**Every order having exactly one line.** `avg_lines_per_order` turns orders
+into baskets: `OrderKey` repeats across 1..n rows that share the customer,
+date, channel and store, with `LineNumber` running 1..n inside each. It
+defaults to `1.0`, which keeps the historical one-row-per-order fact table.
+
+```toml
+[customers]
+avg_lines_per_order = 2.6   # FactSales rows ~= target_orders x 2.6
+max_lines_per_order = 12
+```
+
+The multipliers are relative: they are normalised against their own
+order-weighted mean, so raising one segment's basket does not drag the whole
+table's average away from the number you configured.
 
 ## Custom Category Plugins
 
