@@ -25,17 +25,17 @@ CUG is a Python-native answer to the same problem: same spirit, different stack,
 
 > *Standing on the shoulders of giants.*
 
-**What CUG adds:**
+**Where the two differ:**
 
-| Problem with DG V2 | CUG solution |
+| DG V2 | CUG |
 | --- | --- |
-| Requires .NET SDK (~75 MB runtime) | 100% Python — no separate runtime to install |
+| .NET SDK required (~75 MB runtime) | 100% Python — no separate runtime to install |
 | English-only names and categories | Product catalogue, calendar, names and geography all localized — see [coverage](#language-coverage) for the depth per language |
-| Downloads real data from SQLBI servers | Fully offline — nothing is fetched at generation time |
+| Source data fetched from SQLBI servers | Fully offline — nothing is fetched at generation time |
 | Fixed product schema (`data.xlsx`) | YAML category plugins — extend without touching code |
-| CSV / Parquet / Delta only | + DuckDB, JSON, Excel, SQL Server |
-| No integrity checks | `--verify` + `--strict` for FK-safe datasets |
-| No AI agent integration | Native Antigravity skill (trigger phrases in EN/ES) |
+| CSV / Parquet / Delta | + DuckDB, JSON, Excel, SQL Server |
+| No built-in FK validation | `--verify` + `--strict` for FK-safe datasets |
+| No bundled agent integration | Native Antigravity skill (trigger phrases in EN/ES) |
 
 > CUG and DG V2 serve different needs. DG V2 remains the definitive Contoso reference for .NET environments.
 > CUG is the Python-native alternative — offline, multi-language, and built to be scripted and automated.
