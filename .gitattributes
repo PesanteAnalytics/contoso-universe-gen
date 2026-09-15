@@ -1,0 +1,3 @@
+# Store text files with LF whatever the contributor's OS or core.autocrlf.
+# Git detects binaries (images, xlsx) on its own and leaves them alone.
+* text=auto eol=lf
