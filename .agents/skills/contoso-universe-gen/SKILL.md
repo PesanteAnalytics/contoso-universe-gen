@@ -1,16 +1,11 @@
 ---
 name: contoso-universe-gen
 description: >-
-  Generate synthetic retail datasets using the Contoso Universe Generator (CUG).
-  Use this skill whenever the user needs to create demo data, test datasets,
-  or populate databases (SQL Server, DuckDB, Parquet, CSV, Delta, JSON, Excel)
-  with realistic Contoso-style retail data.
-
-  Triggers (English): "generate test data", "create demo dataset", "populate SQL Server",
-  "generate parquet", "synthetic retail data", "workshop dataset", "data for Power BI"
-
-  Triggers (Español): "crear datos de prueba", "generar dataset Contoso", "poblar SQL Server",
-  "datos sintéticos", "generar parquet", "datos para Power BI", "llenar la base de datos"
+  Use when the user needs synthetic Contoso-style retail data (star schema) for a demo,
+  test, workshop or Power BI / Fabric model, written to Parquet, CSV, DuckDB, Delta,
+  JSON, Excel or SQL Server, via the Contoso Universe Generator (CUG). Triggers:
+  "generate test data", "populate SQL Server", "synthetic retail data",
+  "crear datos de prueba", "generar dataset Contoso", "datos para Power BI".
 ---
 
 # Contoso Universe Generator (CUG) — Agent Skill
@@ -38,6 +33,12 @@ Run `--help` to confirm the CLI is working:
 cd <project_root>
 <python> -m cug --help
 ```
+
+**Installed as a Claude Code plugin?** The placeholders above stay unfilled, because
+the plugin copy is read-only. Ask the user once for the path to their CUG clone and
+use it as `<project_root>`. With no clone, the plugin folder itself holds the full
+source, so `uv run --project "${CLAUDE_PLUGIN_ROOT}" python -m cug --help` works
+as long as `uv` is installed.
 
 ---
 

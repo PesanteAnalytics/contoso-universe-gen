@@ -294,6 +294,31 @@ cug init   # create your local CUG-CONFIG.md configuration card
 
 See [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) for full installation instructions.
 
+### Claude Code plugin
+
+The repository is also a Claude Code plugin and its own marketplace, so the skill
+installs with two commands:
+
+```text
+/plugin marketplace add PesanteAnalytics/contoso-universe-gen
+/plugin install contoso-universe-gen@contoso-universe-gen
+```
+
+#### What this plugin runs, sends and fetches
+
+Installed, the plugin is one skill plus the CUG source. It ships no hooks, no MCP server,
+no telemetry and no background process, and nothing it contains runs on its own.
+
+| When | What happens | Where it goes |
+|---|---|---|
+| The skill is used | Claude reads the skill's Markdown and JSON from the installed plugin folder | Nowhere: local reads only |
+| The skill generates data | Claude runs `python -m cug generate` with your config; the data is random and built locally | Files under the output folder you choose |
+| You pick the SQL Server format | CUG connects through ODBC to the instance you name, creates the database if missing and by default drops and recreates its tables | That SQL Server instance only, with Windows authentication or the SQL login you configure |
+| You run CUG through `uv` with no environment yet | `uv` downloads the dependencies in `pyproject.toml` | Your configured Python package index |
+
+The tests, CI workflows and maintainer scripts in this repository are **not** run by the
+plugin. Privacy policy: [PRIVACY.md](PRIVACY.md).
+
 ---
 
 ## 🏗️ From Pesante Analytics
