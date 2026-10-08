@@ -1,13 +1,18 @@
 {
   "name": "contoso-universe-gen",
+  "displayName": "Contoso Universe Generator",
   "version": "0.3.0",
   "description": "Generate synthetic Contoso-style retail datasets (star schema) to Parquet, CSV, DuckDB, Delta, JSON, Excel or SQL Server from Claude Code.",
   "author": {
     "name": "Pesante Analytics LLC",
-    "url": "https://github.com/PesanteAnalytics"
+    "email": "support@pesanteanalytics.com",
+    "url": "https://www.pesanteanalytics.com"
   },
   "homepage": "https://github.com/PesanteAnalytics/contoso-universe-gen",
   "repository": "https://github.com/PesanteAnalytics/contoso-universe-gen",
+  "documentationUrl": "https://github.com/PesanteAnalytics/contoso-universe-gen#readme",
+  "supportUrl": "https://github.com/PesanteAnalytics/contoso-universe-gen/issues",
+  "privacyPolicyUrl": "https://github.com/PesanteAnalytics/contoso-universe-gen/blob/master/PRIVACY.md",
   "license": "MIT",
   "keywords": ["synthetic-data", "data-generator", "retail", "contoso", "power-bi", "fabric", "duckdb", "polars"],
   "skills": "./.agents/skills"
