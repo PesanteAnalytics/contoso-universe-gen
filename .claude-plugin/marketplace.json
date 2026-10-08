@@ -1,0 +1,19 @@
+{
+  "name": "contoso-universe-gen",
+  "owner": {
+    "name": "Pesante Analytics LLC",
+    "url": "https://github.com/PesanteAnalytics"
+  },
+  "metadata": {
+    "description": "Contoso Universe Generator: synthetic retail data for Power BI, Fabric and SQL demos."
+  },
+  "plugins": [
+    {
+      "name": "contoso-universe-gen",
+      "source": "./",
+      "description": "Generate synthetic Contoso-style retail datasets (star schema) to Parquet, CSV, DuckDB, Delta, JSON, Excel or SQL Server from Claude Code.",
+      "version": "0.3.0",
+      "category": "data"
+    }
+  ]
+}

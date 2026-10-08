@@ -294,6 +294,16 @@ cug init   # create your local CUG-CONFIG.md configuration card
 
 See [`docs/agent-skill/SKILL.md`](docs/agent-skill/SKILL.md) for full installation instructions.
 
+### Claude Code plugin
+
+The repository is also a Claude Code plugin and its own marketplace, so the skill
+installs with two commands:
+
+```text
+/plugin marketplace add PesanteAnalytics/contoso-universe-gen
+/plugin install contoso-universe-gen@contoso-universe-gen
+```
+
 ---
 
 ## 🏗️ From Pesante Analytics

@@ -39,6 +39,12 @@ cd <project_root>
 <python> -m cug --help
 ```
 
+**Installed as a Claude Code plugin?** The placeholders above stay unfilled, because
+the plugin copy is read-only. Ask the user once for the path to their CUG clone and
+use it as `<project_root>`. With no clone, the plugin folder itself holds the full
+source, so `uv run --project "${CLAUDE_PLUGIN_ROOT}" python -m cug --help` works
+as long as `uv` is installed.
+
 ---
 
 ## Trigger Phrases
