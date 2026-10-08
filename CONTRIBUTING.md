@@ -125,6 +125,23 @@ PRs that break existing tests will not be merged.
 
 ---
 
+## Releases and the Claude plugin directory
+
+Releases are tag-driven: bump `version` in `pyproject.toml`, `.claude-plugin/plugin.json`
+and `.claude-plugin/marketplace.json` together, merge, then push a `vX.Y.Z` tag.
+
+The claude.ai plugin directory tracks the **`stable`** branch, not `master`. It scans every
+commit that lands on the branch it tracks and puts each one in review, replacing the one
+before. The release workflow moves `stable` to the released commit, so `master` can take
+commits every day.
+
+- **Batch the work.** A release is a review cycle measured in days, not a deploy.
+- **Test the plugin before tagging**, in Claude Code with `claude --plugin-dir .`.
+- **Do not tag while a version is in review**, unless it carries a security fix.
+- Never push to `stable` by hand outside a release, and never force it.
+
+---
+
 ## Project structure
 
 ```text
