@@ -99,6 +99,22 @@ jobs:
           generate_release_notes: true
           files: dist/*
 
+      # The Claude plugin directory tracks `stable`: it reviews every commit on the
+      # branch it tracks, and each new one replaces the version in review. `stable`
+      # moves here and only here, to the released commit. Fast-forward without force:
+      # if it ever is not one, this fails instead of rewriting what a reviewer read.
+      - name: Move stable to the new release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          if gh api "repos/$REPO/git/ref/heads/stable" --silent 2>/dev/null; then
+            gh api -X PATCH "repos/$REPO/git/refs/heads/stable" -f sha="$SHA" -F force=false
+          else
+            gh api -X POST "repos/$REPO/git/refs" -f ref=refs/heads/stable -f sha="$SHA"
+          fi
+
   pypi:
     name: Publish to PyPI
     needs: build
